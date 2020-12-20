@@ -136,6 +136,89 @@ int InitApplication(HINSTANCE hInstance, int cmdShow)
     return 0;
 }
 
+int InitDirectX(HINSTANCE hInstance, BOOL vSync)
+{
+    // A window handle must have been created already.
+    assert(_windowHandle != 0);
+
+    RECT clientRect;
+    GetClientRect(_windowHandle, &clientRect);
+
+    // Compute the exact client dimensions. This will be used
+    // to initialize the render targets for our swap chain.
+    unsigned int clientWidth = clientRect.right - clientRect.left;
+    unsigned int clientHeight = clientRect.bottom - clientRect.top;
+
+    DXGI_SWAP_CHAIN_DESC swapChainDesc;
+    ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
+
+    swapChainDesc.BufferCount = 1;
+    swapChainDesc.BufferDesc.Width = clientWidth;
+    swapChainDesc.BufferDesc.Height = clientHeight;
+    swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    swapChainDesc.BufferDesc.RefreshRate = DXGI_RATIONAL{0, 1};
+    swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    swapChainDesc.OutputWindow = _windowHandle;
+    swapChainDesc.SampleDesc.Count = 1;
+    swapChainDesc.SampleDesc.Quality = 0;
+    swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+    swapChainDesc.Windowed = TRUE;
+
+    UINT createDeviceFlags = 0;
+#if _DEBUG
+    createDeviceFlags = D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
+    // These are the feature levels that we will accept.
+    D3D_FEATURE_LEVEL featureLevels[] =
+    {
+        D3D_FEATURE_LEVEL_11_1,
+        D3D_FEATURE_LEVEL_11_0,
+        D3D_FEATURE_LEVEL_10_1,
+        D3D_FEATURE_LEVEL_10_0
+    };
+
+    // This will be the feature level that 
+    // is used to create our device and swap chain.
+    D3D_FEATURE_LEVEL featureLevel;
+
+    HRESULT hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE,
+        nullptr, createDeviceFlags, featureLevels, _countof(featureLevels),
+        D3D11_SDK_VERSION, &swapChainDesc, &_d3dSwapChain, &_d3dDevice, &featureLevel,
+        &_d3dDeviceContext);
+
+    //Used if feature level 11_1 is unavailable
+    if (hr == E_INVALIDARG)
+    {
+        hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE,
+            nullptr, createDeviceFlags, &featureLevels[1], _countof(featureLevels) - 1,
+            D3D11_SDK_VERSION, &swapChainDesc, &_d3dSwapChain, &_d3dDevice, &featureLevel,
+            &_d3dDeviceContext);
+    }
+
+    if (FAILED(hr))
+    {
+        return -1;
+    }
+
+    // Next initialize the back buffer of the swap chain and associate it to a 
+    // render target view.
+    ID3D11Texture2D* backBuffer;
+    hr = _d3dSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBuffer);
+    if (FAILED(hr))
+    {
+        return -1;
+    }
+
+    hr = _d3dDevice->CreateRenderTargetView(backBuffer, nullptr, &_d3dRenderTargetView);
+    if (FAILED(hr))
+    {
+        return -1;
+    }
+
+    SafeRelease(backBuffer);
+}
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmdLine, int cmdShow)
 {
     UNREFERENCED_PARAMETER(prevInstance);
