@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\VertexShaders">
+      <UniqueIdentifier>{589d031e-6768-43b6-882a-e2e24646f7f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\PixelShaders">
+      <UniqueIdentifier>{30552340-b51e-4a40-adfb-f6b8469f67b1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -26,5 +32,13 @@
     <ClInclude Include="inc\EnginePCH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders\VertexShaders\BasicVertexShader.hlsl">
+      <Filter>Resource Files\VertexShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\PixelShaders\BasicPixelShader.hlsl">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
