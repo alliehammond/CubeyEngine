@@ -1,4 +1,6 @@
 #include "EnginePCH.h"
+#include "Core\CubeySystem.h"
+#include "Core\LoggingSystem.h"
 
 using namespace DirectX;
 
@@ -84,9 +86,6 @@ WORD _indices[36] =
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 //Main loop
 int Run();
-
-template<class ShaderClass>
-ShaderClass* LoadShader(const std::wstring& fileName, const std::string& entryPoint, const std::string& profile);
 
 //Load resources to gpu (temp probs)
 bool LoadContent();
@@ -581,6 +580,10 @@ int Run()
 
     static DWORD previousTime = timeGetTime();
 
+    //Initialize systems
+    CubeySystem* engineSystems[CubeySystems::SYSTEMCOUNT];
+    engineSystems[CubeySystems::LOGGINGSYSTEM] = new LoggingSystem();
+
     while (msg.message != WM_QUIT)
     {
         if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
@@ -594,10 +597,21 @@ int Run()
             float deltaTime = (currentTime - previousTime) / 1000.0f;
             previousTime = currentTime;
 
+            //Update systems
+            for (int i = 0; i < CubeySystems::SYSTEMCOUNT; ++i)
+            {
+                engineSystems[i]->Update();
+            }
 
             Update(deltaTime);
             Render();
         }
+    }
+
+    //Cleanup systems
+    for (int i = 0; i < CubeySystems::SYSTEMCOUNT; ++i)
+    {
+        delete engineSystems[i];
     }
 
     return static_cast<int>(msg.wParam);
