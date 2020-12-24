@@ -19,10 +19,11 @@ class LoggingSystem : public CubeySystem
 public:
     LoggingSystem();
     ~LoggingSystem();
-    void Update();
+    void Update(float dt);
     static void Log(std::string message, LOGTYPE warningLevel);
 
 private:
     static std::queue<std::string> messageQueue;
     static std::queue<LOGTYPE> warningLevelQueue;
+    float fpsTimer = 0.0f;
 };

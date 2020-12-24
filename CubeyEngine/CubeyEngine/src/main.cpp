@@ -4,8 +4,9 @@
 
 using namespace DirectX;
 
-const int _windowWidth = 1280;
-const int _windowHeight = 720;
+const float frameRateCap = 120.0f;
+const int _windowWidth = 800;
+const int _windowHeight = 450;
 LPCWSTR _windowClassNameW = L"CubeyEngineWindowClass";
 LPCWSTR _windowNameW = L"Cubey Engine!";
 LPCSTR _windowClassName = "CubeyEngineWindowClass";
@@ -292,13 +293,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
 {
     UNREFERENCED_PARAMETER(prevInstance);
     UNREFERENCED_PARAMETER(cmdLine);
-
-    // Check for DirectX Math library support.
-    if (!XMVerifyCPUSupport())
-    {
-        MessageBox(nullptr, TEXT("Failed to verify DirectX Math library support."), TEXT("Error"), MB_OK);
-        return -1;
-    }
 
     if (InitApplication(hInstance, cmdShow) != 0)
     {
@@ -596,11 +590,17 @@ int Run()
             DWORD currentTime = timeGetTime();
             float deltaTime = (currentTime - previousTime) / 1000.0f;
             previousTime = currentTime;
+            float targetDT = 1.0f/frameRateCap;
+            if(deltaTime < targetDT)
+            {
+                //Cap framerate
+                Sleep(int((targetDT - deltaTime) * 1000.0f));
+            }
 
             //Update systems
             for (int i = 0; i < CubeySystems::SYSTEMCOUNT; ++i)
             {
-                engineSystems[i]->Update();
+                engineSystems[i]->Update(deltaTime);
             }
 
             Update(deltaTime);

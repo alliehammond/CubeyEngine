@@ -5,7 +5,7 @@ class CubeySystem
 public:
     CubeySystem() { }
     virtual ~CubeySystem() { }
-    virtual void Update() = 0;
+    virtual void Update(float dt) = 0;
 };
 
 enum CubeySystems
