@@ -1,5 +1,7 @@
 #pragma once
 
+// **Note: All game systems are designed to be singletons
+
 class CubeySystem
 {
 public:
@@ -11,5 +13,6 @@ public:
 enum CubeySystems
 {
     LOGGINGSYSTEM,
+    OBJECTMANAGERSYSTEM,
     SYSTEMCOUNT
 };

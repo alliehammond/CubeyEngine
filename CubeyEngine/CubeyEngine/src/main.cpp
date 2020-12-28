@@ -1,6 +1,5 @@
 #include "EnginePCH.h"
 #include "Core\CubeySystem.h"
-#include "Core\LoggingSystem.h"
 
 using namespace DirectX;
 
@@ -577,6 +576,7 @@ int Run()
     //Initialize systems
     CubeySystem* engineSystems[CubeySystems::SYSTEMCOUNT];
     engineSystems[CubeySystems::LOGGINGSYSTEM] = new LoggingSystem();
+    engineSystems[CubeySystems::OBJECTMANAGERSYSTEM] = new ObjectManagerSystem();
 
     while (msg.message != WM_QUIT)
     {

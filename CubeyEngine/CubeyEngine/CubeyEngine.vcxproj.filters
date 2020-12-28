@@ -36,6 +36,12 @@
     <ClCompile Include="src\Core\LoggingSystem.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\GameObject.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ObjectManagerSystem.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\EnginePCH.h">
@@ -45,6 +51,15 @@
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="inc\Core\LoggingSystem.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Core\Component.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Core\GameObject.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Core\ObjectManagerSystem.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
