@@ -1,3 +1,8 @@
+//Local includes
+#include "Core\LoggingSystem.h"
+#include "Core\GameObject.h"
+#include "Core\ObjectManagerSystem.h"
+
 // System includes
 #include <windows.h>
 
@@ -10,6 +15,8 @@
 // STL includes
 #include <iostream>
 #include <string>
+#include <vector>
+#include <unordered_map>
 
 // Link library dependencies
 #pragma comment(lib, "d3d11.lib")
