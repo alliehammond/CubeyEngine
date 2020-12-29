@@ -1,89 +1,6 @@
 #include "EnginePCH.h"
 #include "Core\CubeySystem.h"
 
-using namespace DirectX;
-
-const float frameRateCap = 120.0f;
-const int _windowWidth = 800;
-const int _windowHeight = 450;
-LPCWSTR _windowClassNameW = L"CubeyEngineWindowClass";
-LPCWSTR _windowNameW = L"Cubey Engine!";
-LPCSTR _windowClassName = "CubeyEngineWindowClass";
-LPCSTR _windowName = "Cubey Engine!";
-HWND _windowHandle = 0;
-
-const bool _enableVSync = false;
-
-// Direct3D device and swap chain.
-ID3D11Device* _d3dDevice = nullptr;
-ID3D11DeviceContext* _d3dDeviceContext = nullptr;
-IDXGISwapChain* _d3dSwapChain = nullptr;
-// Render target view for the back buffer of the swap chain.
-ID3D11RenderTargetView* _d3dRenderTargetView = nullptr;
-// Depth/stencil view for use as a depth buffer.
-ID3D11DepthStencilView* _d3dDepthStencilView = nullptr;
-// A texture to associate to the depth stencil view.
-ID3D11Texture2D* _d3dDepthStencilBuffer = nullptr;
-// Define the functionality of the depth/stencil stages.
-ID3D11DepthStencilState* _d3dDepthStencilState = nullptr;
-// Define the functionality of the rasterizer stage.
-ID3D11RasterizerState* _d3dRasterizerState = nullptr;
-D3D11_VIEWPORT _viewport = { 0 };
-
-//TEMP SHADER STUFF
-// Vertex buffer data
-ID3D11InputLayout* _d3dInputLayout = nullptr;
-ID3D11Buffer* _d3dVertexBuffer = nullptr;
-ID3D11Buffer* _d3dIndexBuffer = nullptr;
-
-// Shader data
-ID3D11VertexShader* _d3dVertexShader = nullptr;
-ID3D11PixelShader* _d3dPixelShader = nullptr;
-
-// Shader resources
-//3 Different constant buffers - updated rarely, per frame, and per object - reduces how much data needs to be rewritten
-enum ConstantBuffer
-{
-    CB_Application,
-    CB_Frame,
-    CB_Object,
-    NumConstantBuffers
-};
-ID3D11Buffer* _d3dConstantBuffers[NumConstantBuffers];
-
-XMMATRIX _worldMatrix, _viewMatrix, _projectionMatrix;
-
-struct VertexPosColor
-{
-    XMFLOAT3 position;
-    XMFLOAT3 color;
-};
-
-//Temp Cube
-VertexPosColor _cubeVertices[8] =
-{
-    { XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) }, //Each cube face consists of 2 triangles
-    { XMFLOAT3(-1.0f,  1.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-    { XMFLOAT3(1.0f,  1.0f, -1.0f), XMFLOAT3(1.0f, 1.0f, 0.0f) },
-    { XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
-    { XMFLOAT3(-1.0f, -1.0f,  1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-    { XMFLOAT3(-1.0f,  1.0f,  1.0f), XMFLOAT3(0.0f, 1.0f, 1.0f) },
-    { XMFLOAT3(1.0f,  1.0f,  1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f) },
-    { XMFLOAT3(1.0f, -1.0f,  1.0f), XMFLOAT3(1.0f, 0.0f, 1.0f) }
-};
-
-WORD _indices[36] =
-{
-    0, 1, 2, 0, 2, 3,
-    4, 6, 5, 4, 7, 6,
-    4, 5, 1, 4, 1, 0,
-    3, 2, 6, 3, 6, 7,
-    1, 5, 6, 1, 6, 2,
-    4, 0, 3, 4, 3, 7
-};
-
-//Windows message handler
-LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 //Main loop
 int Run();
 
@@ -95,45 +12,6 @@ void Update(float deltaTime);
 void Render();
 void Cleanup();
 
-//Init windows application
-int InitApplication(HINSTANCE hInstance, int cmdShow)
-{
-    WNDCLASSEX wndClass = { 0 };
-    wndClass.cbSize = sizeof(WNDCLASSEX);
-    wndClass.style = CS_HREDRAW | CS_VREDRAW; //Redraw window on resize (horizontal/vertical)
-    wndClass.lpfnWndProc = &WndProc;
-    wndClass.hInstance = hInstance;
-    wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wndClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wndClass.lpszMenuName = nullptr;
-    wndClass.lpszClassName = _windowClassNameW;
-
-    if (!RegisterClassEx(&wndClass))
-    {
-        MessageBox(nullptr, TEXT("Could not register window class!"), TEXT("Error"), MB_OK);
-        return -1;
-    }
-
-    RECT windowRect = { 0, 0, _windowWidth, _windowHeight };
-    AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
-
-    _windowHandle = CreateWindowA(_windowClassName, _windowName,
-        WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
-        windowRect.right - windowRect.left,
-        windowRect.bottom - windowRect.top,
-        nullptr, nullptr, hInstance, nullptr);
-
-    if (!_windowHandle)
-    {
-        MessageBox(nullptr, TEXT("Could not create window!"), TEXT("Error"), MB_OK);
-        return -1;
-    }
-
-    ShowWindow(_windowHandle, cmdShow);
-    UpdateWindow(_windowHandle);
-
-    return 0;
-}
 
 int InitDirectX(HINSTANCE hInstance, BOOL vSync)
 {
@@ -293,28 +171,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
     UNREFERENCED_PARAMETER(prevInstance);
     UNREFERENCED_PARAMETER(cmdLine);
 
-    if (InitApplication(hInstance, cmdShow) != 0)
-    {
-        MessageBox(nullptr, TEXT("Failed to create applicaiton window."), TEXT("Error"), MB_OK);
-        return -1;
-    }
-
-    if (InitDirectX(hInstance, _enableVSync) != 0)
-    {
-        MessageBox(nullptr, TEXT("Failed to create DirectX device and swap chain."), TEXT("Error"), MB_OK);
-        return -1;
-    }
-
-    if (!LoadContent())
-    {
-        MessageBox(nullptr, TEXT("Failed to load content."), TEXT("Error"), MB_OK);
-        return -1;
-    }
-
     int returnCode = Run();
-
-    UnloadContent();
-    Cleanup();
 
     return returnCode;
 }
@@ -343,136 +200,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
 
     return 0;
-}
-
-bool LoadContent()
-{
-    assert(_d3dDevice);
-
-    // Create an initialize the vertex buffer.
-    D3D11_BUFFER_DESC vertexBufferDesc;
-    ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
-
-    vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    vertexBufferDesc.ByteWidth = sizeof(VertexPosColor) * _countof(_cubeVertices);
-    vertexBufferDesc.CPUAccessFlags = 0;
-    vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-
-    D3D11_SUBRESOURCE_DATA resourceData;
-    ZeroMemory(&resourceData, sizeof(D3D11_SUBRESOURCE_DATA));
-
-    resourceData.pSysMem = _cubeVertices;
-
-    HRESULT hr = _d3dDevice->CreateBuffer(&vertexBufferDesc, &resourceData, &_d3dVertexBuffer);
-    if (FAILED(hr))
-    {
-        return false;
-    }
-
-    // Create and initialize the index buffer.
-    D3D11_BUFFER_DESC indexBufferDesc;
-    ZeroMemory(&indexBufferDesc, sizeof(D3D11_BUFFER_DESC));
-
-    indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-    indexBufferDesc.ByteWidth = sizeof(WORD) * _countof(_indices);
-    indexBufferDesc.CPUAccessFlags = 0;
-    indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-    resourceData.pSysMem = _indices;
-
-    hr = _d3dDevice->CreateBuffer(&indexBufferDesc, &resourceData, &_d3dIndexBuffer);
-    if (FAILED(hr))
-    {
-        return false;
-    }
-
-    // Create the constant buffers for the variables defined in the vertex shader.
-    D3D11_BUFFER_DESC constantBufferDesc;
-    ZeroMemory(&constantBufferDesc, sizeof(D3D11_BUFFER_DESC));
-
-    constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    constantBufferDesc.ByteWidth = sizeof(XMMATRIX);
-    constantBufferDesc.CPUAccessFlags = 0;
-    constantBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-
-    hr = _d3dDevice->CreateBuffer(&constantBufferDesc, nullptr, &_d3dConstantBuffers[CB_Application]);
-    if (FAILED(hr))
-    {
-        return false;
-    }
-    hr = _d3dDevice->CreateBuffer(&constantBufferDesc, nullptr, &_d3dConstantBuffers[CB_Frame]);
-    if (FAILED(hr))
-    {
-        return false;
-    }
-    hr = _d3dDevice->CreateBuffer(&constantBufferDesc, nullptr, &_d3dConstantBuffers[CB_Object]);
-    if (FAILED(hr))
-    {
-        return false;
-    }
-
-    // Load the compiled vertex shader.
-    ID3DBlob* vertexShaderBlob;
-    LPCWSTR compiledVertexShaderObject = L"BasicVertexShader.cso";
-
-    hr = D3DReadFileToBlob(compiledVertexShaderObject, &vertexShaderBlob);
-    if (FAILED(hr))
-    {
-        return false;
-    }
-
-    hr = _d3dDevice->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), nullptr, &_d3dVertexShader);
-    if (FAILED(hr))
-    {
-        return false;
-    }
-
-    // Create the input layout for the vertex shader.
-    D3D11_INPUT_ELEMENT_DESC vertexLayoutDesc[] =
-    {
-        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offsetof(VertexPosColor, position), D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offsetof(VertexPosColor, color), D3D11_INPUT_PER_VERTEX_DATA, 0 }
-    };
-
-    hr = _d3dDevice->CreateInputLayout(vertexLayoutDesc, _countof(vertexLayoutDesc), vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &_d3dInputLayout);
-    if (FAILED(hr))
-    {
-        return false;
-    }
-
-    SafeRelease(vertexShaderBlob);
-
-    // Load the compiled pixel shader.
-    ID3DBlob* pixelShaderBlob;
-    LPCWSTR compiledPixelShaderObject = L"BasicPixelShader.cso";
-
-    hr = D3DReadFileToBlob(compiledPixelShaderObject, &pixelShaderBlob);
-    if (FAILED(hr))
-    {
-        return false;
-    }
-
-    hr = _d3dDevice->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), nullptr, &_d3dPixelShader);
-    if (FAILED(hr))
-    {
-        return false;
-    }
-
-    SafeRelease(pixelShaderBlob);
-
-    // Setup the projection matrix.
-    RECT clientRect;
-    GetClientRect(_windowHandle, &clientRect);
-
-    // Compute the exact client dimensions.
-    // This is required for a correct projection matrix.
-    float clientWidth = static_cast<float>(clientRect.right - clientRect.left);
-    float clientHeight = static_cast<float>(clientRect.bottom - clientRect.top);
-
-    _projectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), clientWidth / clientHeight, 0.1f, 100.0f);
-
-    _d3dDeviceContext->UpdateSubresource(_d3dConstantBuffers[CB_Application], 0, nullptr, &_projectionMatrix, 0, 0);
-
-    return true;
 }
 
 void Update(float deltaTime)
@@ -539,30 +266,6 @@ void Render()
     _d3dDeviceContext->DrawIndexed(_countof(_indices), 0, 0);
 
     Present(_enableVSync);
-}
-
-void UnloadContent()
-{
-    SafeRelease(_d3dConstantBuffers[CB_Application]);
-    SafeRelease(_d3dConstantBuffers[CB_Frame]);
-    SafeRelease(_d3dConstantBuffers[CB_Object]);
-    SafeRelease(_d3dIndexBuffer);
-    SafeRelease(_d3dVertexBuffer);
-    SafeRelease(_d3dInputLayout);
-    SafeRelease(_d3dVertexShader);
-    SafeRelease(_d3dPixelShader);
-}
-
-void Cleanup()
-{
-    SafeRelease(_d3dDepthStencilView);
-    SafeRelease(_d3dRenderTargetView);
-    SafeRelease(_d3dDepthStencilBuffer);
-    SafeRelease(_d3dDepthStencilState);
-    SafeRelease(_d3dRasterizerState);
-    SafeRelease(_d3dSwapChain);
-    SafeRelease(_d3dDeviceContext);
-    SafeRelease(_d3dDevice);
 }
 
 
