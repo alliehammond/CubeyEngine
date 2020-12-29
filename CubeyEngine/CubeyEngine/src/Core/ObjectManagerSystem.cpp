@@ -39,7 +39,7 @@ void ObjectManagerSystem::Update(float dt)
     }
 }
 
-GameObject* ObjectManagerSystem::CreateObject(GameObject* obj)
+GameObject *ObjectManagerSystem::CreateObject(GameObject* obj)
 {
     gameObjects.push_back(obj);
     return obj;

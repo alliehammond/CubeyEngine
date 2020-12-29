@@ -2,18 +2,17 @@
 #include "Core\GameObject.h"
 
 GameObject::GameObject()
-{ }
+{
+    AddComponent(new Transform(this));
+}
 
 GameObject::GameObject(std::string objName) : name(objName)
 {
-    std::string i = "Creating object " + name;
-    LOGDEBUG(i);
+    AddComponent(new Transform(this));
 }
 
 GameObject::~GameObject()
 {
-    std::string i = "Deleting object " + name;
-    LOGDEBUG(i);
     //Delete all the components
     for(auto &it : components)
     {

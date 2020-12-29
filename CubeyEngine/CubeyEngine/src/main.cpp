@@ -577,6 +577,7 @@ int Run()
     CubeySystem* engineSystems[CubeySystems::SYSTEMCOUNT];
     engineSystems[CubeySystems::LOGGINGSYSTEM] = new LoggingSystem();
     engineSystems[CubeySystems::OBJECTMANAGERSYSTEM] = new ObjectManagerSystem();
+    engineSystems[CubeySystems::GRAPHICSSYSTEM] = new GraphicsSystem();
 
     while (msg.message != WM_QUIT)
     {

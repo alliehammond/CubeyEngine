@@ -21,10 +21,3 @@ private:
     //If delete flag is true, component will be deleted at start of gameobject's update()
     bool deleteFlag = false;
 };
-
-//When creating a new component add it to this list
-enum COMPTYPE
-{
-    RENDER,
-    COMPONENTCOUNT
-};

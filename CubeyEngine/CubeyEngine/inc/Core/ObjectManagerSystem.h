@@ -15,4 +15,5 @@ public:
 
 private:
     static std::vector<GameObject *> gameObjects;
+    friend class GraphicsSystem;
 };

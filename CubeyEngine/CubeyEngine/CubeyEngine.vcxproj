@@ -175,6 +175,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Graphics\GraphicsSystem.cpp" />
+    <ClCompile Include="src\Graphics\RenderComponent.cpp" />
+    <ClCompile Include="src\Graphics\Transform.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -183,7 +186,11 @@
     <ClInclude Include="inc\Core\GameObject.h" />
     <ClInclude Include="inc\Core\LoggingSystem.h" />
     <ClInclude Include="inc\Core\ObjectManagerSystem.h" />
+    <ClInclude Include="inc\CYMath\Vector.h" />
     <ClInclude Include="inc\EnginePCH.h" />
+    <ClInclude Include="inc\Graphics\GraphicsSystem.h" />
+    <ClInclude Include="inc\Graphics\RenderComponent.h" />
+    <ClInclude Include="inc\Graphics\Transform.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\PixelShaders\BasicPixelShader.hlsl">

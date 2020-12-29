@@ -25,6 +25,18 @@
     <Filter Include="Source Files\Core">
       <UniqueIdentifier>{fbfb14c4-9ff9-42ae-a84d-1989763cf2f1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Graphics">
+      <UniqueIdentifier>{105ef52b-9438-4b03-bb80-0a11a21037cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics">
+      <UniqueIdentifier>{c6ef727c-b0c6-4cb4-98ad-d3aed4d9c26f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CYMath">
+      <UniqueIdentifier>{a7cb62d4-e8b4-418a-acfc-7e86456db3c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CYMath">
+      <UniqueIdentifier>{68fe73d5-4baf-441c-b1ed-eddac328a972}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -41,6 +53,15 @@
     </ClCompile>
     <ClCompile Include="src\Core\ObjectManagerSystem.cpp">
       <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\RenderComponent.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Transform.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\GraphicsSystem.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +82,18 @@
     </ClInclude>
     <ClInclude Include="inc\Core\ObjectManagerSystem.h">
       <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Graphics\RenderComponent.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CYMath\Vector.h">
+      <Filter>Header Files\CYMath</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Graphics\Transform.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Graphics\GraphicsSystem.h">
+      <Filter>Header Files\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

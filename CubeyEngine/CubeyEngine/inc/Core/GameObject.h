@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core\Component.h"
+#include "Graphics\Transform.h"
 #include <vector>
 #include <string>
 #include <unordered_map>
