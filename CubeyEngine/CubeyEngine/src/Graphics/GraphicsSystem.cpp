@@ -3,9 +3,6 @@
 
 using namespace DirectX;
 
-const std::string psShaderPath = "shaders/PixelShaders/";
-const std::string vsShaderPath = "shaders/VertexShaders/";
-
 GraphicsSystem::GraphicsSystem(HINSTANCE hInstance, int cmdShow)
 {
     LOGDEBUG("Graphics system initializing...");
@@ -88,10 +85,22 @@ GraphicsSystem::~GraphicsSystem()
     SafeRelease(d3dIndexBuffer);
     SafeRelease(d3dVertexBuffer);
 
-
-    SafeRelease(d3dInputLayout);
-    SafeRelease(d3dVertexShader);
-    SafeRelease(d3dPixelShader);
+    for(auto &it : vertexShaders)
+    {
+        SafeRelease(it.second);
+    }
+    for(auto& it : pixelShaders)
+    {
+        SafeRelease(it.second);
+    }
+    for(auto& it : inputLayouts)
+    {
+        SafeRelease(it.second);
+    }
+    vertexShaders.clear();
+    pixelShaders.clear();
+    inputLayouts.clear();
+    
 
     SafeRelease(d3dDepthStencilView);
     SafeRelease(d3dRenderTargetView);
@@ -105,12 +114,28 @@ GraphicsSystem::~GraphicsSystem()
 
 void GraphicsSystem::Update(float dt)
 {
+    //TEMP
+    XMVECTOR eyePosition = XMVectorSet(0, 0, -10, 1);
+    XMVECTOR focusPoint = XMVectorSet(0, 0, 0, 1);
+    XMVECTOR upDirection = XMVectorSet(0, 1, 0, 0);
+    viewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
+    d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Frame], 0, nullptr, &viewMatrix, 0, 0);
 
+
+    static float angle = 0.0f;
+    angle += 90.0f * dt;
+    XMVECTOR rotationAxis = XMVectorSet(0, 1, 1, 0);
+
+    worldMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(angle));
+    d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Object], 0, nullptr, &worldMatrix, 0, 0);
+    //ENDTEMP
+
+    Render();
 }
 
 void GraphicsSystem::LoadPixelShader(std::string fileName, std::wstring fileNameWide)
 {
-    std::string path = psShaderPath + fileName;
+    std::string path = fileName;
     std::string str = "Loading pixel shader: " + path;
     LOGDEBUG(str);
 
@@ -136,7 +161,7 @@ void GraphicsSystem::LoadPixelShader(std::string fileName, std::wstring fileName
 
 void GraphicsSystem::LoadVertexShader(std::string fileName, std::wstring fileNameWide)
 {
-    std::string path = vsShaderPath + fileName;
+    std::string path = fileName;
     std::string str = "Loading vertex shader: " + path;
     LOGDEBUG(str);
 
@@ -169,7 +194,7 @@ void GraphicsSystem::LoadInputLayouts()
     };
 
     ID3DBlob* vertexShaderBlob;
-    auto hr = D3DReadFileToBlob(L"shaders/VertexShaders/BasicVertexShader.cso", &vertexShaderBlob);
+    auto hr = D3DReadFileToBlob(L"BasicVertexShader.cso", &vertexShaderBlob);
 
     hr = d3dDevice->CreateInputLayout(vertexLayoutDesc, _countof(vertexLayoutDesc), vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &inputLayouts[InputLayout::POSCOL]);
     SafeRelease(vertexShaderBlob);
@@ -393,3 +418,36 @@ void GraphicsSystem::InitDirectX(HINSTANCE hInstance)
     viewport.MaxDepth = 1.0f;
 }
 
+// Clear the color and depth buffers.
+void GraphicsSystem::Clear(const FLOAT clearColor[4], FLOAT clearDepth, UINT8 clearStencil)
+{
+    d3dDeviceContext->ClearRenderTargetView(d3dRenderTargetView, clearColor);
+    d3dDeviceContext->ClearDepthStencilView(d3dDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, clearDepth, clearStencil);
+}
+
+void GraphicsSystem::Render()
+{
+    Clear(Colors::DeepPink, 1.0f, 0);
+
+    const UINT vertexStride = sizeof(VertexPosColor);
+    const UINT offset = 0;
+
+    d3dDeviceContext->IASetVertexBuffers(0, 1, &d3dVertexBuffer, &vertexStride, &offset);
+    d3dDeviceContext->IASetInputLayout(inputLayouts[InputLayout::POSCOL]);
+    d3dDeviceContext->IASetIndexBuffer(d3dIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+    d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    d3dDeviceContext->VSSetShader(vertexShaders["BasicVertexShader.cso"], nullptr, 0);
+    d3dDeviceContext->VSSetConstantBuffers(0, 3, d3dConstantBuffers);
+    d3dDeviceContext->PSSetShader(pixelShaders["BasicPixelShader.cso"], nullptr, 0);
+
+    d3dDeviceContext->RSSetState(d3dRasterizerState);
+    d3dDeviceContext->RSSetViewports(1, &viewport);
+
+    d3dDeviceContext->OMSetRenderTargets(1, &d3dRenderTargetView, d3dDepthStencilView);
+    d3dDeviceContext->OMSetDepthStencilState(d3dDepthStencilState, 1);
+
+    d3dDeviceContext->DrawIndexed(_countof(_indices), 0, 0);
+
+    d3dSwapChain->Present(enableVSync, 0);
+}

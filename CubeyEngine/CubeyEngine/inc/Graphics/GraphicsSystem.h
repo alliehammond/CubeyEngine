@@ -1,6 +1,7 @@
 #pragma once
 #include "Core\CubeySystem.h"
 #include "d3d11.h"
+#include <DirectXMath.h>
 #include <string>
 #include <unordered_map>
 
@@ -16,6 +17,9 @@ enum InputLayout
     POSCOL,
     INPUTLAYOUTCOUNT
 };
+
+using DirectX::XMMATRIX;
+using DirectX::XMFLOAT3;
 
 //Manages creation and deletion of objects
 class GraphicsSystem : public CubeySystem
@@ -33,6 +37,8 @@ private:
 
     void InitApplication(HINSTANCE hInstance, int cmdShow);
     void InitDirectX(HINSTANCE hInstance);
+    void Clear(const FLOAT clearColor[4], FLOAT clearDepth, UINT8 clearStencil);
+    void Render();
 
     std::unordered_map<std::string, ID3D11VertexShader *> vertexShaders;
     std::unordered_map<std::string, ID3D11PixelShader*> pixelShaders;
@@ -41,7 +47,6 @@ private:
     //*****************************************
     //Config Values
     //*****************************************
-    const float frameRateCap = 120.0f;
     const int windowWidth = 800;
     const int windowHeight = 450;
     LPCWSTR windowClassNameW = L"CubeyEngineWindowClass";
