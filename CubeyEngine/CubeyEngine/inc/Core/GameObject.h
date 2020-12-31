@@ -53,5 +53,6 @@ public:
     void DeleteComponent()
     {
         components[std::type_index(typeid(T))]->DeleteComponent();
+        components.erase(std::type_index(typeid(T)));
     }
 };

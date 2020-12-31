@@ -36,7 +36,19 @@ void LoggingSystem::Update(float dt)
 
         if(warningLevel == LOGTYPE::DEBUG)
         {
-            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 0x0D);
+            //change color every debug message
+            static bool colFlip = true;
+            if(colFlip)
+            {
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 0x0D);
+                colFlip = !colFlip;
+            }
+            else
+            {
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 0x0B);
+                colFlip = !colFlip;
+            }
+            
             auto ret = GetLastError();
             std::cout << "[DEBUG]";
             std::cout << curMessage << std::endl;
