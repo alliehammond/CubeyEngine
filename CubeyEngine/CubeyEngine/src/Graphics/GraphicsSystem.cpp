@@ -1,5 +1,7 @@
 #include "EnginePCH.h"
 #include "Graphics\GraphicsSystem.h"
+#include "assimp\Importer.hpp"
+#include "assimp\scene.h"
 
 using namespace DirectX;
 

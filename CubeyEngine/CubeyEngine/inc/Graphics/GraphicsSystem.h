@@ -1,16 +1,10 @@
 #pragma once
 #include "Core\CubeySystem.h"
+#include "Graphics\Mesh.h"
 #include "d3d11.h"
 #include <DirectXMath.h>
 #include <string>
 #include <unordered_map>
-
-struct Material
-{
-    ID3D11PixelShader *pPixShader = 0;
-    ID3D11VertexShader *pVertShader = 0;
-    std::string name = "Material";
-};
 
 enum InputLayout
 {
