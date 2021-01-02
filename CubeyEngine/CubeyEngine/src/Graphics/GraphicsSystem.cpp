@@ -1,7 +1,5 @@
 #include "EnginePCH.h"
 #include "Graphics\GraphicsSystem.h"
-#include "assimp\Importer.hpp"
-#include "assimp\scene.h"
 
 using namespace DirectX;
 
@@ -11,45 +9,6 @@ GraphicsSystem::GraphicsSystem(HINSTANCE hInstance, int cmdShow)
 
     InitApplication(hInstance, cmdShow);
     InitDirectX(hInstance);
-
-    //Temp - Create vertex and index buffers
-    // Create an initialize the vertex buffer.
-    D3D11_BUFFER_DESC vertexBufferDesc;
-    ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
-
-    vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    vertexBufferDesc.ByteWidth = sizeof(VertexPosColor) * _countof(_cubeVertices);
-    vertexBufferDesc.CPUAccessFlags = 0;
-    vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-
-    D3D11_SUBRESOURCE_DATA resourceData;
-    ZeroMemory(&resourceData, sizeof(D3D11_SUBRESOURCE_DATA));
-
-    resourceData.pSysMem = _cubeVertices;
-
-    HRESULT hr = d3dDevice->CreateBuffer(&vertexBufferDesc, &resourceData, &d3dVertexBuffer);
-    if(FAILED(hr))
-    {
-        LOGERROR("Failed to create vertex buffer!");
-        return;
-    }
-
-    // Create and initialize the index buffer.
-    D3D11_BUFFER_DESC indexBufferDesc;
-    ZeroMemory(&indexBufferDesc, sizeof(D3D11_BUFFER_DESC));
-
-    indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-    indexBufferDesc.ByteWidth = sizeof(WORD) * _countof(_indices);
-    indexBufferDesc.CPUAccessFlags = 0;
-    indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-    resourceData.pSysMem = _indices;
-
-    hr = d3dDevice->CreateBuffer(&indexBufferDesc, &resourceData, &d3dIndexBuffer);
-    if(FAILED(hr))
-    {
-        LOGERROR("Failed to create index buffer!");
-        return;
-    }
 
     CreateConstantBuffers();
 
@@ -399,7 +358,7 @@ void GraphicsSystem::InitDirectX(HINSTANCE hInstance)
     rasterizerDesc.DepthBiasClamp = 0.0f;
     rasterizerDesc.DepthClipEnable = TRUE;
     rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-    rasterizerDesc.FrontCounterClockwise = FALSE;
+    rasterizerDesc.FrontCounterClockwise = TRUE;
     rasterizerDesc.MultisampleEnable = FALSE;
     rasterizerDesc.ScissorEnable = FALSE;
     rasterizerDesc.SlopeScaledDepthBias = 0.0f;

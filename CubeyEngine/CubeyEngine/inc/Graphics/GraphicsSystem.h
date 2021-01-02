@@ -23,6 +23,17 @@ public:
     ~GraphicsSystem();
     void Update(float dt);
 
+
+    //*****************************************
+    //Input Layouts
+    //*****************************************
+    struct VertexPosColor
+    {
+        XMFLOAT3 position;
+        XMFLOAT3 color;
+    };
+    //*****************************************
+
 private:
     void LoadPixelShader(std::string fileName, std::wstring fileNameWide);
     void LoadVertexShader(std::string fileName, std::wstring fileNameWide);
@@ -75,16 +86,6 @@ private:
     ID3D11Buffer* d3dConstantBuffers[NumConstantBuffers];
 
     XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-
-    //*****************************************
-    //Input Layouts
-    //*****************************************
-    struct VertexPosColor
-    {
-        XMFLOAT3 position;
-        XMFLOAT3 color;
-    };
-    //*****************************************
 
     //Temp Cube
     VertexPosColor _cubeVertices[8] =

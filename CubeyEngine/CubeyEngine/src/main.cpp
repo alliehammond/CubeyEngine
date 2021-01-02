@@ -11,6 +11,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
     MSG msg = { 0 };
 
     static DWORD previousTime = timeGetTime();
+    std::srand(std::time(nullptr));
 
     //Initialize systems
     CubeySystem* engineSystems[CubeySystems::SYSTEMCOUNT];

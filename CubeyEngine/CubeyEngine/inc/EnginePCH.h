@@ -19,6 +19,8 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <ctime>
+#include <cstdlib>
 
 // Link library dependencies
 #pragma comment(lib, "d3d11.lib")

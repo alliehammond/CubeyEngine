@@ -7,12 +7,12 @@ class Mesh
 {
 public:
     //Loads firsst mesh in file (designed for single mesh files)
-    Mesh(std::string fileName, Material mat);
+    Mesh();
     ~Mesh();
-    //Returns true on success, if a mesh is already loaded deletes that first
-    bool LoadMesh(std::string fileName, Material mat);
 
     Material material;
 private:
     ID3D11Buffer *vertexBuffer = 0, *indexBuffer = 0;
+    friend class Model;
+    friend class GraphicsSystem;
 };
