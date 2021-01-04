@@ -1,7 +1,13 @@
 #include "EnginePCH.h"
 #include "Graphics\GraphicsSystem.h"
+#include "Graphics\RenderComponent.h"
 
 using namespace DirectX;
+
+ID3D11Device *GraphicsSystem::d3dDevice = 0;
+std::unordered_map<std::string, ID3D11PixelShader*> GraphicsSystem::pixelShaders;
+std::unordered_map<std::string, ID3D11VertexShader*> GraphicsSystem::vertexShaders;
+std::unordered_map<InputLayout, ID3D11InputLayout*> GraphicsSystem::inputLayouts;
 
 GraphicsSystem::GraphicsSystem(HINSTANCE hInstance, int cmdShow)
 {
@@ -22,8 +28,8 @@ GraphicsSystem::GraphicsSystem(HINSTANCE hInstance, int cmdShow)
     LoadInputLayouts();
 
     // Setup the projection matrix
-    RECT clientRect;
-    GetClientRect(windowHandle, &clientRect);
+    RECT clientRect = {0, 0, 0, 0};
+    if(windowHandle)GetClientRect(windowHandle, &clientRect);
 
     // Compute the exact client dimensions
     // This is required for a correct projection matrix
@@ -43,8 +49,6 @@ GraphicsSystem::~GraphicsSystem()
     SafeRelease(d3dConstantBuffers[CB_Application]);
     SafeRelease(d3dConstantBuffers[CB_Frame]);
     SafeRelease(d3dConstantBuffers[CB_Object]);
-    SafeRelease(d3dIndexBuffer);
-    SafeRelease(d3dVertexBuffer);
 
     for(auto &it : vertexShaders)
     {
@@ -75,23 +79,7 @@ GraphicsSystem::~GraphicsSystem()
 
 void GraphicsSystem::Update(float dt)
 {
-    //TEMP
-    XMVECTOR eyePosition = XMVectorSet(0, 0, -10, 1);
-    XMVECTOR focusPoint = XMVectorSet(0, 0, 0, 1);
-    XMVECTOR upDirection = XMVectorSet(0, 1, 0, 0);
-    viewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
-    d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Frame], 0, nullptr, &viewMatrix, 0, 0);
-
-
-    static float angle = 0.0f;
-    angle += 90.0f * dt;
-    XMVECTOR rotationAxis = XMVectorSet(0, 1, 1, 0);
-
-    worldMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(angle));
-    d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Object], 0, nullptr, &worldMatrix, 0, 0);
-    //ENDTEMP
-
-    Render();
+    Render(dt);
 }
 
 void GraphicsSystem::LoadPixelShader(std::string fileName, std::wstring fileNameWide)
@@ -386,21 +374,54 @@ void GraphicsSystem::Clear(const FLOAT clearColor[4], FLOAT clearDepth, UINT8 cl
     d3dDeviceContext->ClearDepthStencilView(d3dDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, clearDepth, clearStencil);
 }
 
-void GraphicsSystem::Render()
+void GraphicsSystem::Render(float dt)
 {
     Clear(Colors::DeepPink, 1.0f, 0);
+
+    XMVECTOR eyePosition = XMVectorSet(0, 0, -10, 1);
+    XMVECTOR focusPoint = XMVectorSet(0, 0, 0, 1);
+    XMVECTOR upDirection = XMVectorSet(0, 1, 0, 0);
+    viewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
+    d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Frame], 0, nullptr, &viewMatrix, 0, 0);
+    
+    //Call render object on each object with a render component
+    for(auto &it : ObjectManagerSystem::gameObjects)
+    {
+        RenderComponent *renderComp = it->GetComponent<RenderComponent>();
+        if(renderComp)
+        {
+            for(auto jt : renderComp->pModel->meshes)
+            {
+                RenderObject(jt, dt);
+            }
+        }
+    }
+
+    d3dSwapChain->Present(enableVSync, 0);
+}
+
+void GraphicsSystem::RenderObject(Mesh* pMesh, float dt)
+{
+    static float angle = 0.0f;
+    angle += 90.0f * dt;
+    XMVECTOR rotationAxis = XMVectorSet(0, 1, 1, 0);
+
+    //Set object constant buffer
+    worldMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(angle));
+    d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Object], 0, nullptr, &worldMatrix, 0, 0);
 
     const UINT vertexStride = sizeof(VertexPosColor);
     const UINT offset = 0;
 
-    d3dDeviceContext->IASetVertexBuffers(0, 1, &d3dVertexBuffer, &vertexStride, &offset);
-    d3dDeviceContext->IASetInputLayout(inputLayouts[InputLayout::POSCOL]);
-    d3dDeviceContext->IASetIndexBuffer(d3dIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+    //Render object
+    d3dDeviceContext->IASetVertexBuffers(0, 1, &pMesh->vertexBuffer, &vertexStride, &offset);
+    d3dDeviceContext->IASetInputLayout(pMesh->material.pInputLayout);
+    d3dDeviceContext->IASetIndexBuffer(pMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
     d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    d3dDeviceContext->VSSetShader(vertexShaders["BasicVertexShader.cso"], nullptr, 0);
+    d3dDeviceContext->VSSetShader(pMesh->material.pVertShader, nullptr, 0);
     d3dDeviceContext->VSSetConstantBuffers(0, 3, d3dConstantBuffers);
-    d3dDeviceContext->PSSetShader(pixelShaders["BasicPixelShader.cso"], nullptr, 0);
+    d3dDeviceContext->PSSetShader(pMesh->material.pPixShader, nullptr, 0);
 
     d3dDeviceContext->RSSetState(d3dRasterizerState);
     d3dDeviceContext->RSSetViewports(1, &viewport);
@@ -408,7 +429,5 @@ void GraphicsSystem::Render()
     d3dDeviceContext->OMSetRenderTargets(1, &d3dRenderTargetView, d3dDepthStencilView);
     d3dDeviceContext->OMSetDepthStencilState(d3dDepthStencilState, 1);
 
-    d3dDeviceContext->DrawIndexed(_countof(_indices), 0, 0);
-
-    d3dSwapChain->Present(enableVSync, 0);
+    d3dDeviceContext->DrawIndexed(pMesh->indexCount, 0, 0);
 }

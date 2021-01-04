@@ -27,6 +27,7 @@ public:
     std::string name = "GameObject";
 
 private:
+    //While iterating over components some can be nullptrs
     std::unordered_map<std::type_index, Component *> components;
     //Game object will be destroyed at end of frame if true
     bool deletionFlag = false;
@@ -40,14 +41,15 @@ public:
     template <typename T>
     bool HasComponent()
     {
-        if(components.find(std::type_index(typeid(T))) != components.end())
+        if(GetComponent<T>() != 0)
             return true;
         return false;
     }
     template <typename T>
-    void AddComponent(T *comp)
+    T *AddComponent(T *comp)
     {
         components[std::type_index(typeid(T))] = comp;
+        return comp;
     }
     template <typename T>
     void DeleteComponent()

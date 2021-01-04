@@ -8,10 +8,12 @@
 class Model
 {
 public:
-    Model(std::string fileName, Material mat, ID3D11Device *d3ddevice);
+    Model(std::string fileName, Material mat);
     ~Model();
     //Deletes loaded model if one exists; returns true if successfully loaded model
-    bool LoadModel(std::string fileName, Material mat, ID3D11Device *d3ddevice);
+    bool LoadModel(std::string fileName, Material mat);
 private:
     std::vector<Mesh *> meshes;
+
+    friend class GraphicsSystem;
 };

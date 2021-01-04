@@ -6,9 +6,9 @@
 
 const std::string modelPath = "../resources/models/";
 
-Model::Model(std::string fileName, Material mat, ID3D11Device* d3ddevice)
+Model::Model(std::string fileName, Material mat)
 {
-    LoadModel(fileName, mat, d3ddevice);
+    LoadModel(fileName, mat);
 }
 
 Model::~Model()
@@ -17,7 +17,7 @@ Model::~Model()
         delete it;
 }
 
-bool Model::LoadModel(std::string fileName, Material mat, ID3D11Device* d3ddevice)
+bool Model::LoadModel(std::string fileName, Material mat)
 {
     if(!meshes.empty())
     {
@@ -43,15 +43,18 @@ bool Model::LoadModel(std::string fileName, Material mat, ID3D11Device* d3ddevic
         return false;
     }
 
-    for(int i = 0;i < scene->mNumMeshes; ++i)
+    for(unsigned int i = 0;i < scene->mNumMeshes; ++i)
     {
         aiMesh *curMesh = scene->mMeshes[i];
         Mesh *newMesh = new Mesh();
         newMesh->material = mat;
+        //Assume 3 indices per face
+        newMesh->indexCount = 3 * curMesh->mNumFaces;
+        
 
         GraphicsSystem::VertexPosColor *vertices = new GraphicsSystem::VertexPosColor[curMesh->mNumVertices];
         //Load vertices from assimp aiMesh struct
-        for(int j = 0;j < curMesh->mNumVertices; ++j)
+        for(unsigned int j = 0;j < curMesh->mNumVertices; ++j)
         {
             vertices[j].color.x = (rand() % 100) / 100.0f;
             vertices[j].color.y = (rand() % 100) / 100.0f;
@@ -75,34 +78,45 @@ bool Model::LoadModel(std::string fileName, Material mat, ID3D11Device* d3ddevic
 
         resourceData.pSysMem = vertices;
 
-        HRESULT hr = d3ddevice->CreateBuffer(&vertexBufferDesc, &resourceData, &d3dVertexBuffer);
+        HRESULT hr = GraphicsSystem::GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &resourceData, &newMesh->vertexBuffer);
         if(FAILED(hr))
         {
             LOGERROR("Failed to create vertex buffer!");
-            return;
+            return false;
         }
 
-        // Create and initialize the index buffer.
+        //Create and initialize the index buffer
+        unsigned int *indices = new unsigned int[curMesh->mNumFaces * 3];
+        for(unsigned int j = 0; j < curMesh->mNumFaces; ++j)
+        {
+            aiFace *curFace = &(curMesh->mFaces[j]);
+            //Assume there are 3 indices per face
+            indices[0 + j * 3] = curFace->mIndices[0];
+            indices[1 + j * 3] = curFace->mIndices[1];
+            indices[2 + j * 3] = curFace->mIndices[2];        
+        }
+
         D3D11_BUFFER_DESC indexBufferDesc;
         ZeroMemory(&indexBufferDesc, sizeof(D3D11_BUFFER_DESC));
 
         indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-        indexBufferDesc.ByteWidth = sizeof(WORD) * _countof(_indices);
+        indexBufferDesc.ByteWidth = sizeof(unsigned int) * curMesh->mNumFaces * 3;
         indexBufferDesc.CPUAccessFlags = 0;
         indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-        resourceData.pSysMem = _indices;
+        resourceData.pSysMem = indices;
 
-        hr = d3dDevice->CreateBuffer(&indexBufferDesc, &resourceData, &d3dIndexBuffer);
+        hr = GraphicsSystem::GetD3DDevice()->CreateBuffer(&indexBufferDesc, &resourceData, &newMesh->indexBuffer);
         if(FAILED(hr))
         {
             LOGERROR("Failed to create index buffer!");
-            return;
+            return false;
         }
-        //ENDTEMP
+        
+        delete[] vertices;
+        delete[] indices;
 
         meshes.push_back(newMesh);
     }
-    
 
     return true;
 }
