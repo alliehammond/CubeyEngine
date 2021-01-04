@@ -1,5 +1,6 @@
 #include "EnginePCH.h"
 #include "Core\GameObject.h"
+#include "Graphics\RenderComponent.h"
 
 GameObject::GameObject()
 {
@@ -25,11 +26,13 @@ void GameObject::Update()
 {
     for(auto& it : components)
     {
+        if(!it.second)continue;
         it.second->Update();
     }
 
     for(auto& it : components)
     {
+        if(!it.second)continue;
         it.second->PostUpdate();
     }
 }
