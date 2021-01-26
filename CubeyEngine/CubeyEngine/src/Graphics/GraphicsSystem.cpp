@@ -4,7 +4,20 @@
 
 using namespace DirectX;
 
+int GraphicsSystem::windowWidth = 800;
+int GraphicsSystem::windowHeight = 450;
+
 ID3D11Device *GraphicsSystem::d3dDevice = 0;
+HWND GraphicsSystem::windowHandle = 0;
+ID3D11DeviceContext* GraphicsSystem::d3dDeviceContext = 0;
+IDXGISwapChain* GraphicsSystem::d3dSwapChain = 0;
+ID3D11RenderTargetView* GraphicsSystem::d3dRenderTargetView = 0;
+ID3D11DepthStencilView* GraphicsSystem::d3dDepthStencilView = 0;
+ID3D11Texture2D* GraphicsSystem::d3dDepthStencilBuffer = 0;
+ID3D11DepthStencilState* GraphicsSystem::d3dDepthStencilState = 0;
+ID3D11RasterizerState* GraphicsSystem::d3dRasterizerState = 0;
+D3D11_VIEWPORT GraphicsSystem::viewport = { 0 };
+
 std::unordered_map<std::string, ID3D11PixelShader*> GraphicsSystem::pixelShaders;
 std::unordered_map<std::string, ID3D11VertexShader*> GraphicsSystem::vertexShaders;
 std::unordered_map<InputLayout, ID3D11InputLayout*> GraphicsSystem::inputLayouts;
@@ -75,6 +88,44 @@ GraphicsSystem::~GraphicsSystem()
     SafeRelease(d3dSwapChain);
     SafeRelease(d3dDeviceContext);
     SafeRelease(d3dDevice);
+}
+
+void GraphicsSystem::ResizeWindow(int width, int height)
+{
+    if(d3dSwapChain)
+    {
+        d3dDeviceContext->OMSetRenderTargets(0, 0, 0);
+        // Release all outstanding references to the swap chain's buffers.
+        SafeRelease(d3dRenderTargetView);
+
+        // Preserve the existing buffer count and format.
+        // Automatically choose the width and height to match the client rect for HWNDs.
+        d3dSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+
+        // Get buffer and create a render-target-view.
+        ID3D11Texture2D* pBuffer;
+        d3dSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBuffer);
+        if(pBuffer)
+        {
+            d3dDevice->CreateRenderTargetView(pBuffer, NULL, &d3dRenderTargetView);
+        }
+
+        pBuffer->Release();
+
+        d3dDeviceContext->OMSetRenderTargets(1, &d3dRenderTargetView, NULL);
+
+        // Set up the viewport.
+        D3D11_VIEWPORT vp;
+        vp.Width = float(width);
+        vp.Height = float(height);
+        vp.MinDepth = 0.0f;
+        vp.MaxDepth = 1.0f;
+        vp.TopLeftX = 0;
+        vp.TopLeftY = 0;
+        d3dDeviceContext->RSSetViewports(1, &vp);
+        windowWidth = width;
+        windowHeight = height;
+    }
 }
 
 void GraphicsSystem::Update(float dt)

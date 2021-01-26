@@ -28,6 +28,8 @@ public:
     static ID3D11InputLayout* GetInputLayout(InputLayout layout) { return inputLayouts[layout]; }
     static ID3D11Device *GetD3DDevice() { return d3dDevice; }
 
+    static void ResizeWindow(int width, int height);
+
 
     //*****************************************
     //Input Layouts
@@ -58,8 +60,8 @@ private:
     //*****************************************
     //Config Values
     //*****************************************
-    const int windowWidth = 800;
-    const int windowHeight = 450;
+    static int windowWidth;
+    static int windowHeight;
     LPCWSTR windowClassNameW = L"CubeyEngineWindowClass";
     LPCWSTR windowNameW = L"Cubey Engine!";
     LPCSTR windowClassName = "CubeyEngineWindowClass";
@@ -67,16 +69,16 @@ private:
     const bool enableVSync = false;
     //*****************************************
 
-    HWND windowHandle = 0;
+    static HWND windowHandle;
     static ID3D11Device* d3dDevice;
-    ID3D11DeviceContext* d3dDeviceContext = 0;
-    IDXGISwapChain* d3dSwapChain = 0;
-    ID3D11RenderTargetView* d3dRenderTargetView = 0;
-    ID3D11DepthStencilView* d3dDepthStencilView = 0;
-    ID3D11Texture2D* d3dDepthStencilBuffer = 0;
-    ID3D11DepthStencilState* d3dDepthStencilState = 0;
-    ID3D11RasterizerState* d3dRasterizerState = 0;
-    D3D11_VIEWPORT viewport = { 0 };
+    static ID3D11DeviceContext* d3dDeviceContext;
+    static IDXGISwapChain* d3dSwapChain;
+    static ID3D11RenderTargetView* d3dRenderTargetView;
+    static ID3D11DepthStencilView* d3dDepthStencilView;
+    static ID3D11Texture2D* d3dDepthStencilBuffer;
+    static ID3D11DepthStencilState* d3dDepthStencilState;
+    static ID3D11RasterizerState* d3dRasterizerState;
+    static D3D11_VIEWPORT viewport;
 
     //3 Different constant buffers - updated rarely, per frame, and per object - reduces how much data needs to be rewritten
     enum ConstantBuffer

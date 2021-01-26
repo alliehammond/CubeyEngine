@@ -24,6 +24,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
     GameObject *tempCube = ObjectManagerSystem::CreateObject(new GameObject("Cube!"));
     RenderComponent *tempRComp = tempCube->AddComponent<RenderComponent>(
         new RenderComponent("BasicCube.obj", tempCube));
+    tempCube->GetComponent<Transform>()->pos = CBY::Vector(5.0f, 0.0f, 0.0f);
 
     while(msg.message != WM_QUIT)
     {
@@ -69,18 +70,23 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     switch (message)
     {
-            case WM_PAINT:
+        case WM_PAINT:
         {
             hDC = BeginPaint(hwnd, &paintStruct);
             EndPaint(hwnd, &paintStruct);
         }
-        break;
-            case WM_DESTROY:
+            break;
+        case WM_DESTROY:
         {
             PostQuitMessage(0);
         }
-        break;
-            default:
+            break;
+        case WM_SIZE:
+        {
+            GraphicsSystem::ResizeWindow(LOWORD(lParam), HIWORD(lParam));
+        }
+            break;
+        default:
         return DefWindowProc(hwnd, message, wParam, lParam);
         }
 

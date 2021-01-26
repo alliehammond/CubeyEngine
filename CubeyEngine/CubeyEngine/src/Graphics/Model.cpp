@@ -25,13 +25,10 @@ bool Model::LoadModel(std::string fileName, Material mat)
             delete it;
     }
     std::string path = modelPath + fileName;
-    std::string str = "Loading model from " + path;
-    LOGDEBUG(str);
 
     Assimp::Importer importer;
 
     const aiScene* scene = importer.ReadFile(path,
-        aiProcess_CalcTangentSpace |
         aiProcess_Triangulate |
         aiProcess_JoinIdenticalVertices |
         aiProcess_SortByPType |
@@ -42,7 +39,7 @@ bool Model::LoadModel(std::string fileName, Material mat)
         LOGWARNING("Failed to load model from " + path);
         return false;
     }
-
+    unsigned int totalVerts = 0, totalFaces = 0;
     for(unsigned int i = 0;i < scene->mNumMeshes; ++i)
     {
         aiMesh *curMesh = scene->mMeshes[i];
@@ -50,7 +47,8 @@ bool Model::LoadModel(std::string fileName, Material mat)
         newMesh->material = mat;
         //Assume 3 indices per face
         newMesh->indexCount = 3 * curMesh->mNumFaces;
-        
+        totalFaces += curMesh->mNumFaces;
+        totalVerts += curMesh->mNumVertices;
 
         GraphicsSystem::VertexPosColor *vertices = new GraphicsSystem::VertexPosColor[curMesh->mNumVertices];
         //Load vertices from assimp aiMesh struct
@@ -104,6 +102,9 @@ bool Model::LoadModel(std::string fileName, Material mat)
         indexBufferDesc.CPUAccessFlags = 0;
         indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
         resourceData.pSysMem = indices;
+
+        std::string str = "Loaded model from " + path + "! V:" + std::to_string(totalVerts) + " F:" + std::to_string(totalFaces);
+        LOGDEBUG(str);
 
         hr = GraphicsSystem::GetD3DDevice()->CreateBuffer(&indexBufferDesc, &resourceData, &newMesh->indexBuffer);
         if(FAILED(hr))
