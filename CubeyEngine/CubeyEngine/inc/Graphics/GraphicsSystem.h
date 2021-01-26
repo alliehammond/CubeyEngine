@@ -51,7 +51,7 @@ private:
     void InitDirectX(HINSTANCE hInstance);
     void Clear(const FLOAT clearColor[4], FLOAT clearDepth, UINT8 clearStencil);
     void Render(float dt);
-    void RenderObject(Mesh *pMesh, float dt);
+    void RenderObject(GameObject *pObject, float dt);
 
     static std::unordered_map<std::string, ID3D11VertexShader *> vertexShaders;
     static std::unordered_map<std::string, ID3D11PixelShader*> pixelShaders;
@@ -90,5 +90,5 @@ private:
     };
     ID3D11Buffer* d3dConstantBuffers[NumConstantBuffers];
 
-    XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+    XMMATRIX viewMatrix, projectionMatrix;
 };

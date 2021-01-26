@@ -24,7 +24,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
     GameObject *tempCube = ObjectManagerSystem::CreateObject(new GameObject("Cube!"));
     RenderComponent *tempRComp = tempCube->AddComponent<RenderComponent>(
         new RenderComponent("BasicCube.obj", tempCube));
-    tempCube->GetComponent<Transform>()->pos = CBY::Vector(5.0f, 0.0f, 0.0f);
 
     while(msg.message != WM_QUIT)
     {

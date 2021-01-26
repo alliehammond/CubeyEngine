@@ -2,6 +2,8 @@
 #include "Graphics\GraphicsSystem.h"
 #include "Graphics\RenderComponent.h"
 
+#define PI 3.14159265358979f
+
 using namespace DirectX;
 
 int GraphicsSystem::windowWidth = 800;
@@ -441,44 +443,45 @@ void GraphicsSystem::Render(float dt)
         RenderComponent *renderComp = it->GetComponent<RenderComponent>();
         if(renderComp)
         {
-            for(auto jt : renderComp->pModel->meshes)
-            {
-                RenderObject(jt, dt);
-            }
+            RenderObject(it, dt);
         }
     }
 
     d3dSwapChain->Present(enableVSync, 0);
 }
 
-void GraphicsSystem::RenderObject(Mesh* pMesh, float dt)
+void GraphicsSystem::RenderObject(GameObject* pObject, float dt)
 {
-    static float angle = 0.0f;
-    angle += 90.0f * dt;
-    XMVECTOR rotationAxis = XMVectorSet(0, 1, 1, 0);
+    Transform *pTrans = pObject->GetComponent<Transform>();
 
-    //Set object constant buffer
-    worldMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(angle));
+    DirectX::XMMATRIX translationMatrix = XMMatrixTranslation(pTrans->pos.x, pTrans->pos.y, pTrans->pos.z);
+    DirectX::XMMATRIX scaleMatrix = XMMatrixScaling(pTrans->scale.x, pTrans->scale.y, pTrans->scale.z);
+    DirectX::XMMATRIX rotationMatrix = XMMatrixRotationRollPitchYaw(pTrans->rot.x * (PI / 180.0f), pTrans->rot.y * (PI / 180.0f), pTrans->rot.z * (PI / 180.0f));
+
+    DirectX::XMMATRIX worldMatrix = rotationMatrix * scaleMatrix * translationMatrix;
     d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Object], 0, nullptr, &worldMatrix, 0, 0);
 
-    const UINT vertexStride = sizeof(VertexPosColor);
-    const UINT offset = 0;
+    for(Mesh *pMesh : pObject->GetComponent<RenderComponent>()->pModel->meshes)
+    {
+        const UINT vertexStride = sizeof(VertexPosColor);
+        const UINT offset = 0;
 
-    //Render object
-    d3dDeviceContext->IASetVertexBuffers(0, 1, &pMesh->vertexBuffer, &vertexStride, &offset);
-    d3dDeviceContext->IASetInputLayout(pMesh->material.pInputLayout);
-    d3dDeviceContext->IASetIndexBuffer(pMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-    d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        //Render object
+        d3dDeviceContext->IASetVertexBuffers(0, 1, &pMesh->vertexBuffer, &vertexStride, &offset);
+        d3dDeviceContext->IASetInputLayout(pMesh->material.pInputLayout);
+        d3dDeviceContext->IASetIndexBuffer(pMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+        d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    d3dDeviceContext->VSSetShader(pMesh->material.pVertShader, nullptr, 0);
-    d3dDeviceContext->VSSetConstantBuffers(0, 3, d3dConstantBuffers);
-    d3dDeviceContext->PSSetShader(pMesh->material.pPixShader, nullptr, 0);
+        d3dDeviceContext->VSSetShader(pMesh->material.pVertShader, nullptr, 0);
+        d3dDeviceContext->VSSetConstantBuffers(0, 3, d3dConstantBuffers);
+        d3dDeviceContext->PSSetShader(pMesh->material.pPixShader, nullptr, 0);
 
-    d3dDeviceContext->RSSetState(d3dRasterizerState);
-    d3dDeviceContext->RSSetViewports(1, &viewport);
+        d3dDeviceContext->RSSetState(d3dRasterizerState);
+        d3dDeviceContext->RSSetViewports(1, &viewport);
 
-    d3dDeviceContext->OMSetRenderTargets(1, &d3dRenderTargetView, d3dDepthStencilView);
-    d3dDeviceContext->OMSetDepthStencilState(d3dDepthStencilState, 1);
+        d3dDeviceContext->OMSetRenderTargets(1, &d3dRenderTargetView, d3dDepthStencilView);
+        d3dDeviceContext->OMSetDepthStencilState(d3dDepthStencilState, 1);
 
-    d3dDeviceContext->DrawIndexed(pMesh->indexCount, 0, 0);
+        d3dDeviceContext->DrawIndexed(pMesh->indexCount, 0, 0);
+    }
 }
