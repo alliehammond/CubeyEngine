@@ -16,13 +16,14 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
 
     //Initialize systems
     CubeySystem* engineSystems[CubeySystems::SYSTEMCOUNT];
+    engineSystems[CubeySystems::INPUTSYSTEM] = new InputSystem();
     engineSystems[CubeySystems::LOGGINGSYSTEM] = new LoggingSystem();
     engineSystems[CubeySystems::OBJECTMANAGERSYSTEM] = new ObjectManagerSystem();
     engineSystems[CubeySystems::GRAPHICSSYSTEM] = new GraphicsSystem(hInstance, cmdShow);
 
     //Load temp cube
     GameObject *tempCube = ObjectManagerSystem::CreateObject(new GameObject("Cube!"));
-    RenderComponent *tempRComp = tempCube->AddComponent<RenderComponent>(
+    RenderComponent *tempComp = tempCube->AddComponent<RenderComponent>(
         new RenderComponent("BasicCube.obj", tempCube));
 
     while(msg.message != WM_QUIT)
@@ -74,17 +75,27 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             hDC = BeginPaint(hwnd, &paintStruct);
             EndPaint(hwnd, &paintStruct);
         }
-            break;
+        break;
         case WM_DESTROY:
         {
             PostQuitMessage(0);
         }
-            break;
+        break;
         case WM_SIZE:
         {
             GraphicsSystem::ResizeWindow(LOWORD(lParam), HIWORD(lParam));
         }
-            break;
+        break;
+        case WM_KEYDOWN:
+        {
+            InputSystem::HandleWindowsMessageKeyDown(unsigned int(wParam));
+        }
+        break;
+        case WM_KEYUP:
+        {
+            InputSystem::HandleWindowsMessageKeyUp(unsigned int(wParam));
+        }
+        break;
         default:
         return DefWindowProc(hwnd, message, wParam, lParam);
         }

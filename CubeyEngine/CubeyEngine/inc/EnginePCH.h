@@ -1,5 +1,6 @@
 //Local includes
 #include "Core\LoggingSystem.h"
+#include "Core\InputSystem.h"
 #include "CYMath\Vector.h"
 #include "Core\GameObject.h"
 #include "Core\ObjectManagerSystem.h"

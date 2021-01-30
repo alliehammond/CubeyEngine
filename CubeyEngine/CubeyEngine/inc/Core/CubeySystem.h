@@ -12,6 +12,7 @@ public:
 
 enum CubeySystems
 {
+    INPUTSYSTEM,
     LOGGINGSYSTEM,
     OBJECTMANAGERSYSTEM,
     GRAPHICSSYSTEM,
