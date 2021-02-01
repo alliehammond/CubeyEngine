@@ -1,6 +1,7 @@
 #include "EnginePCH.h"
 #include "Core\CubeySystem.h"
 #include "Graphics\RenderComponent.h"
+#include "Gameplay\PlayerController.h"
 
 const float frameRateCap = 120.0f;
 
@@ -21,10 +22,15 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
     engineSystems[CubeySystems::OBJECTMANAGERSYSTEM] = new ObjectManagerSystem();
     engineSystems[CubeySystems::GRAPHICSSYSTEM] = new GraphicsSystem(hInstance, cmdShow);
 
+    //Create objects
+    GameObject *player = ObjectManagerSystem::CreateObject(new GameObject("Player"));
+    player->AddComponent<PlayerController>(new PlayerController(player));
+    player->GetComponent<Transform>()->pos.x = -10.0f;
+
     //Load temp cube
     GameObject *tempCube = ObjectManagerSystem::CreateObject(new GameObject("Cube!"));
     RenderComponent *tempComp = tempCube->AddComponent<RenderComponent>(
-        new RenderComponent("BasicCube.obj", tempCube));
+        new RenderComponent("BasicCube.fbx", tempCube));
 
     while(msg.message != WM_QUIT)
     {

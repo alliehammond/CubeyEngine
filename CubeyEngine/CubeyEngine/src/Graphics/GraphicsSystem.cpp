@@ -2,8 +2,6 @@
 #include "Graphics\GraphicsSystem.h"
 #include "Graphics\RenderComponent.h"
 
-#define PI 3.14159265358979f
-
 using namespace DirectX;
 
 int GraphicsSystem::windowWidth = 800;
@@ -23,6 +21,9 @@ D3D11_VIEWPORT GraphicsSystem::viewport = { 0 };
 std::unordered_map<std::string, ID3D11PixelShader*> GraphicsSystem::pixelShaders;
 std::unordered_map<std::string, ID3D11VertexShader*> GraphicsSystem::vertexShaders;
 std::unordered_map<InputLayout, ID3D11InputLayout*> GraphicsSystem::inputLayouts;
+
+XMVECTOR GraphicsSystem::eyePosition = XMVectorSet(0, 0, -10, 1);
+XMVECTOR GraphicsSystem::focusPoint = XMVectorSet(0, 0, 0, 1);
 
 GraphicsSystem::GraphicsSystem(HINSTANCE hInstance, int cmdShow)
 {
@@ -431,8 +432,6 @@ void GraphicsSystem::Render(float dt)
 {
     Clear(Colors::DeepPink, 1.0f, 0);
 
-    XMVECTOR eyePosition = XMVectorSet(0, 0, -10, 1);
-    XMVECTOR focusPoint = XMVectorSet(0, 0, 0, 1);
     XMVECTOR upDirection = XMVectorSet(0, 1, 0, 0);
     viewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
     d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Frame], 0, nullptr, &viewMatrix, 0, 0);
@@ -456,7 +455,7 @@ void GraphicsSystem::RenderObject(GameObject* pObject, float dt)
 
     DirectX::XMMATRIX translationMatrix = XMMatrixTranslation(pTrans->pos.x, pTrans->pos.y, pTrans->pos.z);
     DirectX::XMMATRIX scaleMatrix = XMMatrixScaling(pTrans->scale.x, pTrans->scale.y, pTrans->scale.z);
-    DirectX::XMMATRIX rotationMatrix = XMMatrixRotationRollPitchYaw(pTrans->rot.x * (PI / 180.0f), pTrans->rot.y * (PI / 180.0f), pTrans->rot.z * (PI / 180.0f));
+    DirectX::XMMATRIX rotationMatrix = XMMatrixRotationRollPitchYaw(pTrans->rot.x, pTrans->rot.y, pTrans->rot.z);
 
     DirectX::XMMATRIX worldMatrix = rotationMatrix * scaleMatrix * translationMatrix;
     d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Object], 0, nullptr, &worldMatrix, 0, 0);
@@ -484,4 +483,12 @@ void GraphicsSystem::RenderObject(GameObject* pObject, float dt)
 
         d3dDeviceContext->DrawIndexed(pMesh->indexCount, 0, 0);
     }
+}
+
+void GraphicsSystem::SetCameraTrans(Transform *trans)
+{
+    eyePosition = XMVectorSet(trans->pos.x, trans->pos.y, trans->pos.z, 1.0f);
+    //Calculate vector from euler rotation //roll pitch yaw -> pitch yaw roll
+    CBY::Vector rotVector(cos(trans->rot.y) * cos(trans->rot.x), sin(trans->rot.x), sin(trans->rot.y) * cos(trans->rot.x));
+    focusPoint = XMVectorSet(rotVector.x + trans->pos.x, rotVector.y + trans->pos.y, rotVector.z + trans->pos.z, 1.0f);
 }

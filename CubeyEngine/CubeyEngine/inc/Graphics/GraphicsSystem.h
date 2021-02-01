@@ -14,6 +14,7 @@ enum InputLayout
 
 using DirectX::XMMATRIX;
 using DirectX::XMFLOAT3;
+using DirectX::XMVECTOR;
 
 //Manages creation and deletion of objects
 class GraphicsSystem : public CubeySystem
@@ -42,6 +43,8 @@ public:
     //*****************************************
 
 private:
+    static void SetCameraTrans(Transform *trans);
+
     void LoadPixelShader(std::string fileName, std::wstring fileNameWide);
     void LoadVertexShader(std::string fileName, std::wstring fileNameWide);
     void LoadInputLayouts();
@@ -80,6 +83,9 @@ private:
     static ID3D11RasterizerState* d3dRasterizerState;
     static D3D11_VIEWPORT viewport;
 
+    static XMVECTOR eyePosition;
+    static XMVECTOR focusPoint;
+
     //3 Different constant buffers - updated rarely, per frame, and per object - reduces how much data needs to be rewritten
     enum ConstantBuffer
     {
@@ -91,4 +97,6 @@ private:
     ID3D11Buffer* d3dConstantBuffers[NumConstantBuffers];
 
     XMMATRIX viewMatrix, projectionMatrix;
+
+    friend class PlayerController;
 };

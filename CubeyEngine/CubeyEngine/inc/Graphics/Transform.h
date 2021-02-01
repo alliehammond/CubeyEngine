@@ -8,6 +8,7 @@ class Transform : public Component
 {
 public:
     Transform(GameObject *owner);
-    //Rotation uses degrees
+    //Rotation uses radians
+    //rot.x,y,z -> rot.pitch,yaw,roll
     CBY::Vector pos, scale, rot;
 };

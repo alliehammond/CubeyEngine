@@ -18,7 +18,7 @@ public:
     ~GameObject();
 
     //Each game object calls update() and postupdate() of each of their components
-    void Update();
+    void Update(float dt);
     //Deletes game object at the start of next frame
     void Delete();
 

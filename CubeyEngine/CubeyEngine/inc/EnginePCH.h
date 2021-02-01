@@ -39,3 +39,6 @@ inline void SafeRelease(T& ptr)
         ptr = NULL;
     }
 }
+
+//Defines
+#define PI 3.14159265358979f

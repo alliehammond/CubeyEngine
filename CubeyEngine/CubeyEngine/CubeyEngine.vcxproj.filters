@@ -37,6 +37,12 @@
     <Filter Include="Source Files\CYMath">
       <UniqueIdentifier>{68fe73d5-4baf-441c-b1ed-eddac328a972}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Gameplay">
+      <UniqueIdentifier>{0899fa8b-d577-4249-b4a0-0ec23a48169e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Gameplay">
+      <UniqueIdentifier>{dfce8108-6718-40e8-802f-680d92415437}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -71,6 +77,12 @@
     </ClCompile>
     <ClCompile Include="src\Core\InputSystem.cpp">
       <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gameplay\PlayerController.cpp">
+      <Filter>Source Files\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CYMath\Vector.cpp">
+      <Filter>Source Files\CYMath</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +127,9 @@
     </ClInclude>
     <ClInclude Include="inc\Core\InputSystem.h">
       <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Gameplay\PlayerController.h">
+      <Filter>Header Files\Gameplay</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

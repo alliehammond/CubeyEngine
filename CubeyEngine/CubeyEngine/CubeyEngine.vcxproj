@@ -178,12 +178,14 @@
     <ClCompile Include="src\Core\InputSystem.cpp" />
     <ClCompile Include="src\Core\LoggingSystem.cpp" />
     <ClCompile Include="src\Core\ObjectManagerSystem.cpp" />
+    <ClCompile Include="src\CYMath\Vector.cpp" />
     <ClCompile Include="src\EnginePCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Gameplay\PlayerController.cpp" />
     <ClCompile Include="src\Graphics\GraphicsSystem.cpp" />
     <ClCompile Include="src\Graphics\Mesh.cpp" />
     <ClCompile Include="src\Graphics\Model.cpp" />
@@ -200,6 +202,7 @@
     <ClInclude Include="inc\Core\ObjectManagerSystem.h" />
     <ClInclude Include="inc\CYMath\Vector.h" />
     <ClInclude Include="inc\EnginePCH.h" />
+    <ClInclude Include="inc\Gameplay\PlayerController.h" />
     <ClInclude Include="inc\Graphics\GraphicsSystem.h" />
     <ClInclude Include="inc\Graphics\Material.h" />
     <ClInclude Include="inc\Graphics\Mesh.h" />

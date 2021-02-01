@@ -22,18 +22,18 @@ GameObject::~GameObject()
 }
 
 //Each game object calls update() and postupdate() of each of their components
-void GameObject::Update()
+void GameObject::Update(float dt)
 {
     for(auto& it : components)
     {
         if(!it.second)continue;
-        it.second->Update();
+        it.second->Update(dt);
     }
 
     for(auto& it : components)
     {
         if(!it.second)continue;
-        it.second->PostUpdate();
+        it.second->PostUpdate(dt);
     }
 }
 

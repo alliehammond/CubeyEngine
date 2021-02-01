@@ -10,9 +10,9 @@ public:
     Component(GameObject *Owner) : owner(Owner) {}
     Component(GameObject *Owner, std::string compName) : owner(Owner), name(compName) {}
     virtual ~Component() {}
-    virtual void Update() {}
+    virtual void Update(float dt) {}
     //Called after all other components have called update()
-    virtual void PostUpdate() {}
+    virtual void PostUpdate(float dt) {}
     void DeleteComponent() { deleteFlag = true; }
     std::string name = "Component";
     GameObject *owner;

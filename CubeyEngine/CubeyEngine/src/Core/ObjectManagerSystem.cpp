@@ -35,7 +35,7 @@ void ObjectManagerSystem::Update(float dt)
     //Call game object updates
     for(auto &it : gameObjects)
     {
-        it->Update();
+        it->Update(dt);
     }
 }
 
