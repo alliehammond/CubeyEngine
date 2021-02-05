@@ -26,8 +26,7 @@ void PlayerController::Update(float dt)
     if(pTrans->rot.x < -PI / 2.0f)pTrans->rot.x = -PI / 2.0f;
 
     //Player movement
-    //Forward vec only considers yaw
-    CBY::Vector forwardVec(cos(pTrans->rot.y), 0.0f, sin(pTrans->rot.y));
+    CBY::Vector forwardVec(cos(pTrans->rot.y), sin(pTrans->rot.x), sin(pTrans->rot.y));
     if(InputSystem::GetKeyDown('W'))
     {
         pTrans->pos += forwardVec * moveSpeed * dt;

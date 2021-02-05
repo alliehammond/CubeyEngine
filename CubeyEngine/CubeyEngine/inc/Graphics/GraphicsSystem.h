@@ -94,9 +94,9 @@ private:
         CB_Object,
         NumConstantBuffers
     };
-    ID3D11Buffer* d3dConstantBuffers[NumConstantBuffers];
+    static ID3D11Buffer* d3dConstantBuffers[NumConstantBuffers];
 
-    XMMATRIX viewMatrix, projectionMatrix;
+    static XMMATRIX viewMatrix, projectionMatrix;
 
     friend class PlayerController;
 };

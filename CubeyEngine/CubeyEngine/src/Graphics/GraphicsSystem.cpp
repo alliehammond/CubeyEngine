@@ -17,6 +17,8 @@ ID3D11Texture2D* GraphicsSystem::d3dDepthStencilBuffer = 0;
 ID3D11DepthStencilState* GraphicsSystem::d3dDepthStencilState = 0;
 ID3D11RasterizerState* GraphicsSystem::d3dRasterizerState = 0;
 D3D11_VIEWPORT GraphicsSystem::viewport = { 0 };
+ID3D11Buffer* GraphicsSystem::d3dConstantBuffers[NumConstantBuffers] = {0};
+XMMATRIX GraphicsSystem::viewMatrix, GraphicsSystem::projectionMatrix;
 
 std::unordered_map<std::string, ID3D11PixelShader*> GraphicsSystem::pixelShaders;
 std::unordered_map<std::string, ID3D11VertexShader*> GraphicsSystem::vertexShaders;
@@ -100,10 +102,13 @@ void GraphicsSystem::ResizeWindow(int width, int height)
         d3dDeviceContext->OMSetRenderTargets(0, 0, 0);
         // Release all outstanding references to the swap chain's buffers.
         SafeRelease(d3dRenderTargetView);
+        SafeRelease(d3dDepthStencilView);
+        SafeRelease(d3dDepthStencilBuffer);
+        d3dDeviceContext->Flush();
 
         // Preserve the existing buffer count and format.
-        // Automatically choose the width and height to match the client rect for HWNDs.
-        d3dSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+
+        d3dSwapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, 0);
 
         // Get buffer and create a render-target-view.
         ID3D11Texture2D* pBuffer;
@@ -115,19 +120,60 @@ void GraphicsSystem::ResizeWindow(int width, int height)
 
         pBuffer->Release();
 
-        d3dDeviceContext->OMSetRenderTargets(1, &d3dRenderTargetView, NULL);
-
         // Set up the viewport.
-        D3D11_VIEWPORT vp;
-        vp.Width = float(width);
-        vp.Height = float(height);
-        vp.MinDepth = 0.0f;
-        vp.MaxDepth = 1.0f;
-        vp.TopLeftX = 0;
-        vp.TopLeftY = 0;
-        d3dDeviceContext->RSSetViewports(1, &vp);
+        viewport.Width = float(width);
+        viewport.Height = float(height);
+        viewport.MinDepth = 0.0f;
+        viewport.MaxDepth = 1.0f;
+        viewport.TopLeftX = 0;
+        viewport.TopLeftY = 0;
+        d3dDeviceContext->RSSetViewports(1, &viewport);
         windowWidth = width;
         windowHeight = height;
+
+        //Set projection matrix
+        RECT clientRect = { 0, 0, 0, 0 };
+        if(windowHandle)GetClientRect(windowHandle, &clientRect);
+
+        // Compute the exact client dimensions
+        // This is required for a correct projection matrix
+        float clientWidth = static_cast<float>(clientRect.right - clientRect.left);
+        float clientHeight = static_cast<float>(clientRect.bottom - clientRect.top);
+
+        projectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), clientWidth / clientHeight, 0.1f, 100.0f);
+
+        d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Application], 0, nullptr, &projectionMatrix, 0, 0);
+
+        // Create the depth buffer for use with the depth/stencil view.
+        D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
+        ZeroMemory(&depthStencilBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
+
+        depthStencilBufferDesc.ArraySize = 1;
+        depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+        depthStencilBufferDesc.CPUAccessFlags = 0; // No CPU access required.
+        depthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        depthStencilBufferDesc.Width = width;
+        depthStencilBufferDesc.Height = height;
+        depthStencilBufferDesc.MipLevels = 1;
+        depthStencilBufferDesc.SampleDesc.Count = 1;
+        depthStencilBufferDesc.SampleDesc.Quality = 0;
+        depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+
+        HRESULT hr = d3dDevice->CreateTexture2D(&depthStencilBufferDesc, nullptr, &d3dDepthStencilBuffer);
+        if(FAILED(hr))
+        {
+            LOGERROR("Failed to create depth stencil buffer!");
+            return;
+        }
+
+        hr = d3dDevice->CreateDepthStencilView(d3dDepthStencilBuffer, nullptr, &d3dDepthStencilView);
+        if(FAILED(hr))
+        {
+            LOGERROR("Failed to create depth stencil view!");
+            return;
+        }
+
+        d3dDeviceContext->OMSetRenderTargets(1, &d3dRenderTargetView, d3dDepthStencilView);
     }
 }
 
@@ -488,7 +534,7 @@ void GraphicsSystem::RenderObject(GameObject* pObject, float dt)
 void GraphicsSystem::SetCameraTrans(Transform *trans)
 {
     eyePosition = XMVectorSet(trans->pos.x, trans->pos.y, trans->pos.z, 1.0f);
-    //Calculate vector from euler rotation //roll pitch yaw -> pitch yaw roll
+    //Calculate vector from euler rotation
     CBY::Vector rotVector(cos(trans->rot.y) * cos(trans->rot.x), sin(trans->rot.x), sin(trans->rot.y) * cos(trans->rot.x));
     focusPoint = XMVectorSet(rotVector.x + trans->pos.x, rotVector.y + trans->pos.y, rotVector.z + trans->pos.z, 1.0f);
 }
