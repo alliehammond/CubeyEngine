@@ -13,20 +13,16 @@ void PlayerController::Update(float dt)
     //Update player position
 
     //Player rotation
-    if(InputSystem::GetKeyDown('A'))
-        pTrans->rot.y += turnSpeed * dt;
-    if(InputSystem::GetKeyDown('D'))
-        pTrans->rot.y -= turnSpeed * dt;
-    if(InputSystem::GetKeyDown('Q'))
-        pTrans->rot.x += turnSpeed * dt;
-    if(InputSystem::GetKeyDown('E'))
-        pTrans->rot.x -= turnSpeed * dt;
-    //Limit pitch to a 180 degree range
-    if(pTrans->rot.x > PI / 2.0f)pTrans->rot.x = PI / 2.0f;
-    if(pTrans->rot.x < -PI / 2.0f)pTrans->rot.x = -PI / 2.0f;
+    pTrans->rot.y -= InputSystem::GetMouseDeltaX() * turnSpeed * dt;
+    pTrans->rot.x += InputSystem::GetMouseDeltaY() * turnSpeed * dt;
+
+    //Limit pitch to a 180(ish) degree range
+    if(pTrans->rot.x > PI / 2.1f)pTrans->rot.x = PI / 2.1f;
+    if(pTrans->rot.x < -PI / 2.1f)pTrans->rot.x = -PI / 2.1f;
 
     //Player movement
-    CBY::Vector forwardVec(cos(pTrans->rot.y), sin(pTrans->rot.x), sin(pTrans->rot.y));
+    CBY::Vector forwardVec(cos(pTrans->rot.y) * cos(pTrans->rot.x), sin(pTrans->rot.x), sin(pTrans->rot.y) * cos(pTrans->rot.x));
+    CBY::Vector rightVec(cos(pTrans->rot.y - PI / 2.0f), 0.0f, sin(pTrans->rot.y - PI / 2.0f));
     if(InputSystem::GetKeyDown('W'))
     {
         pTrans->pos += forwardVec * moveSpeed * dt;
@@ -34,6 +30,14 @@ void PlayerController::Update(float dt)
     if(InputSystem::GetKeyDown('S'))
     {
         pTrans->pos -= forwardVec * moveSpeed * dt;
+    }
+    if(InputSystem::GetKeyDown('D'))
+    {
+        pTrans->pos += rightVec * moveSpeed * dt;
+    }
+    if(InputSystem::GetKeyDown('A'))
+    {
+        pTrans->pos -= rightVec * moveSpeed * dt;
     }
 
     GraphicsSystem::SetCameraTrans(pTrans);

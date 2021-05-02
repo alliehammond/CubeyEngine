@@ -31,6 +31,9 @@ XMVECTOR GraphicsSystem::focusPoint = XMVectorSet(0, 0, 0, 1);
 
 GraphicsSystem::GraphicsSystem(HINSTANCE hInstance, int cmdShow)
 {
+    //Start cursor as hidden
+    ShowCursor(false);
+
     LOGDEBUG("Graphics system initializing...");
 
     InitApplication(hInstance, cmdShow);
@@ -189,10 +192,19 @@ void GraphicsSystem::ResizeWindow(int width, int height)
 
 void GraphicsSystem::Update(float dt)
 {
+    //Temp toggle mouse lock
+    if(InputSystem::GetKeyPressed('L'))
+    {
+        lockMouseCenter = !lockMouseCenter;
+        ShowCursor(!lockMouseCenter);
+    }
+
     //Lock cursor position
     if(lockMouseCenter)
     {
-        //SetCursorPos(windowWidth / 2, windowHeight / 2);
+        POINT center = {windowWidth / 2, windowHeight / 2 };
+        ClientToScreen(windowHandle, &center);
+        SetCursorPos(center.x, center.y);
     }
 
     if(!windowMinimized)Render(dt);

@@ -52,20 +52,20 @@ void InputSystem::Update(float dt)
     mouseDeltaX = 0;
     mouseDeltaY = 0;
     //Only update mouse deltas if cursor is locked to center of screen
+    static bool ignoreFirstLockFrame = true;//If true ignore first frame where mouse moves to center
     if(GraphicsSystem::GetMouseCursorLock())
     {
-        mouseDeltaX = (int)mouseX - GraphicsSystem::GetWindowWidth() / 2;
-        mouseDeltaY = -((int)mouseY - GraphicsSystem::GetWindowHeight() / 2);
-        LOGDEBUG(std::to_string(mouseDeltaX) + ", " + std::to_string(mouseDeltaY));
+        if(!ignoreFirstLockFrame)
+        {
+            mouseDeltaX = (int)mouseX - GraphicsSystem::GetWindowWidth() / 2;
+            mouseDeltaY = -((int)mouseY - GraphicsSystem::GetWindowHeight() / 2);
+        }
+        ignoreFirstLockFrame = false;
     }
-
-    //Debug print key pressed
-    /*for(int i = 0;i < KeysDown.size(); ++i)
+    else
     {
-        if(KeysDown[i])LOGDEBUG(std::to_string(i) + " down!");
-        if(KeysPressed[i])LOGDEBUG(std::to_string(i) + " pressed!");
-        if(KeysReleased[i])LOGDEBUG(std::to_string(i) + " released!");
-    }*/
+        ignoreFirstLockFrame = true;
+    }
 }
 
 bool InputSystem::GetKeyDown(char key)
