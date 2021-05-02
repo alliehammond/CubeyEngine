@@ -1,4 +1,5 @@
 #include "EnginePCH.h"
+#include "windowsx.h"
 #include "Core\CubeySystem.h"
 #include "Graphics\RenderComponent.h"
 #include "Gameplay\PlayerController.h"
@@ -100,6 +101,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         case WM_KEYUP:
         {
             InputSystem::HandleWindowsMessageKeyUp(unsigned int(wParam));
+        }
+        break;
+        case WM_MOUSEMOVE:
+        {
+            InputSystem::HandleMousePositionMessage(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         }
         break;
         default:

@@ -6,6 +6,8 @@ using namespace DirectX;
 
 int GraphicsSystem::windowWidth = 800;
 int GraphicsSystem::windowHeight = 450;
+bool GraphicsSystem::lockMouseCenter = true;
+bool GraphicsSystem::windowMinimized = false;
 
 ID3D11Device *GraphicsSystem::d3dDevice = 0;
 HWND GraphicsSystem::windowHandle = 0;
@@ -106,80 +108,94 @@ void GraphicsSystem::ResizeWindow(int width, int height)
         SafeRelease(d3dDepthStencilBuffer);
         d3dDeviceContext->Flush();
 
-        // Preserve the existing buffer count and format.
-
-        d3dSwapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, 0);
-
-        // Get buffer and create a render-target-view.
-        ID3D11Texture2D* pBuffer;
-        d3dSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBuffer);
-        if(pBuffer)
+        //Check if window minimized (w/h != 0)
+        if(width && height)
         {
-            d3dDevice->CreateRenderTargetView(pBuffer, NULL, &d3dRenderTargetView);
+            windowMinimized = false;
+            // Preserve the existing buffer count and format.
+            d3dSwapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, 0);
+
+            // Get buffer and create a render-target-view.
+            ID3D11Texture2D* pBuffer;
+            d3dSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBuffer);
+            if(pBuffer)
+            {
+                d3dDevice->CreateRenderTargetView(pBuffer, NULL, &d3dRenderTargetView);
+            }
+
+            pBuffer->Release();
+
+            // Set up the viewport.
+            viewport.Width = float(width);
+            viewport.Height = float(height);
+            viewport.MinDepth = 0.0f;
+            viewport.MaxDepth = 1.0f;
+            viewport.TopLeftX = 0;
+            viewport.TopLeftY = 0;
+            d3dDeviceContext->RSSetViewports(1, &viewport);
+            windowWidth = width;
+            windowHeight = height;
+
+            //Set projection matrix
+            RECT clientRect = { 0, 0, 0, 0 };
+            if(windowHandle)GetClientRect(windowHandle, &clientRect);
+
+            // Compute the exact client dimensions
+            // This is required for a correct projection matrix
+            float clientWidth = static_cast<float>(clientRect.right - clientRect.left);
+            float clientHeight = static_cast<float>(clientRect.bottom - clientRect.top);
+
+            projectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), clientWidth / clientHeight, 0.1f, 100.0f);
+
+            d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Application], 0, nullptr, &projectionMatrix, 0, 0);
+
+            // Create the depth buffer for use with the depth/stencil view.
+            D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
+            ZeroMemory(&depthStencilBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
+
+            depthStencilBufferDesc.ArraySize = 1;
+            depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+            depthStencilBufferDesc.CPUAccessFlags = 0; // No CPU access required.
+            depthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+            depthStencilBufferDesc.Width = width;
+            depthStencilBufferDesc.Height = height;
+            depthStencilBufferDesc.MipLevels = 1;
+            depthStencilBufferDesc.SampleDesc.Count = 1;
+            depthStencilBufferDesc.SampleDesc.Quality = 0;
+            depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+
+            HRESULT hr = d3dDevice->CreateTexture2D(&depthStencilBufferDesc, nullptr, &d3dDepthStencilBuffer);
+            if(FAILED(hr))
+            {
+                LOGERROR("Failed to create depth stencil buffer!");
+                return;
+            }
+
+            hr = d3dDevice->CreateDepthStencilView(d3dDepthStencilBuffer, nullptr, &d3dDepthStencilView);
+            if(FAILED(hr))
+            {
+                LOGERROR("Failed to create depth stencil view!");
+                return;
+            }
+
+            d3dDeviceContext->OMSetRenderTargets(1, &d3dRenderTargetView, d3dDepthStencilView);
         }
-
-        pBuffer->Release();
-
-        // Set up the viewport.
-        viewport.Width = float(width);
-        viewport.Height = float(height);
-        viewport.MinDepth = 0.0f;
-        viewport.MaxDepth = 1.0f;
-        viewport.TopLeftX = 0;
-        viewport.TopLeftY = 0;
-        d3dDeviceContext->RSSetViewports(1, &viewport);
-        windowWidth = width;
-        windowHeight = height;
-
-        //Set projection matrix
-        RECT clientRect = { 0, 0, 0, 0 };
-        if(windowHandle)GetClientRect(windowHandle, &clientRect);
-
-        // Compute the exact client dimensions
-        // This is required for a correct projection matrix
-        float clientWidth = static_cast<float>(clientRect.right - clientRect.left);
-        float clientHeight = static_cast<float>(clientRect.bottom - clientRect.top);
-
-        projectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), clientWidth / clientHeight, 0.1f, 100.0f);
-
-        d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Application], 0, nullptr, &projectionMatrix, 0, 0);
-
-        // Create the depth buffer for use with the depth/stencil view.
-        D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
-        ZeroMemory(&depthStencilBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
-
-        depthStencilBufferDesc.ArraySize = 1;
-        depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-        depthStencilBufferDesc.CPUAccessFlags = 0; // No CPU access required.
-        depthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        depthStencilBufferDesc.Width = width;
-        depthStencilBufferDesc.Height = height;
-        depthStencilBufferDesc.MipLevels = 1;
-        depthStencilBufferDesc.SampleDesc.Count = 1;
-        depthStencilBufferDesc.SampleDesc.Quality = 0;
-        depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-
-        HRESULT hr = d3dDevice->CreateTexture2D(&depthStencilBufferDesc, nullptr, &d3dDepthStencilBuffer);
-        if(FAILED(hr))
+        else
         {
-            LOGERROR("Failed to create depth stencil buffer!");
-            return;
+            windowMinimized = true;
         }
-
-        hr = d3dDevice->CreateDepthStencilView(d3dDepthStencilBuffer, nullptr, &d3dDepthStencilView);
-        if(FAILED(hr))
-        {
-            LOGERROR("Failed to create depth stencil view!");
-            return;
-        }
-
-        d3dDeviceContext->OMSetRenderTargets(1, &d3dRenderTargetView, d3dDepthStencilView);
     }
 }
 
 void GraphicsSystem::Update(float dt)
 {
-    Render(dt);
+    //Lock cursor position
+    if(lockMouseCenter)
+    {
+        //SetCursorPos(windowWidth / 2, windowHeight / 2);
+    }
+
+    if(!windowMinimized)Render(dt);
 }
 
 void GraphicsSystem::LoadPixelShader(std::string fileName, std::wstring fileNameWide)

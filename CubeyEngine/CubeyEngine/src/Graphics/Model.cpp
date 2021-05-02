@@ -91,7 +91,7 @@ bool Model::LoadModel(std::string fileName, Material mat)
             //Assume there are 3 indices per face
             indices[0 + j * 3] = curFace->mIndices[0];
             indices[1 + j * 3] = curFace->mIndices[1];
-            indices[2 + j * 3] = curFace->mIndices[2];        
+            indices[2 + j * 3] = curFace->mIndices[2];
         }
 
         D3D11_BUFFER_DESC indexBufferDesc;

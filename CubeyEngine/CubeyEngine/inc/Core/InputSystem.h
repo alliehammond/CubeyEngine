@@ -15,9 +15,14 @@ public:
     static bool GetKeyDown(char key);
     static bool GetKeyPressed(char key);
     static bool GetKeyReleased(char key);
+    static unsigned GetMouseX() { return mouseX; }
+    static unsigned GetMouseY() { return mouseY; }
+    static int GetMouseDeltaX() { return mouseDeltaX; }
+    static int GetMouseDeltaY() { return mouseDeltaY; }
 
     static void HandleWindowsMessageKeyDown(unsigned int code);
     static void HandleWindowsMessageKeyUp(unsigned int code);
+    static void HandleMousePositionMessage(unsigned x, unsigned y);
 
 private:
     static std::vector<bool> KeysDown;
@@ -25,4 +30,9 @@ private:
     static std::vector<bool> KeysDownPrev;
     static std::vector<bool> KeysPressed;
     static std::vector<bool> KeysReleased;
+
+    //Mouse x, y top left corner is (0, 0)
+    static unsigned mouseX, mouseY;
+    //Mouse delta x positive = right, delta y positive = up
+    static int mouseDeltaX, mouseDeltaY;
 };

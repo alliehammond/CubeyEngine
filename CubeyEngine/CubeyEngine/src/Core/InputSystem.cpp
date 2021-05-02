@@ -7,6 +7,9 @@ std::vector<bool> InputSystem::KeysDownPrev(36);
 std::vector<bool> InputSystem::KeysPressed(36);
 std::vector<bool> InputSystem::KeysReleased(36);
 
+unsigned InputSystem::mouseX = 0, InputSystem::mouseY = 0;
+int InputSystem::mouseDeltaX = 0, InputSystem::mouseDeltaY = 0;
+
 //Vector character layout:
 //0-25 = 'A'-'Z'
 //26-35 = '0'-'9'
@@ -43,6 +46,17 @@ void InputSystem::Update(float dt)
     for(int i = 0;i < KeysDown.size(); ++i)
     {
         KeysDownPrev[i] = KeysDown[i];
+    }
+
+    //Update mouse delta x/y
+    mouseDeltaX = 0;
+    mouseDeltaY = 0;
+    //Only update mouse deltas if cursor is locked to center of screen
+    if(GraphicsSystem::GetMouseCursorLock())
+    {
+        mouseDeltaX = (int)mouseX - GraphicsSystem::GetWindowWidth() / 2;
+        mouseDeltaY = -((int)mouseY - GraphicsSystem::GetWindowHeight() / 2);
+        LOGDEBUG(std::to_string(mouseDeltaX) + ", " + std::to_string(mouseDeltaY));
     }
 
     //Debug print key pressed
@@ -118,4 +132,10 @@ void InputSystem::HandleWindowsMessageKeyUp(unsigned int code)
     {
         KeysDown[26 + code - '0'] = false;
     }
+}
+
+void InputSystem::HandleMousePositionMessage(unsigned x, unsigned y)
+{
+    mouseX = x;
+    mouseY = y;
 }

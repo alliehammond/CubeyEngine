@@ -31,6 +31,10 @@ public:
 
     static void ResizeWindow(int width, int height);
 
+    static bool GetMouseCursorLock() { return lockMouseCenter; }
+    static int GetWindowWidth() { return windowWidth; }
+    static int GetWindowHeight() { return windowHeight; }
+
 
     //*****************************************
     //Input Layouts
@@ -85,6 +89,10 @@ private:
 
     static XMVECTOR eyePosition;
     static XMVECTOR focusPoint;
+
+    //Locks the mouse cursor to center of screen
+    static bool lockMouseCenter;
+    static bool windowMinimized;
 
     //3 Different constant buffers - updated rarely, per frame, and per object - reduces how much data needs to be rewritten
     enum ConstantBuffer
