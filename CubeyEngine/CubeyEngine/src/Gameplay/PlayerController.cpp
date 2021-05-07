@@ -13,8 +13,8 @@ void PlayerController::Update(float dt)
     //Update player position
 
     //Player rotation
-    pTrans->rot.y -= InputSystem::GetMouseDeltaX() * turnSpeed * dt;
-    pTrans->rot.x += InputSystem::GetMouseDeltaY() * turnSpeed * dt;
+    pTrans->rot.y -= InputSystem::GetMouseDeltaX() * turnSpeed;
+    pTrans->rot.x += InputSystem::GetMouseDeltaY() * turnSpeed;
 
     //Limit pitch to a 180(ish) degree range
     if(pTrans->rot.x > PI / 2.1f)pTrans->rot.x = PI / 2.1f;

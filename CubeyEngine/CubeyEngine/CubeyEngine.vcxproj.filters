@@ -43,6 +43,12 @@
     <Filter Include="Source Files\Gameplay">
       <UniqueIdentifier>{dfce8108-6718-40e8-802f-680d92415437}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Terrain">
+      <UniqueIdentifier>{923e34e0-810d-4c22-a3ab-db1599dad8b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Terrain">
+      <UniqueIdentifier>{97403b3d-bd4e-4b7f-b171-1c85d954c550}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -83,6 +89,9 @@
     </ClCompile>
     <ClCompile Include="src\CYMath\Vector.cpp">
       <Filter>Source Files\CYMath</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Terrain\Chunk.cpp">
+      <Filter>Source Files\Terrain</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -130,6 +139,12 @@
     </ClInclude>
     <ClInclude Include="inc\Gameplay\PlayerController.h">
       <Filter>Header Files\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Terrain\Chunk.h">
+      <Filter>Header Files\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\GameDefines.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

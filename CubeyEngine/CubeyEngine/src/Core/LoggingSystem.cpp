@@ -9,6 +9,7 @@ LoggingSystem::LoggingSystem()
     AllocConsole();
     FILE *dummy;
     freopen_s(&dummy, "CONOUT$", "w", stdout);
+    MoveWindow(GetConsoleWindow(), 1000, 200, 900, 500, false);
     
     LOGDEBUG("Logging system initialized!");
 }

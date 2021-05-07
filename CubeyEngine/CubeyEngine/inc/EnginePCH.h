@@ -42,3 +42,4 @@ inline void SafeRelease(T& ptr)
 
 //Defines
 #define PI 3.14159265358979f
+#include "GameDefines.h"

@@ -12,6 +12,6 @@ private:
     //Pointer to transform comp on player object
     Transform *pTrans;
     float moveSpeed = 5.0f;
-    float turnSpeed = 0.08f;
+    float turnSpeed = 0.0006f;
 };
 

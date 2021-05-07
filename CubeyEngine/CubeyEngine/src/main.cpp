@@ -3,8 +3,7 @@
 #include "Core\CubeySystem.h"
 #include "Graphics\RenderComponent.h"
 #include "Gameplay\PlayerController.h"
-
-const float frameRateCap = 120.0f;
+#include "Terrain\Chunk.h"
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _In_ LPWSTR cmdLine, _In_ int cmdShow)
 {
@@ -27,11 +26,17 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
     GameObject *player = ObjectManagerSystem::CreateObject(new GameObject("Player"));
     player->AddComponent<PlayerController>(new PlayerController(player));
     player->GetComponent<Transform>()->pos.x = -10.0f;
+    player->GetComponent<Transform>()->pos.y = 10.0f;
 
-    //Load temp cube
-    GameObject *tempCube = ObjectManagerSystem::CreateObject(new GameObject("Cube!"));
-    RenderComponent *tempComp = tempCube->AddComponent<RenderComponent>(
-        new RenderComponent("BasicCube.fbx", tempCube));
+    //Load temp chunk
+    for(int i = -1; i < 1; ++i)
+    {
+        for(int j = -1; j < 1; ++j)
+        {
+            Chunk testChunk(i, 0, j);
+        }
+    }
+    
 
     while(msg.message != WM_QUIT)
     {
