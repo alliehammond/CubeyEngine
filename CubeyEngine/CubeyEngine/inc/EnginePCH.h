@@ -5,6 +5,7 @@
 #include "Core\GameObject.h"
 #include "Core\ObjectManagerSystem.h"
 #include "Graphics\GraphicsSystem.h"
+#include "Terrain\BlockType.h"
 
 // System includes
 #include <windows.h>

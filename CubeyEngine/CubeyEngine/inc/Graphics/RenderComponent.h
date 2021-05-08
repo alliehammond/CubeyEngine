@@ -8,6 +8,7 @@ class RenderComponent : public Component
 {
 public:
     RenderComponent(std::string modelFileName, GameObject *owner);
+    RenderComponent(Model *Model, GameObject* owner);
     ~RenderComponent();
 
     Model *pModel;

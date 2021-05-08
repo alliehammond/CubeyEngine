@@ -211,6 +211,7 @@
     <ClInclude Include="inc\Graphics\Model.h" />
     <ClInclude Include="inc\Graphics\RenderComponent.h" />
     <ClInclude Include="inc\Graphics\Transform.h" />
+    <ClInclude Include="inc\Terrain\BlockType.h" />
     <ClInclude Include="inc\Terrain\Chunk.h" />
   </ItemGroup>
   <ItemGroup>

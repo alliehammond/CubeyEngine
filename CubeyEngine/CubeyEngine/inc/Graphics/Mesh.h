@@ -15,4 +15,5 @@ private:
     UINT indexCount = 0;
     friend class Model;
     friend class GraphicsSystem;
+    friend class Chunk;
 };

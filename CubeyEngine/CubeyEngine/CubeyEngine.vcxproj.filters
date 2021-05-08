@@ -146,6 +146,9 @@
     <ClInclude Include="inc\GameDefines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\Terrain\BlockType.h">
+      <Filter>Header Files\Terrain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\VertexShaders\BasicVertexShader.hlsl">

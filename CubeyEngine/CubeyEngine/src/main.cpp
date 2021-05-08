@@ -29,11 +29,12 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
     player->GetComponent<Transform>()->pos.y = 10.0f;
 
     //Load temp chunk
-    for(int i = -1; i < 1; ++i)
+    std::vector<Chunk *> chunks;
+    for(int i = -4; i < 4; ++i)
     {
-        for(int j = -1; j < 1; ++j)
+        for(int j = -4; j < 4; ++j)
         {
-            Chunk testChunk(i, 0, j);
+            chunks.push_back(new Chunk(i, 0, j));
         }
     }
     
@@ -63,6 +64,11 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
                 engineSystems[i]->Update(deltaTime);
             }
         }
+    }
+    //temp
+    for(auto &it : chunks)
+    {
+        delete it;
     }
 
     //Cleanup systems

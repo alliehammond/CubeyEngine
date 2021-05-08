@@ -14,6 +14,10 @@ RenderComponent::RenderComponent(std::string modelFileName, GameObject *owner)
     pModel = new Model(modelFileName, mat);
 }
 
+RenderComponent::RenderComponent(Model *Model, GameObject* owner)
+    : Component(owner, "RenderComponent"), pModel(Model)
+{ }
+
 RenderComponent::~RenderComponent()
 {
     delete pModel;

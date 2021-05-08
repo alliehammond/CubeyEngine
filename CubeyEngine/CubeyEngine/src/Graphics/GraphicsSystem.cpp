@@ -59,7 +59,7 @@ GraphicsSystem::GraphicsSystem(HINSTANCE hInstance, int cmdShow)
     float clientWidth = static_cast<float>(clientRect.right - clientRect.left);
     float clientHeight = static_cast<float>(clientRect.bottom - clientRect.top);
 
-    projectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), clientWidth / clientHeight, 0.1f, 100.0f);
+    projectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), clientWidth / clientHeight, 0.1f, 1000000000.0f);
 
     d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Application], 0, nullptr, &projectionMatrix, 0, 0);
 
@@ -148,7 +148,7 @@ void GraphicsSystem::ResizeWindow(int width, int height)
             float clientWidth = static_cast<float>(clientRect.right - clientRect.left);
             float clientHeight = static_cast<float>(clientRect.bottom - clientRect.top);
 
-            projectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), clientWidth / clientHeight, 0.1f, 100.0f);
+            projectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), clientWidth / clientHeight, 0.1f, 1000000000.0f);
 
             d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Application], 0, nullptr, &projectionMatrix, 0, 0);
 

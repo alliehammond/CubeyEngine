@@ -121,3 +121,11 @@ bool Model::LoadModel(std::string fileName, Material mat)
 
     return true;
 }
+
+Model::Model()
+{ }
+
+void Model::AddMesh(Mesh *pMesh)
+{
+    meshes.push_back(pMesh);
+}
