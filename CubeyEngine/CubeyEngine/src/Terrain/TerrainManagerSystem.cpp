@@ -55,6 +55,29 @@ void TerrainManagerSystem::Update(float dt)
         loadedChunks[HashChunkCoord(std::get<0>(tuple), std::get<1>(tuple), std::get<2>(tuple))] = newChunk;
     }
     
+    static float timer = 1.0f;
+    if(timer <= 0.0f)
+    {
+        auto it = loadedChunks.begin();
+        //Delete chunks that are out of render delete range
+        while(it != loadedChunks.end())
+        {
+            Chunk *pChunk = it->second;
+            if(pChunk->x < pcx - CBYDefines::RenderDeleteDistance || pChunk->x > pcx + CBYDefines::RenderDeleteDistance ||
+                pChunk->z < pcz - CBYDefines::RenderDeleteDistance || pChunk->z > pcz + CBYDefines::RenderDeleteDistance)
+            {
+                delete pChunk;
+                it = loadedChunks.erase(it);
+            }
+            else
+            {
+                it++;
+            }
+        }
+        timer = 1.0f;
+    }
+    else
+        timer -= dt;
 }
 
 Chunk* TerrainManagerSystem::GetChunk(short cX, short cY, short cZ)
