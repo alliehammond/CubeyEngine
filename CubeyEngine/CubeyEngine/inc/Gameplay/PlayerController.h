@@ -7,11 +7,12 @@ public:
     PlayerController(GameObject* owner);
     ~PlayerController();
     void Update(float dt);
+    static Transform *GetPlayerTrans();
 
 private:
     //Pointer to transform comp on player object
-    Transform *pTrans;
-    float moveSpeed = 5.0f;
+    static Transform *pTrans;
+    float moveSpeed = 20.0f;
     float turnSpeed = 0.0006f;
 };
 

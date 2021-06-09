@@ -93,6 +93,9 @@
     <ClCompile Include="src\Terrain\Chunk.cpp">
       <Filter>Source Files\Terrain</Filter>
     </ClCompile>
+    <ClCompile Include="src\Terrain\TerrainManagerSystem.cpp">
+      <Filter>Source Files\Terrain</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\EnginePCH.h">
@@ -147,6 +150,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\Terrain\BlockType.h">
+      <Filter>Header Files\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Terrain\TerrainManagerSystem.h">
       <Filter>Header Files\Terrain</Filter>
     </ClInclude>
   </ItemGroup>

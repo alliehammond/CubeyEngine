@@ -1,6 +1,8 @@
 #include "EnginePCH.h"
 #include "Gameplay\PlayerController.h"
 
+Transform *PlayerController::pTrans;
+
 PlayerController::PlayerController(GameObject* owner) : Component(owner, "PlayerController")
 {
     pTrans = owner->GetComponent<Transform>();
@@ -41,4 +43,9 @@ void PlayerController::Update(float dt)
     }
 
     GraphicsSystem::SetCameraTrans(pTrans);
+}
+
+Transform* PlayerController::GetPlayerTrans()
+{
+    return pTrans;
 }

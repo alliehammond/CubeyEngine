@@ -2,12 +2,10 @@
 #include "Terrain\Chunk.h"
 #include "Graphics\RenderComponent.h"
 
-Chunk::Chunk(int xLoc, int yLoc, int zLoc) : x(xLoc), y(yLoc), z(zLoc), blocks(ChunkSize * ChunkSize * ChunkSize)
+Chunk::Chunk(short xLoc, short yLoc, short zLoc) : x(xLoc), y(yLoc), z(zLoc), blocks(CBYDefines::ChunkSize * CBYDefines::ChunkSize * CBYDefines::ChunkSize)
 {
     //Set all blocks to air
-    for(int i = 0;i < ChunkSize * ChunkSize * ChunkSize; ++i)
-        blocks[i] = BlockType::Air;
-
+    std::fill(blocks.begin(), blocks.end(), BlockType::Air);
     LoadChunk();
     CreateChunkMesh();
 }
@@ -20,9 +18,9 @@ Chunk::~Chunk()
 void Chunk::LoadChunk()
 {
     //Temporary chunk generation(lock y axis)
-    for(int i = 0; i < ChunkSize; ++i)
+    for(int i = 0; i < CBYDefines::ChunkSize; ++i)
     {
-        for(int j = 0; j < ChunkSize; ++j)
+        for(int j = 0; j < CBYDefines::ChunkSize; ++j)
         {
             SetBlockChunkRelative(i, 0, j, BlockType::Dirt);
             ++numBlocks;
@@ -52,25 +50,22 @@ void Chunk::CreateChunkMesh()
     int curVertCount = 0;
     int curIndexCount = 0;
 
-    for(unsigned int i = 0; i < ChunkSize; ++i)
+    for(unsigned int i = 0; i < CBYDefines::ChunkSize; ++i)
     {
-        for(unsigned int j = 0; j < ChunkSize; ++j)
+        for(unsigned int j = 0; j < CBYDefines::ChunkSize; ++j)
         {
-            for(unsigned int k = 0;k < ChunkSize; ++k)
+            for(unsigned int k = 0;k < CBYDefines::ChunkSize; ++k)
             {
-                if(GetBlockChunkRelative(i, j, k) == BlockType::Dirt)
+                if(GetBlockChunkRelative(i, j, k) != BlockType::Air)
                 {
                     int blockStartVert = curVertCount;
+                    //Assign vertex colors randomly
+                    for(unsigned int z = 0; z < 8; ++z)
+                    {
+                        vertices[curVertCount + z].color.x = (rand() % 100) / 100.0f; vertices[curVertCount + z].color.y = (rand() % 100) / 100.0f; vertices[curVertCount + z].color.z = (rand() % 100) / 100.0f;
+                    }
                     //SORRY FOR THIS CODE I THINK ITS LESS COMPLEX THAN DOING IT WITH LOOPS
                     //Create the 8 vertices of each block
-                    vertices[curVertCount + 0].color.x = (rand() % 100) / 100.0f; vertices[curVertCount + 0].color.y = (rand() % 100) / 100.0f; vertices[curVertCount + 0].color.z = (rand() % 100) / 100.0f;
-                    vertices[curVertCount + 1].color.x = (rand() % 100) / 100.0f; vertices[curVertCount + 1].color.y = (rand() % 100) / 100.0f; vertices[curVertCount + 1].color.z = (rand() % 100) / 100.0f;
-                    vertices[curVertCount + 2].color.x = (rand() % 100) / 100.0f; vertices[curVertCount + 2].color.y = (rand() % 100) / 100.0f; vertices[curVertCount + 2].color.z = (rand() % 100) / 100.0f;
-                    vertices[curVertCount + 3].color.x = (rand() % 100) / 100.0f; vertices[curVertCount + 3].color.y = (rand() % 100) / 100.0f; vertices[curVertCount + 3].color.z = (rand() % 100) / 100.0f;
-                    vertices[curVertCount + 4].color.x = (rand() % 100) / 100.0f; vertices[curVertCount + 4].color.y = (rand() % 100) / 100.0f; vertices[curVertCount + 4].color.z = (rand() % 100) / 100.0f;
-                    vertices[curVertCount + 5].color.x = (rand() % 100) / 100.0f; vertices[curVertCount + 5].color.y = (rand() % 100) / 100.0f; vertices[curVertCount + 5].color.z = (rand() % 100) / 100.0f;
-                    vertices[curVertCount + 6].color.x = (rand() % 100) / 100.0f; vertices[curVertCount + 6].color.y = (rand() % 100) / 100.0f; vertices[curVertCount + 6].color.z = (rand() % 100) / 100.0f;
-                    vertices[curVertCount + 7].color.x = (rand() % 100) / 100.0f; vertices[curVertCount + 7].color.y = (rand() % 100) / 100.0f; vertices[curVertCount + 7].color.z = (rand() % 100) / 100.0f;
 
                     //Top 4 faces
                     vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 0.0f;
@@ -154,17 +149,18 @@ void Chunk::CreateChunkMesh()
     newModel->AddMesh(newMesh);
 
     blockTerrain = ObjectManagerSystem::CreateObject(new GameObject("BlockTerrainObj"));
-    Transform *pTrans = blockTerrain->AddComponent<Transform>(new Transform(float(x * ChunkSize * BlockSize), float(y * ChunkSize * BlockSize), float(z * ChunkSize * BlockSize), blockTerrain));
-    pTrans->scale = CBY::Vector(BlockSize, BlockSize, BlockSize);
+    Transform *pTrans = blockTerrain->AddComponent<Transform>
+        (new Transform(float(x * CBYDefines::ChunkSize * CBYDefines::BlockSize), float(y * CBYDefines::ChunkSize * CBYDefines::BlockSize), float(z * CBYDefines::ChunkSize * CBYDefines::BlockSize), blockTerrain));
+    pTrans->scale = CBY::Vector(CBYDefines::BlockSize, CBYDefines::BlockSize, CBYDefines::BlockSize);
     blockTerrain->AddComponent<RenderComponent>(new RenderComponent(newModel, blockTerrain));
 }
 
-BlockType Chunk::GetBlockChunkRelative(int x, int y, int z)
+BlockType Chunk::GetBlockChunkRelative(short x, short y, short z)
 {
-    return blocks[x + y * ChunkSize + z * ChunkSize * ChunkSize];
+    return blocks[x + y * CBYDefines::ChunkSize + z * CBYDefines::ChunkSize * CBYDefines::ChunkSize];
 }
 
-void Chunk::SetBlockChunkRelative(int x, int y, int z, BlockType type)
+void Chunk::SetBlockChunkRelative(short x, short y, short z, BlockType type)
 {
-    blocks[x + y * ChunkSize + z * ChunkSize * ChunkSize] = type;
+    blocks[x + y * CBYDefines::ChunkSize + z * CBYDefines::ChunkSize * CBYDefines::ChunkSize] = type;
 }

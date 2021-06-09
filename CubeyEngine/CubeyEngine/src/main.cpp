@@ -4,6 +4,7 @@
 #include "Graphics\RenderComponent.h"
 #include "Gameplay\PlayerController.h"
 #include "Terrain\Chunk.h"
+#include "Terrain\TerrainManagerSystem.h"
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _In_ LPWSTR cmdLine, _In_ int cmdShow)
 {
@@ -21,23 +22,13 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
     engineSystems[CubeySystems::LOGGINGSYSTEM] = new LoggingSystem();
     engineSystems[CubeySystems::OBJECTMANAGERSYSTEM] = new ObjectManagerSystem();
     engineSystems[CubeySystems::GRAPHICSSYSTEM] = new GraphicsSystem(hInstance, cmdShow);
+    engineSystems[CubeySystems::TERRAINMANAGERSYSTEM] = new TerrainManagerSystem();
 
     //Create objects
     GameObject *player = ObjectManagerSystem::CreateObject(new GameObject("Player"));
     player->AddComponent<PlayerController>(new PlayerController(player));
-    player->GetComponent<Transform>()->pos.x = -10.0f;
-    player->GetComponent<Transform>()->pos.y = 10.0f;
-
-    //Load temp chunk
-    std::vector<Chunk *> chunks;
-    for(int i = -4; i < 4; ++i)
-    {
-        for(int j = -4; j < 4; ++j)
-        {
-            chunks.push_back(new Chunk(i, 0, j));
-        }
-    }
-    
+    player->GetComponent<Transform>()->pos.x = 1.0f;
+    player->GetComponent<Transform>()->pos.y = 10.0f;   
 
     while(msg.message != WM_QUIT)
     {
@@ -51,7 +42,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
             DWORD currentTime = timeGetTime();
             float deltaTime = (currentTime - previousTime) / 1000.0f;
             previousTime = currentTime;
-            float targetDT = 1.0f / frameRateCap;
+            float targetDT = 1.0f / CBYDefines::frameRateCap;
             if(deltaTime < targetDT)
             {
                 //Cap framerate
@@ -61,21 +52,20 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
             //Update systems
             for(int i = 0; i < CubeySystems::SYSTEMCOUNT; ++i)
             {
+                
                 engineSystems[i]->Update(deltaTime);
             }
         }
-    }
-    //temp
-    for(auto &it : chunks)
-    {
-        delete it;
     }
 
     //Cleanup systems
     for(int i = 0; i < CubeySystems::SYSTEMCOUNT; ++i)
     {
-        delete engineSystems[i];
+        //Skip object manager deletion for last
+        if(i != CubeySystems::OBJECTMANAGERSYSTEM)
+            delete engineSystems[i];
     }
+    delete engineSystems[CubeySystems::OBJECTMANAGERSYSTEM];
 
     return 0;
 }
