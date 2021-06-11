@@ -1,0 +1,39 @@
+~~Region file file format!~~
+*64x64x64 chunks are seperated into regions containing a 4x4x4 volume of chunks (64 chunks)
+*For the purposes of this file, upper-left refers to the minimum x, y, z chunk coordinate
+*Chunk coordinates or chunk x, y, z refers to the integer chunk coordinates, not the world coordinates
+	(ChunkPosition * ChunkSize * BlockSize == ChunkWorldPosition) where chunk size is 64
+*Blocks are stored as single bytes, if more than 256 block types are needed a simlar solution to Minecraft will be used with block palettes
+
+~~File Naming~~
+Region[RegionHash].dat
+RegionHash is the 8 byte hash value of the upper-left chunk of the region as computed by the same hash function used
+	to hash chunks in the loadedChunks unordered_map - this hash value is guaranteed to be unique
+RegionHash is displayed as an 8 byte unsigned integer for the purposes of file naming
+
+~~Format~~
+~~Header~~ [256 bytes]
+*Chunks are stored with the same relative ordering as blocks (see below)
+[4 bytes] Chunk0(0, 0, 0) - unsigned integer file byte offset, to be multiplied by 256 for the actual byte offset - This indicates the starting byte in the file of the chunk data
+	-A value of 0 indicates the chunk doesn't exist
+.
+.
+[4 bytes] Chunk63(3, 3, 3) - unsigned integer file byte offset, to be multiplied by 256 for the actual byte offset - This indicates the starting byte in the file of the chunk data
+	-A value of 0 indicates the chunk doesn't exist
+
+~~Chunk Data~~
+(For each chunk data offset, starting on 256 byte boundaries)
+*Blocks are stored by iterating through x on the inner loop, y on the middle loop, and z on the outer loop
+[64 bytes] Blocks (0-63, 0, 0)
+[64 bytes] Blocks (0-63, 1, 0)
+.
+.
+[64 bytes] Blocks(0-63, 63, 0)
+[64 bytes] Blocks(0-63, 0, 1)
+[64 bytes] Blocks(0-63, 1, 1)
+.
+.
+[64 bytes] Blocks(0-63, 63, 1)
+.
+.
+[64 bytes] Blocks(0-63, 63, 63)
