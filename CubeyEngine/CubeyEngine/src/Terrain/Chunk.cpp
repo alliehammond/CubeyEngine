@@ -2,19 +2,22 @@
 #include "Terrain\Chunk.h"
 #include "Graphics\RenderComponent.h"
 
-Chunk::Chunk(short xLoc, short yLoc, short zLoc) : x(xLoc), y(yLoc), z(zLoc), blocks(CBYDefines::ChunkSize * CBYDefines::ChunkSize * CBYDefines::ChunkSize)
+Chunk::Chunk(short xLoc, short yLoc, short zLoc, bool empty_) : x(xLoc), y(yLoc), z(zLoc), empty(empty_), blockTerrain(0)
 {
     //Set all blocks to air
     std::fill(blocks.begin(), blocks.end(), BlockType::Air);
-    LoadChunk();
-    CreateChunkMesh();
+    if(!empty)blocks.resize(CBYDefines::ChunkSize * CBYDefines::ChunkSize * CBYDefines::ChunkSize);
+
+    /*LoadChunk();
+    CreateChunkMesh();*/
 }
 
 Chunk::~Chunk()
 {
-    blockTerrain->Delete();
+    if(blockTerrain)blockTerrain->Delete();
 }
 
+//Temp for generating chunk without loading chunk data
 void Chunk::LoadChunk()
 {
     //Temporary chunk generation(lock y axis)
@@ -30,6 +33,8 @@ void Chunk::LoadChunk()
 
 void Chunk::CreateChunkMesh()
 {
+    if(empty)return;
+
     //Temp use hardcoded material
     Material mat;
     mat.name = "BasicMat";
@@ -157,9 +162,11 @@ void Chunk::CreateChunkMesh()
 
 BlockType Chunk::GetBlockChunkRelative(short x, short y, short z)
 {
+    if(empty)return BlockType::Air;
     return blocks[x + y * CBYDefines::ChunkSize + z * CBYDefines::ChunkSize * CBYDefines::ChunkSize];
 }
 
+//Don't use this function to set blocks in empty chunk
 void Chunk::SetBlockChunkRelative(short x, short y, short z, BlockType type)
 {
     blocks[x + y * CBYDefines::ChunkSize + z * CBYDefines::ChunkSize * CBYDefines::ChunkSize] = type;

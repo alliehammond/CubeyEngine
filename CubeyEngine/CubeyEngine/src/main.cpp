@@ -30,6 +30,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
     player->GetComponent<Transform>()->pos.x = 1.0f;
     player->GetComponent<Transform>()->pos.y = 10.0f;   
 
+
     while(msg.message != WM_QUIT)
     {
         if(PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
@@ -42,17 +43,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
             DWORD currentTime = timeGetTime();
             float deltaTime = (currentTime - previousTime) / 1000.0f;
             previousTime = currentTime;
-            float targetDT = 1.0f / CBYDefines::frameRateCap;
-            if(deltaTime < targetDT)
-            {
-                //Cap framerate
-                Sleep(int((targetDT - deltaTime) * 1000.0f));
-            }
 
             //Update systems
             for(int i = 0; i < CubeySystems::SYSTEMCOUNT; ++i)
             {
-                
                 engineSystems[i]->Update(deltaTime);
             }
         }
