@@ -13,6 +13,11 @@ PlayerController::~PlayerController() { }
 void PlayerController::Update(float dt)
 {
     //Update player position
+    float activeMoveSpeed = moveSpeed;
+    if(InputSystem::GetKeyDown(KeyCode::CTRL))
+        activeMoveSpeed = slowMoveSpeed;
+    if(InputSystem::GetKeyDown(KeyCode::SHIFT))
+        activeMoveSpeed = fastMoveSpeed;
 
     //Player rotation
     pTrans->rot.y -= InputSystem::GetMouseDeltaX() * turnSpeed;
@@ -27,19 +32,19 @@ void PlayerController::Update(float dt)
     CBY::Vector rightVec(cos(pTrans->rot.y - PI / 2.0f), 0.0f, sin(pTrans->rot.y - PI / 2.0f));
     if(InputSystem::GetKeyDown('W'))
     {
-        pTrans->pos += forwardVec * moveSpeed * dt;
+        pTrans->pos += forwardVec * activeMoveSpeed * dt;
     }
     if(InputSystem::GetKeyDown('S'))
     {
-        pTrans->pos -= forwardVec * moveSpeed * dt;
+        pTrans->pos -= forwardVec * activeMoveSpeed * dt;
     }
     if(InputSystem::GetKeyDown('D'))
     {
-        pTrans->pos += rightVec * moveSpeed * dt;
+        pTrans->pos += rightVec * activeMoveSpeed * dt;
     }
     if(InputSystem::GetKeyDown('A'))
     {
-        pTrans->pos -= rightVec * moveSpeed * dt;
+        pTrans->pos -= rightVec * activeMoveSpeed * dt;
     }
 
     GraphicsSystem::SetCameraTrans(pTrans);

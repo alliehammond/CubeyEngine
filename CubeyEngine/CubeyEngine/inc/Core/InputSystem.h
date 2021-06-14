@@ -2,6 +2,14 @@
 #include "Core\CubeySystem.h"
 #include <vector>
 
+enum class KeyCode : unsigned char
+{
+    CTRL = 36,
+    SHIFT,
+    ALT,
+    NUMCODES
+};
+
 //Note: Use either number chars or capital letter chars to reference keypress ('1','A' for example)
 //Note Key pressed/Key released will be true on the frame a key is either pressed or released
 //      Key down will be true while the key is held down (and on the frame it is pressed or released)
@@ -15,6 +23,9 @@ public:
     static bool GetKeyDown(char key);
     static bool GetKeyPressed(char key);
     static bool GetKeyReleased(char key);
+    static bool GetKeyDown(KeyCode key);
+    static bool GetKeyPressed(KeyCode key);
+    static bool GetKeyReleased(KeyCode key);
     static unsigned GetMouseX() { return mouseX; }
     static unsigned GetMouseY() { return mouseY; }
     static int GetMouseDeltaX() { return mouseDeltaX; }
