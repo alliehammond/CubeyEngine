@@ -7,9 +7,6 @@ Chunk::Chunk(short xLoc, short yLoc, short zLoc, bool empty_) : x(xLoc), y(yLoc)
     //Set all blocks to air
     std::fill(blocks.begin(), blocks.end(), BlockType::Air);
     if(!empty)blocks.resize(CBYDefines::ChunkSize * CBYDefines::ChunkSize * CBYDefines::ChunkSize);
-
-    /*LoadChunk();
-    CreateChunkMesh();*/
 }
 
 Chunk::~Chunk()
@@ -31,6 +28,7 @@ void Chunk::LoadChunk()
     }
 }
 
+//Creates the chunk mesh once blocks vector has been filled and numBlocks has been set to number of non-air blocks
 void Chunk::CreateChunkMesh()
 {
     if(empty)return;
@@ -65,9 +63,10 @@ void Chunk::CreateChunkMesh()
                 {
                     int blockStartVert = curVertCount;
                     //Assign vertex colors randomly
+                    float colr = (rand() % 100) / 100.0f, colg = 0.0f, colb = colr;
                     for(unsigned int z = 0; z < 8; ++z)
                     {
-                        vertices[curVertCount + z].color.x = (rand() % 100) / 100.0f; vertices[curVertCount + z].color.y = (rand() % 100) / 100.0f; vertices[curVertCount + z].color.z = (rand() % 100) / 100.0f;
+                        vertices[curVertCount + z].color.x = colr; vertices[curVertCount + z].color.y = colg; vertices[curVertCount + z].color.z = colb;
                     }
                     //SORRY FOR THIS CODE I THINK ITS LESS COMPLEX THAN DOING IT WITH LOOPS
                     //Create the 8 vertices of each block

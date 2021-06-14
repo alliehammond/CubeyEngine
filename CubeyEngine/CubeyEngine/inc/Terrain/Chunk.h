@@ -21,6 +21,7 @@ private:
     bool empty;
 
     void LoadChunk();
+    //Creates the chunk mesh once blocks vector has been filled and numBlocks has been set to number of non-air blocks
     void CreateChunkMesh();
     //Don't use this function to set blocks in empty chunk
     void SetBlockChunkRelative(short x, short y, short z, BlockType type);

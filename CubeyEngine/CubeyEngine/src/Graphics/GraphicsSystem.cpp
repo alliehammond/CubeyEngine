@@ -504,7 +504,7 @@ void GraphicsSystem::Clear(const FLOAT clearColor[4], FLOAT clearDepth, UINT8 cl
 
 void GraphicsSystem::Render(float dt)
 {
-    Clear(Colors::DeepPink, 1.0f, 0);
+    Clear(Colors::SkyBlue, 1.0f, 0);
 
     XMVECTOR upDirection = XMVectorSet(0, 1, 0, 0);
     viewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
