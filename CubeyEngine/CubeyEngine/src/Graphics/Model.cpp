@@ -6,18 +6,17 @@
 
 const std::string modelPath = "../resources/models/";
 
-Model::Model(std::string fileName, Material mat)
+Model::Model(std::string fileName, Material *mat)
 {
     LoadModel(fileName, mat);
 }
 
 Model::~Model()
 {
-    for(auto &it : meshes)
-        delete it;
+    ClearModel();
 }
 
-bool Model::LoadModel(std::string fileName, Material mat)
+bool Model::LoadModel(std::string fileName, Material *mat)
 {
     if(!meshes.empty())
     {
@@ -43,8 +42,7 @@ bool Model::LoadModel(std::string fileName, Material mat)
     for(unsigned int i = 0;i < scene->mNumMeshes; ++i)
     {
         aiMesh *curMesh = scene->mMeshes[i];
-        Mesh *newMesh = new Mesh();
-        newMesh->material = mat;
+        Mesh *newMesh = new Mesh(mat);
         //Assume 3 indices per face
         newMesh->indexCount = 3 * curMesh->mNumFaces;
         totalFaces += curMesh->mNumFaces;
@@ -128,4 +126,11 @@ Model::Model()
 void Model::AddMesh(Mesh *pMesh)
 {
     meshes.push_back(pMesh);
+}
+
+void Model::ClearModel()
+{
+    for(auto& it : meshes)
+        delete it;
+    meshes.clear();
 }

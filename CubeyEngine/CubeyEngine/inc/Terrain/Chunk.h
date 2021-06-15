@@ -13,8 +13,9 @@ public:
     //Chunk location (chunks next to each other increment by 1 not by absolute location)
     short x, y, z;
     BlockType GetBlockChunkRelative(short x, short y, short z);
-    //Create public function for setting blocks: check if chunk is empty and if so resize blocks vector/set empty to false, also check if adding a non air block and inc/dec numBlocks
-    
+    //Sets a block in the chunk, if regenMesh is true regenerates the mesh after
+    void SetBlock(short x, short y, short z, BlockType type, bool regenMesh = true);
+
 private:
     //Number of non-air blocks
     int numBlocks = 0;

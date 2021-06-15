@@ -4,9 +4,11 @@
 
 Chunk::Chunk(short xLoc, short yLoc, short zLoc, bool empty_) : x(xLoc), y(yLoc), z(zLoc), empty(empty_), blockTerrain(0)
 {
-    //Set all blocks to air
-    std::fill(blocks.begin(), blocks.end(), BlockType::Air);
-    if(!empty)blocks.resize(CBYDefines::ChunkSize * CBYDefines::ChunkSize * CBYDefines::ChunkSize);
+    if(!empty)
+    {
+        blocks.resize(CBYDefines::ChunkSize * CBYDefines::ChunkSize * CBYDefines::ChunkSize);
+        std::fill(blocks.begin(), blocks.end(), BlockType::Air);
+    }
 }
 
 Chunk::~Chunk()
@@ -33,6 +35,13 @@ void Chunk::CreateChunkMesh()
 {
     if(empty)return;
 
+    //Clear chunk model if it already exists
+    if(blockTerrain)
+    {
+        Model *pModel = blockTerrain->GetComponent<RenderComponent>()->pModel;
+        pModel->ClearModel();
+    }
+
     //Temp use hardcoded material
     Material mat;
     mat.name = "BasicMat";
@@ -40,8 +49,7 @@ void Chunk::CreateChunkMesh()
     mat.pVertShader = GraphicsSystem::GetVertexShader("BasicVertexShader.cso");
     mat.pInputLayout = GraphicsSystem::GetInputLayout(InputLayout::POSCOL);
 
-    Mesh* newMesh = new Mesh();
-    newMesh->material = mat;
+    Mesh* newMesh = new Mesh(&mat);
     //3 indices per face, 6 sides per cube, 2 faces per side of cube
     newMesh->indexCount = 3 * 6 * 2 * numBlocks;
 
@@ -63,7 +71,7 @@ void Chunk::CreateChunkMesh()
                 {
                     int blockStartVert = curVertCount;
                     //Assign vertex colors randomly
-                    float colr = (rand() % 100) / 100.0f, colg = 0.0f, colb = colr;
+                    float colr = (i % 2) / 3.0f + (k % 2) / 3.0f + (j % 2) / 3.0f, colg = 0.0f, colb = colr;
                     for(unsigned int z = 0; z < 8; ++z)
                     {
                         vertices[curVertCount + z].color.x = colr; vertices[curVertCount + z].color.y = colg; vertices[curVertCount + z].color.z = colb;
@@ -149,20 +157,46 @@ void Chunk::CreateChunkMesh()
     delete[] vertices;
     delete[] indices;
 
-    Model *newModel = new Model();
-    newModel->AddMesh(newMesh);
-
-    blockTerrain = ObjectManagerSystem::CreateObject(new GameObject("BlockTerrainObj"));
-    Transform *pTrans = blockTerrain->AddComponent<Transform>
-        (new Transform(float(x * CBYDefines::ChunkSize * CBYDefines::BlockSize), float(y * CBYDefines::ChunkSize * CBYDefines::BlockSize), float(z * CBYDefines::ChunkSize * CBYDefines::BlockSize), blockTerrain));
-    pTrans->scale = CBY::Vector(CBYDefines::BlockSize, CBYDefines::BlockSize, CBYDefines::BlockSize);
-    blockTerrain->AddComponent<RenderComponent>(new RenderComponent(newModel, blockTerrain));
+    if(!blockTerrain)
+    {
+        Model* newModel = new Model();
+        newModel->AddMesh(newMesh);
+        blockTerrain = ObjectManagerSystem::CreateObject(new GameObject("BlockTerrainObj"));
+        Transform *pTrans = blockTerrain->AddComponent<Transform>
+            (new Transform(float(x * CBYDefines::ChunkSize * CBYDefines::BlockSize), float(y * CBYDefines::ChunkSize * CBYDefines::BlockSize), float(z * CBYDefines::ChunkSize * CBYDefines::BlockSize), blockTerrain));
+        pTrans->scale = CBY::Vector(CBYDefines::BlockSize, CBYDefines::BlockSize, CBYDefines::BlockSize);
+        blockTerrain->AddComponent<RenderComponent>(new RenderComponent(newModel, blockTerrain));
+    }
+    else
+    {
+        blockTerrain->GetComponent<RenderComponent>()->pModel->AddMesh(newMesh);
+    }
 }
 
 BlockType Chunk::GetBlockChunkRelative(short x, short y, short z)
 {
     if(empty)return BlockType::Air;
     return blocks[x + y * CBYDefines::ChunkSize + z * CBYDefines::ChunkSize * CBYDefines::ChunkSize];
+}
+
+//Check if chunk is empty and if so resize blocks vector/set empty to false, also check if adding a non air block and inc/dec numBlocks
+void Chunk::SetBlock(short x, short y, short z, BlockType type, bool regenMesh)
+{
+    if(type == BlockType::Air && empty)return;
+    if(empty)
+    {
+        //Chunk is empty, create blocks vector
+        empty = false;
+        blocks.resize(CBYDefines::ChunkSize * CBYDefines::ChunkSize * CBYDefines::ChunkSize);
+        std::fill(blocks.begin(), blocks.end(), BlockType::Air);
+    }
+    BlockType curType = GetBlockChunkRelative(x, y, z);
+    if(curType == type)return;
+    if(curType == BlockType::Air)++numBlocks;
+    if(curType != BlockType::Air && type == BlockType::Air)--numBlocks;
+    SetBlockChunkRelative(x, y, z, type);
+
+    if(regenMesh)CreateChunkMesh();
 }
 
 //Don't use this function to set blocks in empty chunk

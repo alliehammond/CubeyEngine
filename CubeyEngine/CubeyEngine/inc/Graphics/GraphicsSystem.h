@@ -85,6 +85,7 @@ private:
     static ID3D11Texture2D* d3dDepthStencilBuffer;
     static ID3D11DepthStencilState* d3dDepthStencilState;
     static ID3D11RasterizerState* d3dRasterizerState;
+    static ID3D11BlendState* d3dBlendState;
     static D3D11_VIEWPORT viewport;
 
     static XMVECTOR eyePosition;

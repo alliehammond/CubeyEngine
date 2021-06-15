@@ -96,6 +96,9 @@
     <ClCompile Include="src\Terrain\TerrainManagerSystem.cpp">
       <Filter>Source Files\Terrain</Filter>
     </ClCompile>
+    <ClCompile Include="src\Graphics\Material.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\EnginePCH.h">
@@ -162,6 +165,9 @@
     </FxCompile>
     <FxCompile Include="shaders\PixelShaders\BasicPixelShader.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\VertexShaders\BlockPlacementDisplayVS.hlsl">
+      <Filter>Resource Files\VertexShaders</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

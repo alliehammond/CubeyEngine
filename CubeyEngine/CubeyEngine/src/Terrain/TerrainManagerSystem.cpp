@@ -100,6 +100,18 @@ Chunk* TerrainManagerSystem::GetChunk(short cX, short cY, short cZ)
     return it->second;
 }
 
+//Gets the corresponding chunk coordinate to inputted block coordinate  
+short TerrainManagerSystem::GetChunkCoordinate(int n)
+{
+    if(n >= 0)
+    {
+        return n / CBYDefines::ChunkSize;
+    }
+    if(n % CBYDefines::ChunkSize == 0)
+        return n / CBYDefines::ChunkSize;
+    return (n / CBYDefines::ChunkSize) - 1;
+}
+
 //Rounds a single coordinate value to the region coordinate
 short GetRegionShortCoordFromShort(short n)
 {
@@ -168,6 +180,35 @@ void TerrainManagerSystem::SaveLoadedChunks()
         SaveRegion(std::get<0>(coord), std::get<1>(coord), std::get<2>(coord), it.second);
     }
 }
+
+//Uses block coordinates
+void TerrainManagerSystem::SetBlockInLoadedChunk(int x, int y, int z, BlockType type)
+{
+    int cx = GetChunkCoordinate(x);
+    int cy = GetChunkCoordinate(y);
+    int cz = GetChunkCoordinate(z);
+
+    Chunk* pChunk = GetChunk(cx, cy, cz);
+    if(!pChunk)
+    {
+        LOGWARNING("Attempting to set block in unloaded chunk! (" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")");
+        return;
+    }
+    pChunk->SetBlock(x - cx * CBYDefines::ChunkSize, y - cy * CBYDefines::ChunkSize, z - cz * CBYDefines::ChunkSize, type, true);
+}
+
+//Uses block coordinates, returns air if chunk is not loaded
+BlockType TerrainManagerSystem::GetBlockInLoadedChunk(int x, int y, int z)
+{
+    int cx = GetChunkCoordinate(x);
+    int cy = GetChunkCoordinate(y);
+    int cz = GetChunkCoordinate(z);
+
+    Chunk *pChunk = GetChunk(cx, cy, cz);
+    if(!pChunk)return BlockType::Air;
+    return pChunk->GetBlockChunkRelative(x - cx * CBYDefines::ChunkSize, y - cy * CBYDefines::ChunkSize, z - cz * CBYDefines::ChunkSize);
+}
+
 
 //Don't modify this function - will invalidate all region files
 unsigned __int64 TerrainManagerSystem::HashChunkCoord(short cX, short cY, short cZ)

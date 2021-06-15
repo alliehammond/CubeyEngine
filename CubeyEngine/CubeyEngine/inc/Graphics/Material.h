@@ -9,4 +9,6 @@ struct Material
     ID3D11VertexShader *pVertShader = 0;
     ID3D11InputLayout *pInputLayout = 0;
     std::string name = "Material";
+
+    virtual Material *Clone();
 };

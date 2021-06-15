@@ -3,12 +3,29 @@
 
 Transform *PlayerController::pTrans;
 
-PlayerController::PlayerController(GameObject* owner) : Component(owner, "PlayerController")
+PlayerController::PlayerController(GameObject* owner) : Component(owner, "PlayerController"), pBlockPlacementOutline(0), showBlockPlaceOutline(false)
 {
     pTrans = owner->GetComponent<Transform>();
+
+    //Block placement outline
+    Material mat;
+    mat.name = "BlockPlaceMaterial";
+    mat.pPixShader = GraphicsSystem::GetPixelShader("BasicPixelShader.cso");
+    mat.pVertShader = GraphicsSystem::GetVertexShader("BlockPlacementDisplayVS.cso");
+    mat.pInputLayout = GraphicsSystem::GetInputLayout(InputLayout::POSCOL);
+
+    pBlockPlacementOutline = ObjectManagerSystem::CreateObject(new GameObject("BlockPlacementOutline"));
+    Transform* pBlockTrans = pBlockPlacementOutline->AddComponent<Transform>(new Transform(pBlockPlacementOutline));
+    pBlockTrans->scale = CBY::Vector(1.05f, 1.05f, 1.05f);
+    RenderComponent *rComp = pBlockPlacementOutline->AddComponent<RenderComponent>(new RenderComponent("BasicCube.fbx", &mat, pBlockPlacementOutline));
+    rComp->renderComponent = showBlockPlaceOutline;
+    rComp->transparent = true;
 }
 
-PlayerController::~PlayerController() { }
+PlayerController::~PlayerController()
+{
+    pBlockPlacementOutline->Delete();
+}
 
 void PlayerController::Update(float dt)
 {
@@ -48,9 +65,51 @@ void PlayerController::Update(float dt)
     }
 
     GraphicsSystem::SetCameraTrans(pTrans);
+
+    //Block placement
+    if(InputSystem::GetKeyPressed('B'))
+    {
+        showBlockPlaceOutline = !showBlockPlaceOutline;
+        pBlockPlacementOutline->GetComponent<RenderComponent>()->renderComponent = showBlockPlaceOutline;
+    }
+    //Update block placement outline pos
+    auto pos = GetBlockPlacementCoord();
+    pBlockPlacementOutline->GetComponent<Transform>()->pos = CBY::Vector((float)std::get<0>(pos) + 0.5f, (float)std::get<1>(pos) + 0.5f, (float)std::get<2>(pos) + 0.5f);
+
+    if(showBlockPlaceOutline)
+    {
+        if(InputSystem::GetKeyPressed('0'))
+        {
+            PlaceBlock(BlockType::Air);
+        }
+        if(InputSystem::GetKeyPressed('1'))
+        {
+            PlaceBlock(BlockType::Dirt);
+        }
+    }
 }
 
 Transform* PlayerController::GetPlayerTrans()
 {
     return pTrans;
+}
+
+std::tuple<int, int, int> PlayerController::GetBlockPlacementCoord()
+{
+    CBY::Vector forwardVec(cos(pTrans->rot.y) * cos(pTrans->rot.x), sin(pTrans->rot.x), sin(pTrans->rot.y) * cos(pTrans->rot.x));
+    forwardVec *= 5;
+    int curBlockX = int(std::floor(pTrans->pos.x));
+    int curBlockY = int(std::floor(pTrans->pos.y));
+    int curBlockZ = int(std::floor(pTrans->pos.z));
+
+    return std::tuple<int, int, int>(int(curBlockX + std::round(forwardVec.x)), int(curBlockY + std::round(forwardVec.y)), int(curBlockZ + std::round(forwardVec.z)));
+}
+
+void PlayerController::PlaceBlock(BlockType type)
+{
+    std::tuple<int, int, int> pos = GetBlockPlacementCoord();
+    if(std::get<1>(pos) < 256 && std::get<1>(pos) >= 0)
+    {
+        TerrainManagerSystem::SetBlockInLoadedChunk(std::get<0>(pos), std::get<1>(pos), std::get<2>(pos), type);
+    }
 }

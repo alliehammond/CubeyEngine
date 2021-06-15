@@ -18,6 +18,7 @@ ID3D11DepthStencilView* GraphicsSystem::d3dDepthStencilView = 0;
 ID3D11Texture2D* GraphicsSystem::d3dDepthStencilBuffer = 0;
 ID3D11DepthStencilState* GraphicsSystem::d3dDepthStencilState = 0;
 ID3D11RasterizerState* GraphicsSystem::d3dRasterizerState = 0;
+ID3D11BlendState* GraphicsSystem::d3dBlendState = 0;
 D3D11_VIEWPORT GraphicsSystem::viewport = { 0 };
 ID3D11Buffer* GraphicsSystem::d3dConstantBuffers[NumConstantBuffers] = {0};
 XMMATRIX GraphicsSystem::viewMatrix, GraphicsSystem::projectionMatrix;
@@ -43,6 +44,7 @@ GraphicsSystem::GraphicsSystem(HINSTANCE hInstance, int cmdShow)
 
     LOGDEBUG("Loading vertex shaders...");
     LoadVertexShader("BasicVertexShader.cso", L"BasicVertexShader.cso");
+    LoadVertexShader("BlockPlacementDisplayVS.cso", L"BlockPlacementDisplayVS.cso");
 
     LOGDEBUG("Loading pixel shaders...");
     LoadPixelShader("BasicPixelShader.cso", L"BasicPixelShader.cso");
@@ -98,6 +100,7 @@ GraphicsSystem::~GraphicsSystem()
     SafeRelease(d3dSwapChain);
     SafeRelease(d3dDeviceContext);
     SafeRelease(d3dDevice);
+    SafeRelease(d3dBlendState);
 }
 
 void GraphicsSystem::ResizeWindow(int width, int height)
@@ -493,6 +496,22 @@ void GraphicsSystem::InitDirectX(HINSTANCE hInstance)
     viewport.TopLeftY = 0.0f;
     viewport.MinDepth = 0.0f;
     viewport.MaxDepth = 1.0f;
+
+    //Setup blend state
+    D3D11_BLEND_DESC blendDesc;
+    ZeroMemory(&blendDesc, sizeof(D3D11_BLEND_DESC));
+    blendDesc.RenderTarget[0].BlendEnable = TRUE;
+    blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+    blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+    blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+    blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+    blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+    d3dDevice->CreateBlendState(&blendDesc, &d3dBlendState);
+
+    d3dDeviceContext->OMSetBlendState(d3dBlendState, 0, 0xffffffff);
 }
 
 // Clear the color and depth buffers.
@@ -510,14 +529,29 @@ void GraphicsSystem::Render(float dt)
     viewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
     d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Frame], 0, nullptr, &viewMatrix, 0, 0);
     
+    //Use to render transparent objects last
+    std::vector<GameObject *> transparentObjects;
     //Call render object on each object with a render component
     for(auto &it : ObjectManagerSystem::gameObjects)
     {
         RenderComponent *renderComp = it->GetComponent<RenderComponent>();
-        if(renderComp)
+        if(renderComp && renderComp->renderComponent)
         {
-            RenderObject(it, dt);
+            if(renderComp->transparent)
+            {
+                transparentObjects.push_back(it);
+            }
+            else
+            {
+                RenderObject(it, dt);
+            }
         }
+    }
+
+    //Render transparent objects after regular ones
+    for(auto& it : transparentObjects)
+    {
+        RenderObject(it, dt);
     }
 
     d3dSwapChain->Present(enableVSync, 0);
@@ -541,13 +575,13 @@ void GraphicsSystem::RenderObject(GameObject* pObject, float dt)
 
         //Render object
         d3dDeviceContext->IASetVertexBuffers(0, 1, &pMesh->vertexBuffer, &vertexStride, &offset);
-        d3dDeviceContext->IASetInputLayout(pMesh->material.pInputLayout);
+        d3dDeviceContext->IASetInputLayout(pMesh->material->pInputLayout);
         d3dDeviceContext->IASetIndexBuffer(pMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
         d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        d3dDeviceContext->VSSetShader(pMesh->material.pVertShader, nullptr, 0);
+        d3dDeviceContext->VSSetShader(pMesh->material->pVertShader, nullptr, 0);
         d3dDeviceContext->VSSetConstantBuffers(0, 3, d3dConstantBuffers);
-        d3dDeviceContext->PSSetShader(pMesh->material.pPixShader, nullptr, 0);
+        d3dDeviceContext->PSSetShader(pMesh->material->pPixShader, nullptr, 0);
 
         d3dDeviceContext->RSSetState(d3dRasterizerState);
         d3dDeviceContext->RSSetViewports(1, &viewport);

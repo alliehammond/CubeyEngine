@@ -1,8 +1,7 @@
 #pragma once
 #include "Core\CubeySystem.h"
+#include "Terrain\Chunk.h"
 #include <unordered_map>
-
-class Chunk;
 
 class TerrainManagerSystem : public CubeySystem
 {
@@ -13,6 +12,10 @@ public:
     //Use chunk coordinates not world coords; returns null if chunk not loaded/doesn't exist
     static Chunk* GetChunk(short cX, short cY, short cZ);
     void SaveLoadedChunks();
+    //Uses block coordinates
+    static void SetBlockInLoadedChunk(int x, int y, int z, BlockType type);
+    //Uses block coordinates, returns air if chunk is not loaded
+    static BlockType GetBlockInLoadedChunk(int x, int y, int z);
 
 private:
     static unsigned __int64 HashChunkCoord(short cX, short cY, short cZ);
@@ -25,6 +28,7 @@ private:
     std::string GetRegionFileName(unsigned __int64 hash);
     std::string GetRegionFileNameAndPath(unsigned __int64 hash);
     void CloseOpenRegionFiles();
+    static short GetChunkCoordinate(int n);
 
     std::vector<std::pair<unsigned __int64, std::ifstream *>> openRegionFiles;
     static std::unordered_map<unsigned __int64, Chunk *> loadedChunks;

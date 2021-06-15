@@ -5,7 +5,9 @@
 #include "Core\GameObject.h"
 #include "Core\ObjectManagerSystem.h"
 #include "Graphics\GraphicsSystem.h"
+#include "Terrain\TerrainManagerSystem.h"
 #include "Terrain\BlockType.h"
+#include "Graphics\RenderComponent.h"
 
 // System includes
 #include <windows.h>
@@ -23,6 +25,7 @@
 #include <unordered_map>
 #include <ctime>
 #include <cstdlib>
+#include <tuple>
 
 // Link library dependencies
 #pragma comment(lib, "d3d11.lib")
