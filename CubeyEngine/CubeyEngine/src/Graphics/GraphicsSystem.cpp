@@ -529,8 +529,9 @@ void GraphicsSystem::Render(float dt)
     viewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
     d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Frame], 0, nullptr, &viewMatrix, 0, 0);
     
-    //Use to render transparent objects last
-    std::vector<GameObject *> transparentObjects;
+    //Use to render transparent objects last (object, distsq from camera)
+    std::vector<std::pair<GameObject *, float>> transparentObjects;
+    CBY::Vector camPos = PlayerController::GetPlayerTrans()->pos;
     //Call render object on each object with a render component
     for(auto &it : ObjectManagerSystem::gameObjects)
     {
@@ -539,7 +540,9 @@ void GraphicsSystem::Render(float dt)
         {
             if(renderComp->transparent)
             {
-                transparentObjects.push_back(it);
+                Transform *pTrans = it->GetComponent<Transform>();
+                float distSq = (pTrans->pos.x - camPos.x) * (pTrans->pos.x - camPos.x) + (pTrans->pos.y - camPos.y) * (pTrans->pos.y - camPos.y) + (pTrans->pos.z - camPos.z) * (pTrans->pos.z - camPos.z);
+                transparentObjects.push_back(std::pair<GameObject *, float>(it, distSq));
             }
             else
             {
@@ -548,10 +551,17 @@ void GraphicsSystem::Render(float dt)
         }
     }
 
+    //Sort transparent objects back to front
+    auto sortLambda = [](std::pair<GameObject *, float> const &a, std::pair<GameObject*, float> const& b) -> bool
+    {
+        return a.second > b.second;
+    };
+    std::sort(transparentObjects.begin(), transparentObjects.end(), sortLambda);
+
     //Render transparent objects after regular ones
     for(auto& it : transparentObjects)
     {
-        RenderObject(it, dt);
+        RenderObject(it.first, dt);
     }
 
     d3dSwapChain->Present(enableVSync, 0);

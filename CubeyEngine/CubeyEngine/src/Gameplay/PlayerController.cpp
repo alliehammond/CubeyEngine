@@ -97,6 +97,23 @@ Transform* PlayerController::GetPlayerTrans()
 std::tuple<int, int, int> PlayerController::GetBlockPlacementCoord()
 {
     CBY::Vector forwardVec(cos(pTrans->rot.y) * cos(pTrans->rot.x), sin(pTrans->rot.x), sin(pTrans->rot.y) * cos(pTrans->rot.x));
+    
+    CBY::Vector camPos = pTrans->pos;
+    float interpolateAmount = 0.2f;
+    //Interpolate to find ideal block placement
+    for(float i = interpolateAmount; i <= CBYDefines::MaxBlockPlaceDist; i += interpolateAmount)
+    {
+        if(TerrainManagerSystem::GetBlockInLoadedChunk(int(std::floor(camPos.x + forwardVec.x * i)), int(std::floor(camPos.y + forwardVec.y * i)), int(std::floor(camPos.z + forwardVec.z * i))) 
+            != BlockType::Air)
+        {
+            i -= interpolateAmount;
+            //Return previous block since it is (in most circumstances) the correct air block
+            return std::tuple<int, int, int>(int(std::floor(camPos.x + forwardVec.x * i)), int(std::floor(camPos.y + forwardVec.y * i)), int(std::floor(camPos.z + forwardVec.z * i)));
+        }
+    }
+
+    
+    //If no valid block placement found, default to placing block at 5 distance away
     forwardVec *= 5;
     int curBlockX = int(std::floor(pTrans->pos.x));
     int curBlockY = int(std::floor(pTrans->pos.y));

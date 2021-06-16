@@ -8,6 +8,7 @@
 #include "Terrain\TerrainManagerSystem.h"
 #include "Terrain\BlockType.h"
 #include "Graphics\RenderComponent.h"
+#include "Gameplay\PlayerController.h"
 
 // System includes
 #include <windows.h>

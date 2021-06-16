@@ -1,14 +1,23 @@
 #pragma once
 namespace CBYDefines
 {
-    const int BlockSize = 1;
+    
+
+    //************************************************************************************
+    //**Gameplay defines
+    const float MaxBlockPlaceDist = 7.0f;
+
+    //************************************************************************************
+
+    //************************************************************************************
+    //**Optimization defines
     //Render distance in chunks
     const int RenderDistance = 4;
     //Distance before loaded chunks are deleted
     const int RenderDeleteDistance = 6;
     const int ChunkLoadsPerFrame = 1;
-
-
+    //************************************************************************************
+    
     //************************************************************************************
     //**Region file data [Don't modify these - will invalidate all region files]
     const int ChunkDataByteBoundarys = 256;
@@ -16,5 +25,6 @@ namespace CBYDefines
     const int HeaderBoundaryOffset = 1;
     //Chunk size must be even
     const int ChunkSize = 64;
+    const int BlockSize = 1;
     //************************************************************************************
 }
