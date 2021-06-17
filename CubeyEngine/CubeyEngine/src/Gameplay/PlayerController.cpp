@@ -122,9 +122,40 @@ std::tuple<int, int, int> PlayerController::GetBlockPlacementCoord()
     return std::tuple<int, int, int>(int(curBlockX + std::round(forwardVec.x)), int(curBlockY + std::round(forwardVec.y)), int(curBlockZ + std::round(forwardVec.z)));
 }
 
+std::tuple<int, int, int> PlayerController::GetBlockPlacementCoordDelete()
+{
+    CBY::Vector forwardVec(cos(pTrans->rot.y) * cos(pTrans->rot.x), sin(pTrans->rot.x), sin(pTrans->rot.y) * cos(pTrans->rot.x));
+
+    CBY::Vector camPos = pTrans->pos;
+    float interpolateAmount = 0.2f;
+    //Interpolate to find ideal block placement
+    for(float i = interpolateAmount; i <= CBYDefines::MaxBlockPlaceDist; i += interpolateAmount)
+    {
+        if(TerrainManagerSystem::GetBlockInLoadedChunk(int(std::floor(camPos.x + forwardVec.x * i)), int(std::floor(camPos.y + forwardVec.y * i)), int(std::floor(camPos.z + forwardVec.z * i)))
+            != BlockType::Air)
+        {
+            //Return previous block since it is (in most circumstances) the correct air block
+            return std::tuple<int, int, int>(int(std::floor(camPos.x + forwardVec.x * i)), int(std::floor(camPos.y + forwardVec.y * i)), int(std::floor(camPos.z + forwardVec.z * i)));
+        }
+    }
+
+
+    //If no valid block placement found, default to placing block at 5 distance away
+    forwardVec *= 5;
+    int curBlockX = int(std::floor(pTrans->pos.x));
+    int curBlockY = int(std::floor(pTrans->pos.y));
+    int curBlockZ = int(std::floor(pTrans->pos.z));
+
+    return std::tuple<int, int, int>(int(curBlockX + std::round(forwardVec.x)), int(curBlockY + std::round(forwardVec.y)), int(curBlockZ + std::round(forwardVec.z)));
+}
+
 void PlayerController::PlaceBlock(BlockType type)
 {
-    std::tuple<int, int, int> pos = GetBlockPlacementCoord();
+    std::tuple<int, int, int> pos;
+    if(type == BlockType::Air)
+        pos = GetBlockPlacementCoordDelete();
+    else
+        pos = GetBlockPlacementCoord();
     if(std::get<1>(pos) < 256 && std::get<1>(pos) >= 0)
     {
         TerrainManagerSystem::SetBlockInLoadedChunk(std::get<0>(pos), std::get<1>(pos), std::get<2>(pos), type);

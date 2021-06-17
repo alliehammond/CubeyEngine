@@ -13,6 +13,7 @@ public:
 private:
     //Returns coordinate of block placement target (block coordinates)
     std::tuple<int, int, int> GetBlockPlacementCoord();
+    std::tuple<int, int, int> GetBlockPlacementCoordDelete();
     void PlaceBlock(BlockType type);
 
     //Pointer to transform comp on player object
