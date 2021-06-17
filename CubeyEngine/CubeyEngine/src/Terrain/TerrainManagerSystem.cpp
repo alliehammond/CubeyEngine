@@ -143,8 +143,6 @@ std::tuple<short, short, short> TerrainManagerSystem::GetRegionCoordinateFromChu
 
 void TerrainManagerSystem::SaveLoadedChunks()
 {
-    CloseOpenRegionFiles();
-
     std::vector<std::pair<unsigned __int64, std::vector<Chunk *>>> regions;
     //**Loop through loaded chunks, adding them to corresponding regions (or creating new regions if not in regions vector)
     for(auto &it : loadedChunks)
@@ -172,7 +170,40 @@ void TerrainManagerSystem::SaveLoadedChunks()
         }
     }
 
+    //Load any chunks that aren't currently loaded on each region so they get saved
+    for(auto &it :regions)
+    {
+        std::tuple<short, short, short> regionCoord = GetRegionCoordinateFromChunk(it.second[0]);
+        //Loop through each chunk that should exist in a region
+        for(short i = std::get<0>(regionCoord); i <= std::get<0>(regionCoord) + 3; ++i)
+        {
+            for(short j = std::get<1>(regionCoord); j <= std::get<1>(regionCoord) + 3; ++j)
+            {
+                for(short k = std::get<2>(regionCoord); k <= std::get<2>(regionCoord) + 3; ++k)
+                {
+                    bool chunkFound = false;
+                    //Loop through chunk vector to see if it is loaded
+                    for(auto &jt : it.second)
+                    {
+                        if(jt->x == i && jt->y == j && jt->z == k)
+                        {
+                            chunkFound = true;
+                            break;
+                        }
+                    }
 
+                    if(!chunkFound)
+                    {
+                        //Chunk not loaded - load it
+                        Chunk* loadedChunk = LoadAndCreateChunk(i, j, k);
+                        it.second.push_back(loadedChunk);
+                    }
+                }
+            }
+        }
+    }
+
+    CloseOpenRegionFiles();
     //**Call SaveRegion() on each region
     for(auto &it : regions)
     {
@@ -230,6 +261,14 @@ void TerrainManagerSystem::SaveRegion(short x, short y, short z, std::vector<Chu
     //Open region file in binary mode, deleting file if it already exists
     std::ofstream regionFile;
     regionFile.open(path, std::ios::trunc | std::ios::binary);
+
+    //Remove empty chunks
+    auto new_end = std::remove_if(chunks.begin(), chunks.end(), [](Chunk *chunk)
+    {
+        if(chunk->IsAirChunk())return true;
+        return false;
+    });
+    chunks.erase(new_end, chunks.end());
 
     //**Order the chunks into same order as chunk data for reading efficiency(see RegionFileFormat.txt)
     struct chunkLessThan
@@ -332,7 +371,7 @@ void TerrainManagerSystem::SaveRegion(short x, short y, short z, std::vector<Chu
 }
 
 //Loads chunk data from region file and creates chunk object from it
-void TerrainManagerSystem::LoadAndCreateChunk(short x, short y, short z)
+Chunk *TerrainManagerSystem::LoadAndCreateChunk(short x, short y, short z)
 {
     //Check if chunk is inside openRegionFiles
     std::tuple<short, short, short> rCoord = GetRegionCoordinateFromChunk(x, y, z);
@@ -357,7 +396,7 @@ void TerrainManagerSystem::LoadAndCreateChunk(short x, short y, short z)
             delete pRFile;
             Chunk* newChunk = new Chunk(x, y, z, true);
             loadedChunks[HashChunkCoord(x, y, z)] = newChunk;
-            return;
+            return newChunk;
         }
         else
         {
@@ -401,6 +440,7 @@ void TerrainManagerSystem::LoadAndCreateChunk(short x, short y, short z)
     }
 
     loadedChunks[HashChunkCoord(x, y, z)] = newChunk;
+    return newChunk;
 }
 
 std::string TerrainManagerSystem::GetRegionFileName(unsigned __int64 hash)

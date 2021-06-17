@@ -24,7 +24,7 @@ private:
     //Each region is a 4x4x4 group of chunks
     void SaveRegion(short x, short y, short z, std::vector<Chunk *> &chunks);
     //Loads chunk data from region file and creates chunk object from it
-    void LoadAndCreateChunk(short x, short y, short z);
+    Chunk *LoadAndCreateChunk(short x, short y, short z);
     std::string GetRegionFileName(unsigned __int64 hash);
     std::string GetRegionFileNameAndPath(unsigned __int64 hash);
     void CloseOpenRegionFiles();

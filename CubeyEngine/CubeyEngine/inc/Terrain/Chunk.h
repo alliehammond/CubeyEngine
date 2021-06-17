@@ -15,6 +15,7 @@ public:
     BlockType GetBlockChunkRelative(short x, short y, short z);
     //Sets a block in the chunk, if regenMesh is true regenerates the mesh after
     void SetBlock(short x, short y, short z, BlockType type, bool regenMesh = true);
+    bool IsAirChunk() const { return empty || numBlocks == 0; }
 
 private:
     //Number of non-air blocks
