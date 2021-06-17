@@ -73,7 +73,7 @@ void PlayerController::Update(float dt)
         pBlockPlacementOutline->GetComponent<RenderComponent>()->renderComponent = showBlockPlaceOutline;
     }
     //Update block placement outline pos
-    auto pos = GetBlockPlacementCoord();
+    auto pos = GetBlockPlacementCoord(false);
     pBlockPlacementOutline->GetComponent<Transform>()->pos = CBY::Vector((float)std::get<0>(pos) + 0.5f, (float)std::get<1>(pos) + 0.5f, (float)std::get<2>(pos) + 0.5f);
 
     if(showBlockPlaceOutline)
@@ -94,7 +94,7 @@ Transform* PlayerController::GetPlayerTrans()
     return pTrans;
 }
 
-std::tuple<int, int, int> PlayerController::GetBlockPlacementCoord()
+std::tuple<int, int, int> PlayerController::GetBlockPlacementCoord(bool deleteBlockCoord)
 {
     CBY::Vector forwardVec(cos(pTrans->rot.y) * cos(pTrans->rot.x), sin(pTrans->rot.x), sin(pTrans->rot.y) * cos(pTrans->rot.x));
     
@@ -106,40 +106,13 @@ std::tuple<int, int, int> PlayerController::GetBlockPlacementCoord()
         if(TerrainManagerSystem::GetBlockInLoadedChunk(int(std::floor(camPos.x + forwardVec.x * i)), int(std::floor(camPos.y + forwardVec.y * i)), int(std::floor(camPos.z + forwardVec.z * i))) 
             != BlockType::Air)
         {
-            i -= interpolateAmount;
-            //Return previous block since it is (in most circumstances) the correct air block
+            if(!deleteBlockCoord)i -= interpolateAmount;
+            //Return previous block since it is (in most circumstances) the correct air block if not deleting the block
             return std::tuple<int, int, int>(int(std::floor(camPos.x + forwardVec.x * i)), int(std::floor(camPos.y + forwardVec.y * i)), int(std::floor(camPos.z + forwardVec.z * i)));
         }
     }
 
     
-    //If no valid block placement found, default to placing block at 5 distance away
-    forwardVec *= 5;
-    int curBlockX = int(std::floor(pTrans->pos.x));
-    int curBlockY = int(std::floor(pTrans->pos.y));
-    int curBlockZ = int(std::floor(pTrans->pos.z));
-
-    return std::tuple<int, int, int>(int(curBlockX + std::round(forwardVec.x)), int(curBlockY + std::round(forwardVec.y)), int(curBlockZ + std::round(forwardVec.z)));
-}
-
-std::tuple<int, int, int> PlayerController::GetBlockPlacementCoordDelete()
-{
-    CBY::Vector forwardVec(cos(pTrans->rot.y) * cos(pTrans->rot.x), sin(pTrans->rot.x), sin(pTrans->rot.y) * cos(pTrans->rot.x));
-
-    CBY::Vector camPos = pTrans->pos;
-    float interpolateAmount = 0.2f;
-    //Interpolate to find ideal block placement
-    for(float i = interpolateAmount; i <= CBYDefines::MaxBlockPlaceDist; i += interpolateAmount)
-    {
-        if(TerrainManagerSystem::GetBlockInLoadedChunk(int(std::floor(camPos.x + forwardVec.x * i)), int(std::floor(camPos.y + forwardVec.y * i)), int(std::floor(camPos.z + forwardVec.z * i)))
-            != BlockType::Air)
-        {
-            //Return previous block since it is (in most circumstances) the correct air block
-            return std::tuple<int, int, int>(int(std::floor(camPos.x + forwardVec.x * i)), int(std::floor(camPos.y + forwardVec.y * i)), int(std::floor(camPos.z + forwardVec.z * i)));
-        }
-    }
-
-
     //If no valid block placement found, default to placing block at 5 distance away
     forwardVec *= 5;
     int curBlockX = int(std::floor(pTrans->pos.x));
@@ -153,9 +126,9 @@ void PlayerController::PlaceBlock(BlockType type)
 {
     std::tuple<int, int, int> pos;
     if(type == BlockType::Air)
-        pos = GetBlockPlacementCoordDelete();
+        pos = GetBlockPlacementCoord(true);
     else
-        pos = GetBlockPlacementCoord();
+        pos = GetBlockPlacementCoord(false);
     if(std::get<1>(pos) < 256 && std::get<1>(pos) >= 0)
     {
         TerrainManagerSystem::SetBlockInLoadedChunk(std::get<0>(pos), std::get<1>(pos), std::get<2>(pos), type);

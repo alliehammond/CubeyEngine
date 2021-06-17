@@ -9,9 +9,7 @@ std::unordered_map<unsigned __int64, Chunk*> TerrainManagerSystem::loadedChunks;
 const std::string terrainDataPath = "../resources/terrainData/";
 
 TerrainManagerSystem::TerrainManagerSystem()
-{
-
-}
+{ }
 
 TerrainManagerSystem::~TerrainManagerSystem()
 {

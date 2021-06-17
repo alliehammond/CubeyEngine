@@ -11,9 +11,8 @@ public:
     static Transform *GetPlayerTrans();
 
 private:
-    //Returns coordinate of block placement target (block coordinates)
-    std::tuple<int, int, int> GetBlockPlacementCoord();
-    std::tuple<int, int, int> GetBlockPlacementCoordDelete();
+    //Returns coordinate of block placement target (block coordinates) (deleteBlockCoord gets different block if you are deleting a block)
+    std::tuple<int, int, int> GetBlockPlacementCoord(bool deleteBlockCoord);
     void PlaceBlock(BlockType type);
 
     //Pointer to transform comp on player object

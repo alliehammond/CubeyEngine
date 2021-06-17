@@ -16,10 +16,10 @@ Chunk::~Chunk()
     if(blockTerrain)blockTerrain->Delete();
 }
 
-//Temp for generating chunk without loading chunk data
+//Generate a chunk without loading chunk data
 void Chunk::LoadChunk()
 {
-    //Temporary chunk generation(lock y axis)
+    //Generate floor of blocks
     for(int i = 0; i < CBYDefines::ChunkSize; ++i)
     {
         for(int j = 0; j < CBYDefines::ChunkSize; ++j)
@@ -70,7 +70,7 @@ void Chunk::CreateChunkMesh()
                 if(GetBlockChunkRelative(i, j, k) != BlockType::Air)
                 {
                     int blockStartVert = curVertCount;
-                    //Assign vertex colors randomly
+                    //Assign vertex colors by position
                     float colr = (i % 2) / 3.0f + (k % 2) / 3.0f + (j % 2) / 3.0f, colg = 0.0f, colb = colr;
                     for(unsigned int z = 0; z < 8; ++z)
                     {
