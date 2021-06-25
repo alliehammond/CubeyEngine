@@ -49,6 +49,12 @@
     <Filter Include="Source Files\Terrain">
       <UniqueIdentifier>{97403b3d-bd4e-4b7f-b171-1c85d954c550}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Graphics\Materials">
+      <UniqueIdentifier>{a0295523-6e4c-47a6-8c37-a1a62b914a85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Materials">
+      <UniqueIdentifier>{fc250e6c-0c71-4bd9-9ef4-f62c95c367ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -98,6 +104,12 @@
     </ClCompile>
     <ClCompile Include="src\Graphics\Material.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Texture.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Materials\TextureMaterial.cpp">
+      <Filter>Source Files\Graphics\Materials</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -158,6 +170,12 @@
     <ClInclude Include="inc\Terrain\TerrainManagerSystem.h">
       <Filter>Header Files\Terrain</Filter>
     </ClInclude>
+    <ClInclude Include="inc\Graphics\Texture.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Graphics\Materials\TextureMaterial.h">
+      <Filter>Header Files\Graphics\Materials</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\VertexShaders\BasicVertexShader.hlsl">
@@ -168,6 +186,12 @@
     </FxCompile>
     <FxCompile Include="shaders\VertexShaders\BlockPlacementDisplayVS.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\VertexShaders\BasicTextureVS.hlsl">
+      <Filter>Resource Files\VertexShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\PixelShaders\BasicTexturePS.hlsl">
+      <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

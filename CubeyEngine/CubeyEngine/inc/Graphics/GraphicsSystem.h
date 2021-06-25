@@ -1,20 +1,39 @@
 #pragma once
 #include "Core\CubeySystem.h"
-#include "Graphics\Mesh.h"
 #include "d3d11.h"
 #include <DirectXMath.h>
 #include <string>
 #include <unordered_map>
 
-enum InputLayout
-{
-    POSCOL,
-    INPUTLAYOUTCOUNT
-};
 
 using DirectX::XMMATRIX;
+using DirectX::XMFLOAT2;
 using DirectX::XMFLOAT3;
 using DirectX::XMVECTOR;
+
+//*****************************************
+//Input Layouts
+//*****************************************
+struct VertexPosColor
+{
+    XMFLOAT3 position;
+    XMFLOAT3 color;
+};
+struct VertexPosUV
+{
+    XMFLOAT3 position;
+    XMFLOAT2 uv;
+};
+//*****************************************
+enum InputLayout
+{
+    POSCOL = 0,
+    POSUV,
+    INPUTLAYOUTCOUNT
+};
+const unsigned int InputLayoutVertexSizes[InputLayout::INPUTLAYOUTCOUNT] = { sizeof(VertexPosColor), sizeof(VertexPosUV) };
+
+class Texture;
 
 //Manages creation and deletion of objects
 class GraphicsSystem : public CubeySystem
@@ -27,24 +46,16 @@ public:
     static ID3D11PixelShader *GetPixelShader(std::string name) { return pixelShaders[name]; }
     static ID3D11VertexShader* GetVertexShader(std::string name) { return vertexShaders[name]; }
     static ID3D11InputLayout* GetInputLayout(InputLayout layout) { return inputLayouts[layout]; }
+    //Gets a texture from texture pool, or loads it if it isn't already loaded - returns null if texture couldn't be loaded
+    static Texture *GetTexture(std::string textureName);
     static ID3D11Device *GetD3DDevice() { return d3dDevice; }
+    static ID3D11DeviceContext* GetD3DDeviceContext() { return d3dDeviceContext; }
 
     static void ResizeWindow(int width, int height);
 
     static bool GetMouseCursorLock() { return lockMouseCenter; }
     static int GetWindowWidth() { return windowWidth; }
     static int GetWindowHeight() { return windowHeight; }
-
-
-    //*****************************************
-    //Input Layouts
-    //*****************************************
-    struct VertexPosColor
-    {
-        XMFLOAT3 position;
-        XMFLOAT3 color;
-    };
-    //*****************************************
 
 private:
     static void SetCameraTrans(Transform *trans);
@@ -63,6 +74,7 @@ private:
     static std::unordered_map<std::string, ID3D11VertexShader *> vertexShaders;
     static std::unordered_map<std::string, ID3D11PixelShader*> pixelShaders;
     static std::unordered_map<InputLayout, ID3D11InputLayout *> inputLayouts;
+    static std::unordered_map<std::string, Texture*> textures;
 
     //*****************************************
     //Config Values
@@ -86,6 +98,7 @@ private:
     static ID3D11DepthStencilState* d3dDepthStencilState;
     static ID3D11RasterizerState* d3dRasterizerState;
     static ID3D11BlendState* d3dBlendState;
+    static ID3D11SamplerState* d3dSamplerState;
     static D3D11_VIEWPORT viewport;
 
     static XMVECTOR eyePosition;

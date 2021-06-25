@@ -8,11 +8,7 @@ PlayerController::PlayerController(GameObject* owner) : Component(owner, "Player
     pTrans = owner->GetComponent<Transform>();
 
     //Block placement outline
-    Material mat;
-    mat.name = "BlockPlaceMaterial";
-    mat.pPixShader = GraphicsSystem::GetPixelShader("BasicPixelShader.cso");
-    mat.pVertShader = GraphicsSystem::GetVertexShader("BlockPlacementDisplayVS.cso");
-    mat.pInputLayout = GraphicsSystem::GetInputLayout(InputLayout::POSCOL);
+    Material mat("BlockPlacementDisplayVS.cso", "BasicPixelShader.cso", InputLayout::POSCOL, "BlockPlaceMaterial");
 
     pBlockPlacementOutline = ObjectManagerSystem::CreateObject(new GameObject("BlockPlacementOutline"));
     Transform* pBlockTrans = pBlockPlacementOutline->AddComponent<Transform>(new Transform(pBlockPlacementOutline));

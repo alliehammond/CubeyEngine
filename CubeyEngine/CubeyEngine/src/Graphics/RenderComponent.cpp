@@ -4,11 +4,7 @@
 RenderComponent::RenderComponent(std::string modelFileName, GameObject *owner) : Component(owner, "RenderComponent")
 {
     //Use default material
-    Material mat;
-    mat.name = "BasicMat";
-    mat.pPixShader = GraphicsSystem::GetPixelShader("BasicPixelShader.cso");
-    mat.pVertShader = GraphicsSystem::GetVertexShader("BasicVertexShader.cso");
-    mat.pInputLayout = GraphicsSystem::GetInputLayout(InputLayout::POSCOL);
+    Material mat("BasicVertexShader.cso", "BasicPixelShader.cso", InputLayout::POSCOL, "BaseMaterial");
 
     pModel = new Model(modelFileName, &mat);
 }

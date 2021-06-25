@@ -19,8 +19,8 @@ struct VertexData
 
 struct VertexShaderOutput
 {
-    float4 color : COLOR;
     float4 position : SV_POSITION;
+    float4 color : COLOR;
 };
 
 VertexShaderOutput main(VertexData IN)

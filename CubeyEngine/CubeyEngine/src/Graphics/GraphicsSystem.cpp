@@ -1,6 +1,7 @@
 #include "EnginePCH.h"
 #include "Graphics\GraphicsSystem.h"
 #include "Graphics\RenderComponent.h"
+#include "Graphics\Texture.h"
 
 using namespace DirectX;
 
@@ -19,6 +20,7 @@ ID3D11Texture2D* GraphicsSystem::d3dDepthStencilBuffer = 0;
 ID3D11DepthStencilState* GraphicsSystem::d3dDepthStencilState = 0;
 ID3D11RasterizerState* GraphicsSystem::d3dRasterizerState = 0;
 ID3D11BlendState* GraphicsSystem::d3dBlendState = 0;
+ID3D11SamplerState* GraphicsSystem::d3dSamplerState = 0;
 D3D11_VIEWPORT GraphicsSystem::viewport = { 0 };
 ID3D11Buffer* GraphicsSystem::d3dConstantBuffers[NumConstantBuffers] = {0};
 XMMATRIX GraphicsSystem::viewMatrix, GraphicsSystem::projectionMatrix;
@@ -26,6 +28,7 @@ XMMATRIX GraphicsSystem::viewMatrix, GraphicsSystem::projectionMatrix;
 std::unordered_map<std::string, ID3D11PixelShader*> GraphicsSystem::pixelShaders;
 std::unordered_map<std::string, ID3D11VertexShader*> GraphicsSystem::vertexShaders;
 std::unordered_map<InputLayout, ID3D11InputLayout*> GraphicsSystem::inputLayouts;
+std::unordered_map<std::string, Texture*> GraphicsSystem::textures;
 
 XMVECTOR GraphicsSystem::eyePosition = XMVectorSet(0, 0, -10, 1);
 XMVECTOR GraphicsSystem::focusPoint = XMVectorSet(0, 0, 0, 1);
@@ -39,15 +42,17 @@ GraphicsSystem::GraphicsSystem(HINSTANCE hInstance, int cmdShow)
 
     InitApplication(hInstance, cmdShow);
     InitDirectX(hInstance);
-
+    
     CreateConstantBuffers();
 
     LOGDEBUG("Loading vertex shaders...");
     LoadVertexShader("BasicVertexShader.cso", L"BasicVertexShader.cso");
     LoadVertexShader("BlockPlacementDisplayVS.cso", L"BlockPlacementDisplayVS.cso");
+    LoadVertexShader("BasicTextureVS.cso", L"BasicTextureVS.cso");
 
     LOGDEBUG("Loading pixel shaders...");
     LoadPixelShader("BasicPixelShader.cso", L"BasicPixelShader.cso");
+    LoadPixelShader("BasicTexturePS.cso", L"BasicTexturePS.cso");
 
     LOGDEBUG("Loading input layouts...");
     LoadInputLayouts();
@@ -87,6 +92,10 @@ GraphicsSystem::~GraphicsSystem()
     {
         SafeRelease(it.second);
     }
+    for(auto& it : textures)
+    {
+        delete it.second;
+    }
     vertexShaders.clear();
     pixelShaders.clear();
     inputLayouts.clear();
@@ -101,6 +110,34 @@ GraphicsSystem::~GraphicsSystem()
     SafeRelease(d3dDeviceContext);
     SafeRelease(d3dDevice);
     SafeRelease(d3dBlendState);
+}
+
+//Gets a texture from texture pool, or loads it if it isn't already loaded - returns null if the texture couldn't be loaded
+Texture* GraphicsSystem::GetTexture(std::string textureName)
+{
+    auto it = textures.find(textureName);
+    if(it != textures.end())
+    {
+        //Texture found
+        return it->second;
+    }
+    //Texture not found, create/add it
+    Texture *pTex = new Texture(textureName);
+    //Check if texture loaded correctly
+    if(pTex->texture == 0)
+    {
+        delete pTex;
+        if(textureName == "errorTexture.tga")
+        {
+            LOGERROR("Could not load error texture!");
+            return 0;
+        }
+        Texture *errTex = GetTexture("errorTexture.tga");
+        return errTex;
+    }
+
+    textures[textureName] = pTex;
+    return pTex;
 }
 
 void GraphicsSystem::ResizeWindow(int width, int height)
@@ -282,6 +319,21 @@ void GraphicsSystem::LoadInputLayouts()
         LOGWARNING("Failed to create input layout POSCOL!");
     else
         LOGDEBUG("Created input layout POSCOL");
+
+    D3D11_INPUT_ELEMENT_DESC vertexLayoutDesc1[] =
+    {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offsetof(VertexPosUV, position), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, offsetof(VertexPosUV, uv), D3D11_INPUT_PER_VERTEX_DATA, 0 }
+    };
+
+    hr = D3DReadFileToBlob(L"BasicTextureVS.cso", &vertexShaderBlob);
+
+    hr = d3dDevice->CreateInputLayout(vertexLayoutDesc1, _countof(vertexLayoutDesc1), vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &inputLayouts[InputLayout::POSUV]);
+    SafeRelease(vertexShaderBlob);
+    if(FAILED(hr))
+        LOGWARNING("Failed to create input layout POSUV!");
+    else
+        LOGDEBUG("Created input layout POSUV");
 }
 
 void GraphicsSystem::CreateConstantBuffers()
@@ -417,6 +469,7 @@ void GraphicsSystem::InitDirectX(HINSTANCE hInstance)
     hr = d3dSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBuffer);
     if(FAILED(hr))
     {
+        LOGERROR("Failed to get back buffer!");
         return;
     }
 
@@ -447,12 +500,14 @@ void GraphicsSystem::InitDirectX(HINSTANCE hInstance)
     hr = d3dDevice->CreateTexture2D(&depthStencilBufferDesc, nullptr, &d3dDepthStencilBuffer);
     if(FAILED(hr))
     {
+        LOGERROR("Failed to create depth stencil buffer!");
         return;
     }
 
     hr = d3dDevice->CreateDepthStencilView(d3dDepthStencilBuffer, nullptr, &d3dDepthStencilView);
     if(FAILED(hr))
     {
+        LOGERROR("Failed to create depth stencil view!");
         return;
     }
 
@@ -486,6 +541,7 @@ void GraphicsSystem::InitDirectX(HINSTANCE hInstance)
     hr = d3dDevice->CreateRasterizerState(&rasterizerDesc, &d3dRasterizerState);
     if(FAILED(hr))
     {
+        LOGERROR("Failed to create rasterizer state!");
         return;
     }
 
@@ -509,9 +565,37 @@ void GraphicsSystem::InitDirectX(HINSTANCE hInstance)
     blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
     blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-    d3dDevice->CreateBlendState(&blendDesc, &d3dBlendState);
+    hr = d3dDevice->CreateBlendState(&blendDesc, &d3dBlendState);
+    if(FAILED(hr))
+    {
+        LOGERROR("Failed to create blend state!");
+        return;
+    }
 
     d3dDeviceContext->OMSetBlendState(d3dBlendState, 0, 0xffffffff);
+
+    //Setup sampler state
+    D3D11_SAMPLER_DESC samplerDesc;
+    ID3D11SamplerState* samplerState;
+    samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+    samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+    samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+    samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+    samplerDesc.MinLOD = -FLT_MAX;
+    samplerDesc.MaxLOD = FLT_MAX;
+    samplerDesc.MipLODBias = 0.0f;
+    samplerDesc.MaxAnisotropy = 1;
+    samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+
+
+    hr = d3dDevice->CreateSamplerState(&samplerDesc, &samplerState);
+    if(FAILED(hr))
+    {
+        LOGERROR("Failed to create sampler state!");
+        return;
+    }
+    d3dDeviceContext->PSSetSamplers(0, 1, &samplerState);
+
 }
 
 // Clear the color and depth buffers.
@@ -580,18 +664,16 @@ void GraphicsSystem::RenderObject(GameObject* pObject, float dt)
 
     for(Mesh *pMesh : pObject->GetComponent<RenderComponent>()->pModel->meshes)
     {
-        const UINT vertexStride = sizeof(VertexPosColor);
+        const UINT vertexStride = pMesh->material->GetVertexSize();
         const UINT offset = 0;
 
         //Render object
+        pMesh->material->BindMaterial();
         d3dDeviceContext->IASetVertexBuffers(0, 1, &pMesh->vertexBuffer, &vertexStride, &offset);
-        d3dDeviceContext->IASetInputLayout(pMesh->material->pInputLayout);
         d3dDeviceContext->IASetIndexBuffer(pMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
         d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        d3dDeviceContext->VSSetShader(pMesh->material->pVertShader, nullptr, 0);
         d3dDeviceContext->VSSetConstantBuffers(0, 3, d3dConstantBuffers);
-        d3dDeviceContext->PSSetShader(pMesh->material->pPixShader, nullptr, 0);
 
         d3dDeviceContext->RSSetState(d3dRasterizerState);
         d3dDeviceContext->RSSetViewports(1, &viewport);

@@ -1,6 +1,7 @@
 #include "EnginePCH.h"
 #include "Terrain\Chunk.h"
 #include "Graphics\RenderComponent.h"
+#include "Graphics\Materials\TextureMaterial.h"
 
 Chunk::Chunk(short xLoc, short yLoc, short zLoc, bool empty_) : x(xLoc), y(yLoc), z(zLoc), empty(empty_), blockTerrain(0)
 {
@@ -43,19 +44,15 @@ void Chunk::CreateChunkMesh()
     }
 
     //Temp use hardcoded material
-    Material mat;
-    mat.name = "BasicMat";
-    mat.pPixShader = GraphicsSystem::GetPixelShader("BasicPixelShader.cso");
-    mat.pVertShader = GraphicsSystem::GetVertexShader("BasicVertexShader.cso");
-    mat.pInputLayout = GraphicsSystem::GetInputLayout(InputLayout::POSCOL);
+    TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUV, "BaseTextureMaterial", "dirtTexture.tga");
 
     Mesh* newMesh = new Mesh(&mat);
     //3 indices per face, 6 sides per cube, 2 faces per side of cube
     newMesh->indexCount = 3 * 6 * 2 * numBlocks;
 
-    int totalFaces = numBlocks * 6 * 2, totalVerts = numBlocks * 8;
+    int totalFaces = numBlocks * 6 * 2, totalVerts = numBlocks * 24;
 
-    GraphicsSystem::VertexPosColor* vertices = new GraphicsSystem::VertexPosColor[totalVerts];
+    VertexPosUV* vertices = new VertexPosUV[totalVerts];
     unsigned int* indices = new unsigned int[newMesh->indexCount];
 
     int curVertCount = 0;
@@ -70,24 +67,64 @@ void Chunk::CreateChunkMesh()
                 if(GetBlockChunkRelative(i, j, k) != BlockType::Air)
                 {
                     int blockStartVert = curVertCount;
-                    //Assign vertex colors by position
-                    float colr = (i % 2) / 3.0f + (k % 2) / 3.0f + (j % 2) / 3.0f, colg = 0.0f, colb = colr;
-                    for(unsigned int z = 0; z < 8; ++z)
-                    {
-                        vertices[curVertCount + z].color.x = colr; vertices[curVertCount + z].color.y = colg; vertices[curVertCount + z].color.z = colb;
-                    }
-                    //SORRY FOR THIS CODE I THINK ITS LESS COMPLEX THAN DOING IT WITH LOOPS
-                    //Create the 8 vertices of each block
 
-                    //Top 4 faces
+
+                    //SORRY FOR THIS CODE I THINK ITS LESS COMPLEX THAN DOING IT WITH LOOPS
+                    //Create the 24 vertices of each block and assign UVs
+
+                    //Top 2 faces (0-3)
+                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 0.0f);
                     vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 0.0f;
+                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 0.0f);
                     vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 0.0f;
+                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 1.0f);
                     vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 1.0f;
+                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 1.0f);
                     vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 1.0f;
-                    //Bottom 4 faces                                                                                                                     
+                    //Bottom 2 faces (4-7)
+                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 1.0f);
                     vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 0.0f;
+                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 1.0f);
                     vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 0.0f;
+                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 0.0f);
                     vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 1.0f;
+                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 0.0f);
+                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 1.0f;
+                    //Back 2 faces (8-11)
+                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 0.0f);
+                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 0.0f;
+                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 0.0f);
+                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 0.0f;
+                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 1.0f);
+                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 0.0f;
+                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 1.0f);
+                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 0.0f;
+                    //Front 2 faces (12-15)
+                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 0.0f);
+                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 1.0f;
+                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 0.0f);
+                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 1.0f;
+                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 1.0f);
+                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 1.0f;
+                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 1.0f);
+                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 1.0f;
+                    //Left 2 faces (16-19)
+                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 0.0f);
+                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 0.0f;
+                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 0.0f);
+                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 1.0f;
+                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 1.0f);
+                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 0.0f;
+                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 1.0f);
+                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 1.0f;
+                    //Right 2 faces (20-23)
+                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 0.0f);
+                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 0.0f;
+                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 0.0f);
+                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 1.0f;
+                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 1.0f);
+                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 0.0f;
+                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 1.0f);
                     vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 1.0f;
 
                     //Set indices for each face
@@ -97,15 +134,15 @@ void Chunk::CreateChunkMesh()
                     indices[curIndexCount++] = blockStartVert + 6; indices[curIndexCount++] = blockStartVert + 5; indices[curIndexCount++] = blockStartVert + 4;
                     indices[curIndexCount++] = blockStartVert + 7; indices[curIndexCount++] = blockStartVert + 5; indices[curIndexCount++] = blockStartVert + 6;
                     //Back and front                                                                                                   
-                    indices[curIndexCount++] = blockStartVert + 5; indices[curIndexCount++] = blockStartVert + 1; indices[curIndexCount++] = blockStartVert + 0;
-                    indices[curIndexCount++] = blockStartVert + 4; indices[curIndexCount++] = blockStartVert + 5; indices[curIndexCount++] = blockStartVert + 0;
-                    indices[curIndexCount++] = blockStartVert + 2; indices[curIndexCount++] = blockStartVert + 3; indices[curIndexCount++] = blockStartVert + 7;
-                    indices[curIndexCount++] = blockStartVert + 2; indices[curIndexCount++] = blockStartVert + 7; indices[curIndexCount++] = blockStartVert + 6;
+                    indices[curIndexCount++] = blockStartVert + 11; indices[curIndexCount++] = blockStartVert + 9; indices[curIndexCount++] = blockStartVert + 8;
+                    indices[curIndexCount++] = blockStartVert + 10; indices[curIndexCount++] = blockStartVert + 11; indices[curIndexCount++] = blockStartVert + 8;
+                    indices[curIndexCount++] = blockStartVert + 12; indices[curIndexCount++] = blockStartVert + 13; indices[curIndexCount++] = blockStartVert + 15;
+                    indices[curIndexCount++] = blockStartVert + 12; indices[curIndexCount++] = blockStartVert + 15; indices[curIndexCount++] = blockStartVert + 14;
                     //Left and right                                                                                                   
-                    indices[curIndexCount++] = blockStartVert + 0; indices[curIndexCount++] = blockStartVert + 2; indices[curIndexCount++] = blockStartVert + 4;
-                    indices[curIndexCount++] = blockStartVert + 2; indices[curIndexCount++] = blockStartVert + 6; indices[curIndexCount++] = blockStartVert + 4;
-                    indices[curIndexCount++] = blockStartVert + 3; indices[curIndexCount++] = blockStartVert + 1; indices[curIndexCount++] = blockStartVert + 5;
-                    indices[curIndexCount++] = blockStartVert + 3; indices[curIndexCount++] = blockStartVert + 5; indices[curIndexCount++] = blockStartVert + 7;
+                    indices[curIndexCount++] = blockStartVert + 16; indices[curIndexCount++] = blockStartVert + 17; indices[curIndexCount++] = blockStartVert + 18;
+                    indices[curIndexCount++] = blockStartVert + 17; indices[curIndexCount++] = blockStartVert + 19; indices[curIndexCount++] = blockStartVert + 18;
+                    indices[curIndexCount++] = blockStartVert + 20; indices[curIndexCount++] = blockStartVert + 22; indices[curIndexCount++] = blockStartVert + 21;
+                    indices[curIndexCount++] = blockStartVert + 21; indices[curIndexCount++] = blockStartVert + 22; indices[curIndexCount++] = blockStartVert + 23;
                 }
             }
         }
@@ -117,7 +154,7 @@ void Chunk::CreateChunkMesh()
     ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
 
     vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    vertexBufferDesc.ByteWidth = sizeof(GraphicsSystem::VertexPosColor) * totalVerts;
+    vertexBufferDesc.ByteWidth = sizeof(VertexPosUV) * totalVerts;
     vertexBufferDesc.CPUAccessFlags = 0;
     vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 

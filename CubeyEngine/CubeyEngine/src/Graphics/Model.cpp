@@ -48,7 +48,7 @@ bool Model::LoadModel(std::string fileName, Material *mat)
         totalFaces += curMesh->mNumFaces;
         totalVerts += curMesh->mNumVertices;
 
-        GraphicsSystem::VertexPosColor *vertices = new GraphicsSystem::VertexPosColor[curMesh->mNumVertices];
+        VertexPosColor *vertices = new VertexPosColor[curMesh->mNumVertices];
         //Load vertices from assimp aiMesh struct
         for(unsigned int j = 0;j < curMesh->mNumVertices; ++j)
         {
@@ -65,7 +65,7 @@ bool Model::LoadModel(std::string fileName, Material *mat)
         ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
 
         vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-        vertexBufferDesc.ByteWidth = sizeof(GraphicsSystem::VertexPosColor) * curMesh->mNumVertices;
+        vertexBufferDesc.ByteWidth = sizeof(VertexPosColor) * curMesh->mNumVertices;
         vertexBufferDesc.CPUAccessFlags = 0;
         vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 
