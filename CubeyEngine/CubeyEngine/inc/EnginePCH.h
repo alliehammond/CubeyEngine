@@ -31,6 +31,7 @@
 #include <ctime>
 #include <cstdlib>
 #include <tuple>
+#include <memory>
 
 // Link library dependencies
 #pragma comment(lib, "d3d11.lib")

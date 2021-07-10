@@ -1,7 +1,7 @@
 #include "EnginePCH.h"
 #include "Graphics\Mesh.h"
 
-Mesh::Mesh(Material* mat) : material(0)
+Mesh::Mesh(std::unique_ptr<Material> mat)
 {
     if(mat)
     {
@@ -9,12 +9,8 @@ Mesh::Mesh(Material* mat) : material(0)
     }
 }
 
-Mesh::Mesh() : material(0)
+Mesh::Mesh()
 { }
 
 Mesh::~Mesh()
-{
-    SafeRelease(vertexBuffer);
-    SafeRelease(indexBuffer);
-    if(material)delete material;
-}
+{ }

@@ -14,6 +14,7 @@ public:
     //Called after all other components have called update()
     virtual void PostUpdate(float dt) {}
     void DeleteComponent() { deleteFlag = true; }
+    bool GetDeleteFlag() { return deleteFlag; }
     std::string name = "Component";
     GameObject *owner;
 

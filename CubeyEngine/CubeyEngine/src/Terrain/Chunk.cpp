@@ -198,11 +198,11 @@ void Chunk::CreateChunkMesh()
     {
         Model* newModel = new Model();
         newModel->AddMesh(newMesh);
-        blockTerrain = ObjectManagerSystem::CreateObject(new GameObject("BlockTerrainObj"));
-        Transform *pTrans = blockTerrain->AddComponent<Transform>
-            (new Transform(float(x * CBYDefines::ChunkSize * CBYDefines::BlockSize), float(y * CBYDefines::ChunkSize * CBYDefines::BlockSize), float(z * CBYDefines::ChunkSize * CBYDefines::BlockSize), blockTerrain));
+        blockTerrain = CreateGameObject("BlockTerrainObj");
+        Transform *pTrans = blockTerrain->GetComponent<Transform>();
+        pTrans->pos = CBY::Vector(float(x * CBYDefines::ChunkSize * CBYDefines::BlockSize), float(y * CBYDefines::ChunkSize * CBYDefines::BlockSize), float(z * CBYDefines::ChunkSize * CBYDefines::BlockSize));
         pTrans->scale = CBY::Vector(CBYDefines::BlockSize, CBYDefines::BlockSize, CBYDefines::BlockSize);
-        blockTerrain->AddComponent<RenderComponent>(new RenderComponent(newModel, blockTerrain));
+        blockTerrain->AddComponent<RenderComponent>(std::make_unique<RenderComponent>(newModel, blockTerrain));
     }
     else
     {

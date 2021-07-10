@@ -7,9 +7,11 @@
 #include <unordered_map>
 #include <typeinfo>
 #include <typeindex>
+#include <memory>
 
 class ObjectManagerSystem;
 
+//All GameObjects start with a transform component
 class GameObject
 {
 public:
@@ -27,34 +29,45 @@ public:
     std::string name = "GameObject";
 
 private:
-    //While iterating over components some can be nullptrs
-    std::unordered_map<std::type_index, Component *> components;
+    std::unordered_map<std::type_index, std::unique_ptr<Component>> components;
     //Game object will be destroyed at end of frame if true
     bool deletionFlag = false;
 
 public:
+    //Returns null if component doesn't exist
     template <typename T>
     T *GetComponent()
     {
-        return (T*)components[std::type_index(typeid(T))];
+        auto it = components.find(std::type_index(typeid(T)));
+        if (it == components.end())
+            return 0;
+        return (T*)((*it).second.get());
     }
     template <typename T>
     bool HasComponent()
     {
-        if(GetComponent<T>() != 0)
-            return true;
-        return false;
+        if(components.find(std::type_index(typeid(T))) == components.end())
+            return false;
+        return true;
     }
     template <typename T>
-    T *AddComponent(T *comp)
+    T *AddComponent(std::unique_ptr<T> comp)
     {
-        components[std::type_index(typeid(T))] = comp;
-        return comp;
+        T *ret = comp.get();
+        if(ret == 0)return 0;
+        if(HasComponent<T>())
+        {
+            LOGERROR("Double creation of component!");
+            return 0;
+        }
+
+        components[std::type_index(typeid(T))] = std::move(comp);
+        return ret;
     }
     template <typename T>
     void DeleteComponent()
     {
-        components[std::type_index(typeid(T))]->DeleteComponent();
-        components.erase(std::type_index(typeid(T)));
+        auto &it = components.find(std::type_index(typeid(T)));
+        if(it != components.end())it->second->DeleteComponent();
     }
 };

@@ -17,16 +17,16 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
     std::srand(unsigned int(std::time(nullptr)));
 
     //Initialize systems
-    CubeySystem* engineSystems[CubeySystems::SYSTEMCOUNT];
-    engineSystems[CubeySystems::INPUTSYSTEM] = new InputSystem();
-    engineSystems[CubeySystems::LOGGINGSYSTEM] = new LoggingSystem();
-    engineSystems[CubeySystems::OBJECTMANAGERSYSTEM] = new ObjectManagerSystem();
-    engineSystems[CubeySystems::GRAPHICSSYSTEM] = new GraphicsSystem(hInstance, cmdShow);
-    engineSystems[CubeySystems::TERRAINMANAGERSYSTEM] = new TerrainManagerSystem();
+    std::unique_ptr<CubeySystem> engineSystems[CubeySystems::SYSTEMCOUNT];
+    engineSystems[CubeySystems::INPUTSYSTEM] = std::make_unique<InputSystem>();
+    engineSystems[CubeySystems::LOGGINGSYSTEM] = std::make_unique<LoggingSystem>();
+    engineSystems[CubeySystems::OBJECTMANAGERSYSTEM] = std::make_unique<ObjectManagerSystem>();
+    engineSystems[CubeySystems::GRAPHICSSYSTEM] = std::make_unique<GraphicsSystem>(hInstance, cmdShow);
+    engineSystems[CubeySystems::TERRAINMANAGERSYSTEM] = std::make_unique<TerrainManagerSystem>();
 
     //Create objects
-    GameObject *player = ObjectManagerSystem::CreateObject(new GameObject("Player"));
-    player->AddComponent<PlayerController>(new PlayerController(player));
+    GameObject *player = CreateGameObject("Player");
+    player->AddComponent<PlayerController>(std::make_unique<PlayerController>(player));
     player->GetComponent<Transform>()->pos.x = 1.0f;
     player->GetComponent<Transform>()->pos.y = 10.0f;   
 
@@ -57,9 +57,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
     {
         //Skip object manager deletion for last
         if(i != CubeySystems::OBJECTMANAGERSYSTEM)
-            delete engineSystems[i];
+            engineSystems[i].reset();
     }
-    delete engineSystems[CubeySystems::OBJECTMANAGERSYSTEM];
+    engineSystems[CubeySystems::OBJECTMANAGERSYSTEM].reset();
 
     return 0;
 }

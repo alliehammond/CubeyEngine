@@ -15,9 +15,9 @@ void TextureMaterial::BindMaterial()
     Material::BindMaterial();
 }
 
-Material* TextureMaterial::Clone()
+std::unique_ptr<Material> TextureMaterial::Clone()
 {
-    TextureMaterial* mat = new TextureMaterial;
+    std::unique_ptr<TextureMaterial> mat = std::make_unique<TextureMaterial>();
     (*mat) = (*this);
     return mat;
 }

@@ -626,11 +626,11 @@ void GraphicsSystem::Render(float dt)
             {
                 Transform *pTrans = it->GetComponent<Transform>();
                 float distSq = (pTrans->pos.x - camPos.x) * (pTrans->pos.x - camPos.x) + (pTrans->pos.y - camPos.y) * (pTrans->pos.y - camPos.y) + (pTrans->pos.z - camPos.z) * (pTrans->pos.z - camPos.z);
-                transparentObjects.push_back(std::pair<GameObject *, float>(it, distSq));
+                transparentObjects.push_back(std::pair<GameObject *, float>(it.get(), distSq));
             }
             else
             {
-                RenderObject(it, dt);
+                RenderObject(it.get(), dt);
             }
         }
     }

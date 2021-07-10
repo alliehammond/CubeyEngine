@@ -20,9 +20,9 @@ void Material::BindMaterial()
     GraphicsSystem::GetD3DDeviceContext()->PSSetShader(pPixShader, nullptr, 0);
 }
 
-Material* Material::Clone()
+std::unique_ptr<Material> Material::Clone()
 {
-    Material *mat = new Material;
+    std::unique_ptr<Material> mat = std::make_unique<Material>();
     (*mat) = (*this);
     return mat;
 }

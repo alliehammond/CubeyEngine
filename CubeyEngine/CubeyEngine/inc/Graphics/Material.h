@@ -6,7 +6,7 @@ public:
     Material(std::string VS, std::string PS, InputLayout IL, std::string name_);
     virtual ~Material() {}
     virtual void BindMaterial();
-    virtual Material* Clone();
+    virtual std::unique_ptr<Material> Clone();
     std::string GetName() { return name; }
     unsigned int GetVertexSize() { return vertexSize; }
 private:

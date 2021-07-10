@@ -1,7 +1,7 @@
 #include "EnginePCH.h"
 #include "Core\ObjectManagerSystem.h"
 
-std::vector<GameObject *> ObjectManagerSystem::gameObjects;
+std::vector<std::unique_ptr<GameObject>> ObjectManagerSystem::gameObjects;
 
 ObjectManagerSystem::ObjectManagerSystem()
 {
@@ -10,11 +10,6 @@ ObjectManagerSystem::ObjectManagerSystem()
 
 ObjectManagerSystem::~ObjectManagerSystem()
 {
-    //Destroy all remaining game objects
-    for(auto &it : gameObjects)
-    {
-        delete it;
-    }
     gameObjects.clear();
 }
 
@@ -22,12 +17,10 @@ void ObjectManagerSystem::Update(float dt)
 {
     //Delete game objects with deletion flag set
     gameObjects.erase(std::remove_if(gameObjects.begin(), gameObjects.end(),
-        [](GameObject *it)
+        [](std::unique_ptr<GameObject> &it)
     { 
-        //Delete game object and return true to delete pointer from vector
         if(it->GetDeletionFlag())
         {
-            delete it;
             return true;
         }
         return false;
@@ -39,8 +32,9 @@ void ObjectManagerSystem::Update(float dt)
     }
 }
 
-GameObject *ObjectManagerSystem::CreateObject(GameObject* obj)
+GameObject *ObjectManagerSystem::CreateObject(std::unique_ptr<GameObject> obj)
 {
-    gameObjects.push_back(obj);
-    return obj;
+    GameObject *ret = obj.get();
+    gameObjects.push_back(std::move(obj));
+    return ret;
 }

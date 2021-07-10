@@ -4,35 +4,30 @@
 
 GameObject::GameObject()
 {
-    AddComponent(new Transform(this));
+    AddComponent(std::make_unique<Transform>(this));
 }
 
 GameObject::GameObject(std::string objName) : name(objName)
 {
-    AddComponent(new Transform(this));
+    AddComponent(std::make_unique<Transform>(this));
 }
 
 GameObject::~GameObject()
-{
-    //Delete all the components
-    for(auto &it : components)
-    {
-        delete it.second;
-    }
-}
+{ }
 
 //Each game object calls update() and postupdate() of each of their components
 void GameObject::Update(float dt)
 {
+    for(auto it = components.begin(); it != components.end(); ++it)
+    {
+        if(it->second->GetDeleteFlag())components.erase(it--);
+    }
     for(auto& it : components)
     {
-        if(!it.second)continue;
         it.second->Update(dt);
     }
-
     for(auto& it : components)
     {
-        if(!it.second)continue;
         it.second->PostUpdate(dt);
     }
 }
