@@ -12,6 +12,9 @@ public:
     Mesh();
     ~Mesh();
 
+    void SetVertexBuffer(std::unique_ptr<ID3D11Buffer> vertBuf) { vertexBuffer = std::move(vertBuf); }
+    void SetIndexBuffer(std::unique_ptr<ID3D11Buffer> indexBuf) { vertexBuffer = std::move(indexBuf); }
+
     std::unique_ptr<Material> material;
 private:
     std::unique_ptr<ID3D11Buffer> vertexBuffer, indexBuffer;

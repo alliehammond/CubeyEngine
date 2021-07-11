@@ -42,7 +42,7 @@ bool Model::LoadModel(std::string fileName, Material *mat)
     for(unsigned int i = 0;i < scene->mNumMeshes; ++i)
     {
         aiMesh *curMesh = scene->mMeshes[i];
-        Mesh *newMesh = new Mesh(mat);
+        Mesh *newMesh = new Mesh(mat->Clone());
         //Assume 3 indices per face
         newMesh->indexCount = 3 * curMesh->mNumFaces;
         totalFaces += curMesh->mNumFaces;
@@ -74,12 +74,14 @@ bool Model::LoadModel(std::string fileName, Material *mat)
 
         resourceData.pSysMem = vertices;
 
-        HRESULT hr = GraphicsSystem::GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &resourceData, &newMesh->vertexBuffer);
+        ID3D11Buffer *vBufPointer;
+        HRESULT hr = GraphicsSystem::GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &resourceData, &vBufPointer);
         if(FAILED(hr))
         {
             LOGERROR("Failed to create vertex buffer!");
             return false;
         }
+        newMesh->SetVertexBuffer(std::unique_ptr<ID3D11Buffer>(vBufPointer));
 
         //Create and initialize the index buffer
         unsigned int *indices = new unsigned int[curMesh->mNumFaces * 3];
@@ -104,12 +106,14 @@ bool Model::LoadModel(std::string fileName, Material *mat)
         std::string str = "Loaded model from " + path + "! V:" + std::to_string(totalVerts) + " F:" + std::to_string(totalFaces);
         LOGDEBUG(str);
 
-        hr = GraphicsSystem::GetD3DDevice()->CreateBuffer(&indexBufferDesc, &resourceData, &newMesh->indexBuffer);
+        ID3D11Buffer *iBufPointer;
+        hr = GraphicsSystem::GetD3DDevice()->CreateBuffer(&indexBufferDesc, &resourceData, &iBufPointer);
         if(FAILED(hr))
         {
             LOGERROR("Failed to create index buffer!");
             return false;
         }
+        newMesh->SetIndexBuffer(std::unique_ptr<ID3D11Buffer>(iBufPointer));
         
         delete[] vertices;
         delete[] indices;
