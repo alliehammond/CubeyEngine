@@ -111,6 +111,9 @@
     <ClCompile Include="src\Graphics\Materials\TextureMaterial.cpp">
       <Filter>Source Files\Graphics\Materials</Filter>
     </ClCompile>
+    <ClCompile Include="src\Gameplay\UIComponent.cpp">
+      <Filter>Source Files\Gameplay</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\EnginePCH.h">
@@ -175,6 +178,9 @@
     </ClInclude>
     <ClInclude Include="inc\Graphics\Materials\TextureMaterial.h">
       <Filter>Header Files\Graphics\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Gameplay\UIComponent.h">
+      <Filter>Header Files\Gameplay</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

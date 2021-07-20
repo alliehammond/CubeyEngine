@@ -6,12 +6,12 @@ RenderComponent::RenderComponent(std::string modelFileName, GameObject *owner) :
     //Use default material
     Material mat("BasicVertexShader.cso", "BasicPixelShader.cso", InputLayout::POSCOL, "BaseMaterial");
 
-    pModel = new Model(modelFileName, &mat);
+    pModel = new Model(modelFileName, &mat, mat.GetInputLayout());
 }
 
 RenderComponent::RenderComponent(std::string modelFileName, Material* mat, GameObject* owner) : Component(owner, "RenderComponent")
 {
-    pModel = new Model(modelFileName, mat);
+    pModel = new Model(modelFileName, mat, mat->GetInputLayout());
 }
 
 RenderComponent::RenderComponent(Model *Model, GameObject* owner)

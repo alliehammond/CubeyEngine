@@ -104,7 +104,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>ExternalLibraries/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc142-mt.lib;DirectXTex.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc142-mt.lib;DirectXTexd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -124,7 +124,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>ExternalLibraries/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc142-mt.lib;DirectXTex.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc142-mt.lib;DirectXTexd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -209,6 +209,7 @@
     <ClInclude Include="inc\EnginePCH.h" />
     <ClInclude Include="inc\GameDefines.h" />
     <ClInclude Include="inc\Gameplay\PlayerController.h" />
+    <ClInclude Include="inc\Gameplay\UIComponent.h" />
     <ClInclude Include="inc\Graphics\GraphicsSystem.h" />
     <ClInclude Include="inc\Graphics\Material.h" />
     <ClInclude Include="inc\Graphics\Materials\TextureMaterial.h" />
@@ -220,6 +221,9 @@
     <ClInclude Include="inc\Terrain\BlockType.h" />
     <ClInclude Include="inc\Terrain\Chunk.h" />
     <ClInclude Include="inc\Terrain\TerrainManagerSystem.h" />
+    <ClCompile Include="src\Gameplay\UIComponent.cpp">
+      <FileType>CppHeader</FileType>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\PixelShaders\BasicPixelShader.hlsl">

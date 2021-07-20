@@ -1,7 +1,7 @@
 #include "EnginePCH.h"
 #include "Graphics\Material.h"
 
-Material::Material() : vertexSize(0)
+Material::Material() : vertexSize(0), ILayout(InputLayout::INPUTLAYOUTCOUNT)
 { }
 
 Material::Material(std::string VS, std::string PS, InputLayout IL, std::string name_)
@@ -11,6 +11,7 @@ Material::Material(std::string VS, std::string PS, InputLayout IL, std::string n
     pInputLayout = GraphicsSystem::GetInputLayout(IL);
     name = name_;
     vertexSize = InputLayoutVertexSizes[IL];
+    ILayout =  IL;
 }
 
 void Material::BindMaterial()

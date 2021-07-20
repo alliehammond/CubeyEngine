@@ -2,8 +2,26 @@
 #include "Graphics\GraphicsSystem.h"
 #include "Graphics\RenderComponent.h"
 #include "Graphics\Texture.h"
+#include <codecvt>
+#include <locale>
 
 using namespace DirectX;
+
+namespace GS
+{
+    using convert_t = std::codecvt_utf8<wchar_t>;
+    std::wstring_convert<convert_t, wchar_t> strconverter;
+
+    std::string to_string(std::wstring wstr)
+    {
+        return strconverter.to_bytes(wstr);
+    }
+
+    std::wstring to_wstring(std::string str)
+    {
+        return strconverter.from_bytes(str);
+    }
+}
 
 int GraphicsSystem::windowWidth = 800;
 int GraphicsSystem::windowHeight = 450;
@@ -44,15 +62,6 @@ GraphicsSystem::GraphicsSystem(HINSTANCE hInstance, int cmdShow)
     InitDirectX(hInstance);
     
     CreateConstantBuffers();
-
-    LOGDEBUG("Loading vertex shaders...");
-    LoadVertexShader("BasicVertexShader.cso", L"BasicVertexShader.cso");
-    LoadVertexShader("BlockPlacementDisplayVS.cso", L"BlockPlacementDisplayVS.cso");
-    LoadVertexShader("BasicTextureVS.cso", L"BasicTextureVS.cso");
-
-    LOGDEBUG("Loading pixel shaders...");
-    LoadPixelShader("BasicPixelShader.cso", L"BasicPixelShader.cso");
-    LoadPixelShader("BasicTexturePS.cso", L"BasicTexturePS.cso");
 
     LOGDEBUG("Loading input layouts...");
     LoadInputLayouts();
@@ -250,7 +259,22 @@ void GraphicsSystem::Update(float dt)
     if(!windowMinimized)Render(dt);
 }
 
-void GraphicsSystem::LoadPixelShader(std::string fileName, std::wstring fileNameWide)
+ID3D11PixelShader *GraphicsSystem::GetPixelShader(std::string name)
+{
+    auto it = pixelShaders.find(name);
+    if(it != pixelShaders.end())
+        return it->second;
+    return LoadPixelShader(name, GS::to_wstring(name));
+}
+ID3D11VertexShader *GraphicsSystem::GetVertexShader(std::string name)
+{
+    auto it = vertexShaders.find(name);
+    if(it != vertexShaders.end())
+        return it->second;
+    return LoadVertexShader(name, GS::to_wstring(name));
+}
+
+ID3D11PixelShader *GraphicsSystem::LoadPixelShader(std::string fileName, std::wstring fileNameWide)
 {
     std::string path = fileName;
     std::string str = "Loading pixel shader: " + path;
@@ -264,6 +288,7 @@ void GraphicsSystem::LoadPixelShader(std::string fileName, std::wstring fileName
     {
         std::string wrnstr = "Could not read " + path;
         LOGWARNING(wrnstr);
+        return 0;
     }
 
     hr = d3dDevice->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), nullptr, &pixelShaders[fileName]);
@@ -271,12 +296,14 @@ void GraphicsSystem::LoadPixelShader(std::string fileName, std::wstring fileName
     {
         std::string wrnstr = "Could not create pixel shader " + fileName;
         LOGWARNING(wrnstr);
+        return 0;
     }
 
     SafeRelease(pixelShaderBlob);
+    return pixelShaders[fileName];
 }
 
-void GraphicsSystem::LoadVertexShader(std::string fileName, std::wstring fileNameWide)
+ID3D11VertexShader *GraphicsSystem::LoadVertexShader(std::string fileName, std::wstring fileNameWide)
 {
     std::string path = fileName;
     std::string str = "Loading vertex shader: " + path;
@@ -290,6 +317,7 @@ void GraphicsSystem::LoadVertexShader(std::string fileName, std::wstring fileNam
     {
         std::string wrnstr = "Could not read " + path;
         LOGWARNING(wrnstr);
+        return 0;
     }
 
     hr = d3dDevice->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), nullptr, &vertexShaders[fileName]);
@@ -297,9 +325,11 @@ void GraphicsSystem::LoadVertexShader(std::string fileName, std::wstring fileNam
     {
         std::string wrnstr = "Could not create vertex shader " + fileName;
         LOGWARNING(wrnstr);
+        return 0;
     }
 
     SafeRelease(vertexShaderBlob);
+    return vertexShaders[fileName];
 }
 
 void GraphicsSystem::LoadInputLayouts()

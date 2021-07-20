@@ -6,9 +6,9 @@
 
 const std::string modelPath = "../resources/models/";
 
-Model::Model(std::string fileName, Material *mat)
+Model::Model(std::string fileName, Material *mat, InputLayout IL)
 {
-    LoadModel(fileName, mat);
+    LoadModel(fileName, mat, IL);
 }
 
 Model::~Model()
@@ -16,7 +16,7 @@ Model::~Model()
     ClearModel();
 }
 
-bool Model::LoadModel(std::string fileName, Material *mat)
+bool Model::LoadModel(std::string fileName, Material *mat, InputLayout IL)
 {
     if(!meshes.empty())
     {
@@ -48,31 +48,56 @@ bool Model::LoadModel(std::string fileName, Material *mat)
         totalFaces += curMesh->mNumFaces;
         totalVerts += curMesh->mNumVertices;
 
-        VertexPosColor *vertices = new VertexPosColor[curMesh->mNumVertices];
-        //Load vertices from assimp aiMesh struct
-        for(unsigned int j = 0;j < curMesh->mNumVertices; ++j)
-        {
-            vertices[j].color.x = (rand() % 100) / 100.0f;
-            vertices[j].color.y = (rand() % 100) / 100.0f;
-            vertices[j].color.z = (rand() % 100) / 100.0f;
-            vertices[j].position.x = curMesh->mVertices[j].x;
-            vertices[j].position.y = curMesh->mVertices[j].y;
-            vertices[j].position.z = curMesh->mVertices[j].z;
-        }
-
         //Create an initialize the vertex buffer.
         D3D11_BUFFER_DESC vertexBufferDesc;
         ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
 
         vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-        vertexBufferDesc.ByteWidth = sizeof(VertexPosColor) * curMesh->mNumVertices;
         vertexBufferDesc.CPUAccessFlags = 0;
         vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 
         D3D11_SUBRESOURCE_DATA resourceData;
         ZeroMemory(&resourceData, sizeof(D3D11_SUBRESOURCE_DATA));
 
-        resourceData.pSysMem = vertices;
+        VertexPosColor *verticesPosCol = 0;
+        VertexPosUV *verticesPosUV = 0;
+
+        if(IL == InputLayout::POSCOL)
+        {
+            verticesPosCol = new VertexPosColor[curMesh->mNumVertices];
+            //Load vertices from assimp aiMesh struct
+            for(unsigned int j = 0; j < curMesh->mNumVertices; ++j)
+            {
+                verticesPosCol[j].color.x = (rand() % 100) / 100.0f;
+                verticesPosCol[j].color.y = (rand() % 100) / 100.0f;
+                verticesPosCol[j].color.z = (rand() % 100) / 100.0f;
+                verticesPosCol[j].position.x = curMesh->mVertices[j].x;
+                verticesPosCol[j].position.y = curMesh->mVertices[j].y;
+                verticesPosCol[j].position.z = curMesh->mVertices[j].z;
+            }
+            vertexBufferDesc.ByteWidth = sizeof(VertexPosColor) * curMesh->mNumVertices;
+            resourceData.pSysMem = verticesPosCol;
+        }
+        else if(IL == InputLayout::POSUV)
+        {
+            verticesPosUV = new VertexPosUV[curMesh->mNumVertices];
+            //Load vertices from assimp aiMesh struct
+            for(unsigned int j = 0; j < curMesh->mNumVertices; ++j)
+            {
+                verticesPosUV[j].uv.x = curMesh->mTextureCoords[j]->x;
+                verticesPosUV[j].uv.y = curMesh->mTextureCoords[j]->y;
+                verticesPosUV[j].position.x = curMesh->mVertices[j].x;
+                verticesPosUV[j].position.y = curMesh->mVertices[j].y;
+                verticesPosUV[j].position.z = curMesh->mVertices[j].z;
+            }
+            vertexBufferDesc.ByteWidth = sizeof(VertexPosUV) * curMesh->mNumVertices;
+            resourceData.pSysMem = verticesPosUV;
+        }
+        else
+        {
+            LOGERROR("Invalid input layout passed to model loader!");
+            return false;
+        }
 
         HRESULT hr = GraphicsSystem::GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &resourceData, &newMesh->vertexBuffer);
         if(FAILED(hr))
@@ -111,7 +136,8 @@ bool Model::LoadModel(std::string fileName, Material *mat)
             return false;
         }
         
-        delete[] vertices;
+        if(verticesPosCol)delete[] verticesPosCol;
+        if(verticesPosUV)delete[] verticesPosUV;
         delete[] indices;
 
         meshes.push_back(newMesh);

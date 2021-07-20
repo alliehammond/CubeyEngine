@@ -36,24 +36,35 @@ public:
     template <typename T>
     T *GetComponent()
     {
-        return (T*)components[std::type_index(typeid(T))];
+        auto it = components.find(std::type_index(typeid(T)));
+        if(it == components.end())return 0;
+        return (T*)it->second;
     }
     template <typename T>
     bool HasComponent()
     {
-        if(GetComponent<T>() != 0)
-            return true;
-        return false;
+        auto it = components.find(std::type_index(typeid(T)));
+        if(it == components.end())return false;
+        return true;
     }
+    //If component already exists, return that component
     template <typename T>
     T *AddComponent(T *comp)
     {
+        auto it = components.find(std::type_index(typeid(T)));
+        if(it != components.end())
+        {
+            LOGWARNING("Adding already existing component, possible memory leak!");
+            return (T *)it->second;
+        }
+
         components[std::type_index(typeid(T))] = comp;
         return comp;
     }
     template <typename T>
     void DeleteComponent()
     {
+        if(!HasComponent<T>())return;
         components[std::type_index(typeid(T))]->DeleteComponent();
         components.erase(std::type_index(typeid(T)));
     }

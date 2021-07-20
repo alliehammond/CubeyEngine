@@ -11,7 +11,7 @@ PlayerController::PlayerController(GameObject* owner) : Component(owner, "Player
     Material mat("BlockPlacementDisplayVS.cso", "BasicPixelShader.cso", InputLayout::POSCOL, "BlockPlaceMaterial");
 
     pBlockPlacementOutline = ObjectManagerSystem::CreateObject(new GameObject("BlockPlacementOutline"));
-    Transform* pBlockTrans = pBlockPlacementOutline->AddComponent<Transform>(new Transform(pBlockPlacementOutline));
+    Transform* pBlockTrans = pBlockPlacementOutline->GetComponent<Transform>();
     pBlockTrans->scale = CBY::Vector(1.05f, 1.05f, 1.05f);
     RenderComponent *rComp = pBlockPlacementOutline->AddComponent<RenderComponent>(new RenderComponent("BasicCube.fbx", &mat, pBlockPlacementOutline));
     rComp->renderComponent = showBlockPlaceOutline;

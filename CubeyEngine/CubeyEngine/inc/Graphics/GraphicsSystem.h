@@ -43,8 +43,8 @@ public:
     ~GraphicsSystem();
     void Update(float dt);
 
-    static ID3D11PixelShader *GetPixelShader(std::string name) { return pixelShaders[name]; }
-    static ID3D11VertexShader* GetVertexShader(std::string name) { return vertexShaders[name]; }
+    static ID3D11PixelShader *GetPixelShader(std::string name);
+    static ID3D11VertexShader* GetVertexShader(std::string name);
     static ID3D11InputLayout* GetInputLayout(InputLayout layout) { return inputLayouts[layout]; }
     //Gets a texture from texture pool, or loads it if it isn't already loaded - returns null if texture couldn't be loaded
     static Texture *GetTexture(std::string textureName);
@@ -60,8 +60,8 @@ public:
 private:
     static void SetCameraTrans(Transform *trans);
 
-    void LoadPixelShader(std::string fileName, std::wstring fileNameWide);
-    void LoadVertexShader(std::string fileName, std::wstring fileNameWide);
+    static ID3D11PixelShader *LoadPixelShader(std::string fileName, std::wstring fileNameWide);
+    static ID3D11VertexShader *LoadVertexShader(std::string fileName, std::wstring fileNameWide);
     void LoadInputLayouts();
     void CreateConstantBuffers();
 
