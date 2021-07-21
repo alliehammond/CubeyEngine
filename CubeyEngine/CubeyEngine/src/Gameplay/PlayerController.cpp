@@ -1,7 +1,7 @@
 #include "EnginePCH.h"
 #include "Gameplay\PlayerController.h"
 
-Transform *PlayerController::pTrans;
+Transform *PlayerController::pTrans = 0;
 
 PlayerController::PlayerController(GameObject* owner) : Component(owner, "PlayerController"), pBlockPlacementOutline(0), showBlockPlaceOutline(false)
 {
@@ -59,6 +59,7 @@ void PlayerController::Update(float dt)
     {
         pTrans->pos -= rightVec * activeMoveSpeed * dt;
     }
+    //LOGDEBUG("X: " + std::to_string(pTrans->pos.x) + ", Y: " + std::to_string(pTrans->pos.y) + ", Z: " + std::to_string(pTrans->pos.z));
 
     GraphicsSystem::SetCameraTrans(pTrans);
 

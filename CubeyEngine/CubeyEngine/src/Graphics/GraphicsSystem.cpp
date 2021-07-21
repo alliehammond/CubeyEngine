@@ -1,3 +1,6 @@
+//Left handed coordinate system (Y-up)
+//Counter clockwise winding order
+
 #include "EnginePCH.h"
 #include "Graphics\GraphicsSystem.h"
 #include "Graphics\RenderComponent.h"
@@ -116,9 +119,24 @@ GraphicsSystem::~GraphicsSystem()
     SafeRelease(d3dDepthStencilState);
     SafeRelease(d3dRasterizerState);
     SafeRelease(d3dSwapChain);
-    SafeRelease(d3dDeviceContext);
-    SafeRelease(d3dDevice);
     SafeRelease(d3dBlendState);
+    SafeRelease(d3dSamplerState);
+
+
+    d3dDeviceContext->ClearState();
+    d3dDeviceContext->Flush();
+    SafeRelease(d3dDeviceContext);
+
+#if _DEBUG
+    ID3D11Debug *d3dDebug;
+    HRESULT hr = d3dDevice->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void **>(&d3dDebug));
+    if(SUCCEEDED(hr))
+    {
+        hr = d3dDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+    }
+    SafeRelease(d3dDebug);
+#endif
+    SafeRelease(d3dDevice);
 }
 
 //Gets a texture from texture pool, or loads it if it isn't already loaded - returns null if the texture couldn't be loaded
@@ -606,7 +624,7 @@ void GraphicsSystem::InitDirectX(HINSTANCE hInstance)
 
     //Setup sampler state
     D3D11_SAMPLER_DESC samplerDesc;
-    ID3D11SamplerState* samplerState;
+
     samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
     samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
     samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -618,13 +636,13 @@ void GraphicsSystem::InitDirectX(HINSTANCE hInstance)
     samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 
 
-    hr = d3dDevice->CreateSamplerState(&samplerDesc, &samplerState);
+    hr = d3dDevice->CreateSamplerState(&samplerDesc, &d3dSamplerState);
     if(FAILED(hr))
     {
         LOGERROR("Failed to create sampler state!");
         return;
     }
-    d3dDeviceContext->PSSetSamplers(0, 1, &samplerState);
+    d3dDeviceContext->PSSetSamplers(0, 1, &d3dSamplerState);
 
 }
 

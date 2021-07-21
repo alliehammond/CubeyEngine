@@ -7,5 +7,5 @@ class UIComponent : public Component
 public:
     UIComponent(GameObject *owner);
     ~UIComponent();
-    void Update(float dt);
+    void PostUpdate(float dt);
 };

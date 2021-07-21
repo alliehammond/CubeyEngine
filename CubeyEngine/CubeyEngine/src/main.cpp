@@ -5,6 +5,7 @@
 #include "Gameplay\PlayerController.h"
 #include "Terrain\Chunk.h"
 #include "Terrain\TerrainManagerSystem.h"
+#include "Gameplay\UIComponent.h"
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _In_ LPWSTR cmdLine, _In_ int cmdShow)
 {
@@ -28,7 +29,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
     GameObject *player = ObjectManagerSystem::CreateObject(new GameObject("Player"));
     player->AddComponent<PlayerController>(new PlayerController(player));
     player->GetComponent<Transform>()->pos.x = 1.0f;
-    player->GetComponent<Transform>()->pos.y = 10.0f;   
+    player->GetComponent<Transform>()->pos.y = 10.0f;
+
+    GameObject *UI = ObjectManagerSystem::CreateObject(new GameObject("UI"));
+    player->AddComponent<UIComponent>(new UIComponent(UI));
 
 
     while(msg.message != WM_QUIT)
@@ -55,11 +59,12 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
     //Cleanup systems
     for(int i = 0; i < CubeySystems::SYSTEMCOUNT; ++i)
     {
-        //Skip object manager deletion for last
-        if(i != CubeySystems::OBJECTMANAGERSYSTEM)
+        //Skip object manager and graphics system deletion for last
+        if(i != CubeySystems::OBJECTMANAGERSYSTEM && i != CubeySystems::GRAPHICSSYSTEM)
             delete engineSystems[i];
     }
     delete engineSystems[CubeySystems::OBJECTMANAGERSYSTEM];
+    delete engineSystems[CubeySystems::GRAPHICSSYSTEM];
 
     return 0;
 }

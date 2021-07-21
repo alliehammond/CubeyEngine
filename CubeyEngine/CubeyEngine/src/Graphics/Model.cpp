@@ -3,6 +3,7 @@
 #include "assimp\Importer.hpp"
 #include "assimp\scene.h"
 #include "assimp\postprocess.h"
+#include "assimp\vector3.h"
 
 const std::string modelPath = "../resources/models/";
 
@@ -81,11 +82,13 @@ bool Model::LoadModel(std::string fileName, Material *mat, InputLayout IL)
         else if(IL == InputLayout::POSUV)
         {
             verticesPosUV = new VertexPosUV[curMesh->mNumVertices];
+            
             //Load vertices from assimp aiMesh struct
             for(unsigned int j = 0; j < curMesh->mNumVertices; ++j)
             {
-                verticesPosUV[j].uv.x = curMesh->mTextureCoords[j]->x;
-                verticesPosUV[j].uv.y = curMesh->mTextureCoords[j]->y;
+                aiVector3D *texCoords = curMesh->mTextureCoords[0];
+                verticesPosUV[j].uv.x = texCoords[j].x;
+                verticesPosUV[j].uv.y = texCoords[j].y;
                 verticesPosUV[j].position.x = curMesh->mVertices[j].x;
                 verticesPosUV[j].position.y = curMesh->mVertices[j].y;
                 verticesPosUV[j].position.z = curMesh->mVertices[j].z;
