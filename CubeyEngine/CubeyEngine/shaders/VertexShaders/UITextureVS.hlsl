@@ -28,7 +28,7 @@ VertexShaderOutput main(VertexData IN)
 {
     VertexShaderOutput OUT;
 
-    OUT.position = float4(IN.position.x, IN.position.y, 1.0f, 1.0f);
+    OUT.position = float4(IN.position.x, IN.position.y, 0.0f, 1.0f);
     OUT.uv = IN.uv;
 
     return OUT;

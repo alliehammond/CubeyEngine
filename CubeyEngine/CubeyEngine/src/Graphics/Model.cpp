@@ -32,7 +32,8 @@ bool Model::LoadModel(std::string fileName, Material *mat, InputLayout IL)
         aiProcess_Triangulate |
         aiProcess_JoinIdenticalVertices |
         aiProcess_SortByPType |
-        aiProcess_MakeLeftHanded);
+        aiProcess_MakeLeftHanded |
+        aiProcess_FlipUVs);
 
     //If the import failed, report it
     if(!scene) {

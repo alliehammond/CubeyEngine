@@ -4,7 +4,7 @@
 
 UIComponent::UIComponent(GameObject *owner) : Component(owner, "UIComponent")
 {
-    TextureMaterial mat("UITextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUV, "UITextureMaterial", "dirtTexture.tga");
+    TextureMaterial mat("UITextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUV, "UITextureMaterial", "UITexture.tga");
     //Create render component with UI texture
     RenderComponent *rComp = owner->AddComponent<RenderComponent>(new RenderComponent("VerticalPlane.fbx", &mat, owner));
     rComp->transparent = true;
