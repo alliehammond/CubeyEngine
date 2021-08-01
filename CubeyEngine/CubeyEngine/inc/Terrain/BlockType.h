@@ -2,6 +2,8 @@
 
 enum class BlockType : unsigned char
 {
-    Air,
-    Dirt
+    Air = 0,
+    Dirt,
+    Stone,
+    BLOCKCOUNT
 };

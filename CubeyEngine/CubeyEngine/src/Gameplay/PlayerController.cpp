@@ -60,6 +60,10 @@ void PlayerController::Update(float dt)
     {
         PlaceBlock(BlockType::Dirt);
     }
+    if(InputSystem::GetKeyPressed('2'))
+    {
+        PlaceBlock(BlockType::Stone);
+    }
 }
 
 Transform* PlayerController::GetPlayerTrans()

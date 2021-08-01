@@ -43,20 +43,16 @@ void Chunk::CreateChunkMesh()
         pModel->ClearModel();
     }
 
-    //Temp use hardcoded material
-    TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUV, "BaseTextureMaterial", "dirtTexture.tga");
+    //Vector for the vertices and indices of each block type
+    std::vector<std::vector<VertexPosUV>> blockTypeVertices;
+    std::vector<std::vector<unsigned int>> blockTypeIndices;
 
-    Mesh* newMesh = new Mesh(&mat);
-    //3 indices per face, 6 sides per cube, 2 faces per side of cube
-    newMesh->indexCount = 3 * 6 * 2 * numBlocks;
-
-    int totalFaces = numBlocks * 6 * 2, totalVerts = numBlocks * 24;
-
-    VertexPosUV* vertices = new VertexPosUV[totalVerts];
-    unsigned int* indices = new unsigned int[newMesh->indexCount];
-
-    int curVertCount = 0;
-    int curIndexCount = 0;
+    //Initialize vectors
+    for(unsigned char i = 0;i < unsigned char(BlockType::BLOCKCOUNT); ++i)
+    {
+        blockTypeVertices.push_back(std::vector<VertexPosUV>());
+        blockTypeIndices.push_back(std::vector<unsigned int>());
+    }
 
     for(unsigned int i = 0; i < CBYDefines::ChunkSize; ++i)
     {
@@ -64,150 +60,176 @@ void Chunk::CreateChunkMesh()
         {
             for(unsigned int k = 0;k < CBYDefines::ChunkSize; ++k)
             {
-                if(GetBlockChunkRelative(i, j, k) != BlockType::Air)
+                BlockType bType = GetBlockChunkRelative(i, j, k);
+                if(bType != BlockType::Air)
                 {
-                    int blockStartVert = curVertCount;
-
+                    size_t bTypeIndex = size_t(bType);
+                    int blockStartVert = int(blockTypeVertices[bTypeIndex].size());
+                    
 
                     //SORRY FOR THIS CODE I THINK ITS LESS COMPLEX THAN DOING IT WITH LOOPS
                     //Create the 24 vertices of each block and assign UVs
 
                     //Top 2 faces (0-3)
-                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 1.0f);
-                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 0.0f;
-                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 1.0f);
-                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 0.0f;
-                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 0.0f);
-                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 1.0f;
-                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 0.0f);
-                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 1.0f;
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 1.0f, k + 0.0f), XMFLOAT2(0.0f, 1.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 1.0f, k + 0.0f), XMFLOAT2(1.0f, 1.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 1.0f, k + 1.0f), XMFLOAT2(0.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 1.0f, k + 1.0f), XMFLOAT2(1.0f, 0.0f) });
+
                     //Bottom 2 faces (4-7)
-                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 1.0f);
-                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 0.0f;
-                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 1.0f);
-                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 0.0f;
-                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 0.0f);
-                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 1.0f;
-                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 0.0f);
-                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 1.0f;
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 0.0f, k + 0.0f), XMFLOAT2(0.0f, 1.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 0.0f, k + 0.0f), XMFLOAT2(1.0f, 1.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 0.0f, k + 1.0f), XMFLOAT2(0.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 0.0f, k + 1.0f), XMFLOAT2(1.0f, 0.0f) });
+
                     //Front 2 faces (8-11)
-                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 0.0f);
-                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 0.0f;
-                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 0.0f);
-                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 0.0f;
-                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 1.0f);
-                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 0.0f;
-                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 1.0f);
-                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 0.0f;
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 1.0f, k + 0.0f), XMFLOAT2(0.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 1.0f, k + 0.0f), XMFLOAT2(1.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 0.0f, k + 0.0f), XMFLOAT2(0.0f, 1.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 0.0f, k + 0.0f), XMFLOAT2(1.0f, 1.0f) });
+
                     //Back 2 faces (12-15)
-                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 0.0f);
-                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 1.0f;
-                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 0.0f);
-                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 1.0f;
-                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 1.0f);
-                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 1.0f;
-                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 1.0f);
-                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 1.0f;
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 1.0f, k + 1.0f), XMFLOAT2(1.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 1.0f, k + 1.0f), XMFLOAT2(0.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 0.0f, k + 1.0f), XMFLOAT2(1.0f, 1.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 0.0f, k + 1.0f), XMFLOAT2(0.0f, 1.0f) });
+
                     //Left 2 faces (16-19)
-                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 0.0f);
-                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 0.0f;
-                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 0.0f);
-                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 1.0f;
-                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 1.0f);
-                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 0.0f;
-                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 1.0f);
-                    vertices[curVertCount].position.x = i + 0.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 1.0f;
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 1.0f, k + 0.0f), XMFLOAT2(1.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 1.0f, k + 1.0f), XMFLOAT2(0.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 0.0f, k + 0.0f), XMFLOAT2(1.0f, 1.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 0.0f, k + 1.0f), XMFLOAT2(0.0f, 1.0f) });
+
                     //Right 2 faces (20-23)
-                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 0.0f);
-                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 0.0f;
-                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 0.0f);
-                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 1.0f; vertices[curVertCount++].position.z = k + 1.0f;
-                    vertices[curVertCount].uv = XMFLOAT2(0.0f, 1.0f);
-                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 0.0f;
-                    vertices[curVertCount].uv = XMFLOAT2(1.0f, 1.0f);
-                    vertices[curVertCount].position.x = i + 1.0f; vertices[curVertCount].position.y = j + 0.0f; vertices[curVertCount++].position.z = k + 1.0f;
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 1.0f, k + 0.0f), XMFLOAT2(0.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 1.0f, k + 1.0f), XMFLOAT2(1.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 0.0f, k + 0.0f), XMFLOAT2(0.0f, 1.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 0.0f, k + 1.0f), XMFLOAT2(1.0f, 1.0f) });
 
                     //Set indices for each face
                     //Top and bottom
-                    indices[curIndexCount++] = blockStartVert + 0; indices[curIndexCount++] = blockStartVert + 1; indices[curIndexCount++] = blockStartVert + 2;
-                    indices[curIndexCount++] = blockStartVert + 2; indices[curIndexCount++] = blockStartVert + 1; indices[curIndexCount++] = blockStartVert + 3;
-                    indices[curIndexCount++] = blockStartVert + 6; indices[curIndexCount++] = blockStartVert + 5; indices[curIndexCount++] = blockStartVert + 4;
-                    indices[curIndexCount++] = blockStartVert + 7; indices[curIndexCount++] = blockStartVert + 5; indices[curIndexCount++] = blockStartVert + 6;
-                    //Front and back                                                                                                 
-                    indices[curIndexCount++] = blockStartVert + 11; indices[curIndexCount++] = blockStartVert + 9; indices[curIndexCount++] = blockStartVert + 8;
-                    indices[curIndexCount++] = blockStartVert + 10; indices[curIndexCount++] = blockStartVert + 11; indices[curIndexCount++] = blockStartVert + 8;
-                    indices[curIndexCount++] = blockStartVert + 12; indices[curIndexCount++] = blockStartVert + 13; indices[curIndexCount++] = blockStartVert + 15;
-                    indices[curIndexCount++] = blockStartVert + 12; indices[curIndexCount++] = blockStartVert + 15; indices[curIndexCount++] = blockStartVert + 14;
-                    //Left and right                                                                                                   
-                    indices[curIndexCount++] = blockStartVert + 16; indices[curIndexCount++] = blockStartVert + 17; indices[curIndexCount++] = blockStartVert + 18;
-                    indices[curIndexCount++] = blockStartVert + 17; indices[curIndexCount++] = blockStartVert + 19; indices[curIndexCount++] = blockStartVert + 18;
-                    indices[curIndexCount++] = blockStartVert + 20; indices[curIndexCount++] = blockStartVert + 22; indices[curIndexCount++] = blockStartVert + 21;
-                    indices[curIndexCount++] = blockStartVert + 21; indices[curIndexCount++] = blockStartVert + 22; indices[curIndexCount++] = blockStartVert + 23;
+                    blockTypeIndices[bTypeIndex].push_back(blockStartVert + 0); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 1); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 2);
+                    blockTypeIndices[bTypeIndex].push_back(blockStartVert + 2); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 1); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 3);
+                    blockTypeIndices[bTypeIndex].push_back(blockStartVert + 6); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 5); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 4);
+                    blockTypeIndices[bTypeIndex].push_back(blockStartVert + 7); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 5); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 6);
+
+                    //Front and back                            
+                    blockTypeIndices[bTypeIndex].push_back(blockStartVert + 11); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 9); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 8);
+                    blockTypeIndices[bTypeIndex].push_back(blockStartVert + 10); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 11); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 8);
+                    blockTypeIndices[bTypeIndex].push_back(blockStartVert + 12); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 13); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 15);
+                    blockTypeIndices[bTypeIndex].push_back(blockStartVert + 12); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 15); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 14);
+
+                    //Left and right                                                                                  
+                    blockTypeIndices[bTypeIndex].push_back(blockStartVert + 16); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 17); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 18);
+                    blockTypeIndices[bTypeIndex].push_back(blockStartVert + 17); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 19); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 18);
+                    blockTypeIndices[bTypeIndex].push_back(blockStartVert + 20); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 22); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 21);
+                    blockTypeIndices[bTypeIndex].push_back(blockStartVert + 21); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 22); blockTypeIndices[bTypeIndex].push_back(blockStartVert + 23);
                 }
             }
         }
     }
 
 
-    //Create an initialize the vertex buffer.
-    D3D11_BUFFER_DESC vertexBufferDesc;
-    ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
+    /*
+    //Temp use hardcoded material
+    TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUV, "BaseTextureMaterial", "dirtTexture.tga");
 
-    vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    vertexBufferDesc.ByteWidth = sizeof(VertexPosUV) * totalVerts;
-    vertexBufferDesc.CPUAccessFlags = 0;
-    vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+    Mesh* newMesh = new Mesh(&mat);
+    //3 indices per face, 6 sides per cube, 2 faces per side of cube
+    newMesh->indexCount = 3 * 6 * 2 * numBlocks;
 
-    D3D11_SUBRESOURCE_DATA resourceData;
-    ZeroMemory(&resourceData, sizeof(D3D11_SUBRESOURCE_DATA));
+    int totalFaces = numBlocks * 6 * 2, totalVerts = numBlocks * 24;*/
 
-    resourceData.pSysMem = vertices;
+    int totalChunkVerts = 0;
 
-    HRESULT hr = GraphicsSystem::GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &resourceData, &newMesh->vertexBuffer);
-    if(FAILED(hr))
+    //Loop through each vector and create meshes for each one that contains blocks (start at 1 to skip air blocks)
+    for(unsigned char i = 1; i < unsigned char(BlockType::BLOCKCOUNT); ++i)
     {
-        LOGERROR("Failed to create vertex buffer!");
-        return;
+        BlockType bType = BlockType(i);
+
+        //Skip empty buffers
+        if(blockTypeVertices[i].empty())continue;
+
+        //Create an initialize the vertex buffer.
+        D3D11_BUFFER_DESC vertexBufferDesc;
+        ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
+
+        vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        vertexBufferDesc.ByteWidth = sizeof(VertexPosUV) * unsigned(blockTypeVertices[i].size());
+        vertexBufferDesc.CPUAccessFlags = 0;
+        vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+
+        D3D11_SUBRESOURCE_DATA resourceData;
+        ZeroMemory(&resourceData, sizeof(D3D11_SUBRESOURCE_DATA));
+        
+        resourceData.pSysMem = blockTypeVertices[i].data();
+
+        Mesh *newMesh = 0;
+        switch(bType)
+        {
+            case BlockType::Dirt:
+            {
+                TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUV, "BaseTextureMaterial", "dirtTexture.tga");
+                newMesh = new Mesh(&mat);
+                break;
+            }
+            case BlockType::Stone:
+            {
+                TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUV, "BaseTextureMaterial", "stoneTexture.tga");
+                newMesh = new Mesh(&mat);
+                break;
+            }
+            default:
+                LOGERROR("Invalid block type attempting to be loaded!");
+        }
+
+        HRESULT hr = GraphicsSystem::GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &resourceData, &newMesh->vertexBuffer);
+        if(FAILED(hr))
+        {
+            LOGERROR("Failed to create vertex buffer!");
+            return;
+        }
+
+        newMesh->indexCount = unsigned(blockTypeIndices[i].size());
+
+        D3D11_BUFFER_DESC indexBufferDesc;
+        ZeroMemory(&indexBufferDesc, sizeof(D3D11_BUFFER_DESC));
+
+        indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+        indexBufferDesc.ByteWidth = sizeof(unsigned int) * newMesh->indexCount;
+        indexBufferDesc.CPUAccessFlags = 0;
+        indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+        resourceData.pSysMem = blockTypeIndices[i].data();
+
+        
+
+        hr = GraphicsSystem::GetD3DDevice()->CreateBuffer(&indexBufferDesc, &resourceData, &newMesh->indexBuffer);
+        if(FAILED(hr))
+        {
+            LOGERROR("Failed to create index buffer!");
+            return;
+        }
+
+        if(!blockTerrain)
+        {
+            Model *newModel = new Model();
+            newModel->AddMesh(newMesh);
+            blockTerrain = ObjectManagerSystem::CreateObject(new GameObject("BlockTerrainObj"));
+            Transform *pTrans = blockTerrain->GetComponent<Transform>();
+            pTrans->pos = CBY::Vector(float(x * CBYDefines::ChunkSize * CBYDefines::BlockSize), float(y * CBYDefines::ChunkSize * CBYDefines::BlockSize), float(z * CBYDefines::ChunkSize * CBYDefines::BlockSize));
+            pTrans->scale = CBY::Vector(CBYDefines::BlockSize, CBYDefines::BlockSize, CBYDefines::BlockSize);
+            blockTerrain->AddComponent<RenderComponent>(new RenderComponent(newModel, blockTerrain));
+        }
+        else
+        {
+            blockTerrain->GetComponent<RenderComponent>()->pModel->AddMesh(newMesh);
+        }
+
+        totalChunkVerts += unsigned(blockTypeVertices[i].size());
     }
 
-    
-
-    D3D11_BUFFER_DESC indexBufferDesc;
-    ZeroMemory(&indexBufferDesc, sizeof(D3D11_BUFFER_DESC));
-
-    indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-    indexBufferDesc.ByteWidth = sizeof(unsigned int) * newMesh->indexCount;
-    indexBufferDesc.CPUAccessFlags = 0;
-    indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-    resourceData.pSysMem = indices;
-
-    std::string str = "Loaded chunk " + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "! V:" + std::to_string(totalVerts) + " F:" + std::to_string(totalFaces);
+    std::string str = "Loaded chunk " + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "! V:" + std::to_string(totalChunkVerts);
     LOGDEBUG(str);
-
-    hr = GraphicsSystem::GetD3DDevice()->CreateBuffer(&indexBufferDesc, &resourceData, &newMesh->indexBuffer);
-    if(FAILED(hr))
-    {
-        LOGERROR("Failed to create index buffer!");
-        return;
-    }
-
-    delete[] vertices;
-    delete[] indices;
-
-    if(!blockTerrain)
-    {
-        Model* newModel = new Model();
-        newModel->AddMesh(newMesh);
-        blockTerrain = ObjectManagerSystem::CreateObject(new GameObject("BlockTerrainObj"));
-        Transform *pTrans = blockTerrain->GetComponent<Transform>();
-        pTrans->pos = CBY::Vector(float(x * CBYDefines::ChunkSize * CBYDefines::BlockSize), float(y * CBYDefines::ChunkSize * CBYDefines::BlockSize), float(z * CBYDefines::ChunkSize * CBYDefines::BlockSize));
-        pTrans->scale = CBY::Vector(CBYDefines::BlockSize, CBYDefines::BlockSize, CBYDefines::BlockSize);
-        blockTerrain->AddComponent<RenderComponent>(new RenderComponent(newModel, blockTerrain));
-    }
-    else
-    {
-        blockTerrain->GetComponent<RenderComponent>()->pModel->AddMesh(newMesh);
-    }
 }
 
 BlockType Chunk::GetBlockChunkRelative(short x, short y, short z)
