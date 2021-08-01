@@ -5,7 +5,7 @@ namespace CBYDefines
 
     //************************************************************************************
     //**Gameplay defines
-    const float MaxBlockPlaceDist = 7.0f;
+    const float MaxBlockPlaceDist = 15.0f;
 
     //************************************************************************************
 

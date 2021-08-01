@@ -3,25 +3,13 @@
 
 Transform *PlayerController::pTrans = 0;
 
-PlayerController::PlayerController(GameObject* owner) : Component(owner, "PlayerController"), pBlockPlacementOutline(0), showBlockPlaceOutline(false)
+PlayerController::PlayerController(GameObject* owner) : Component(owner, "PlayerController")
 {
     pTrans = owner->GetComponent<Transform>();
-
-    //Block placement outline
-    Material mat("BlockPlacementDisplayVS.cso", "BasicPixelShader.cso", InputLayout::POSCOL, "BlockPlaceMaterial");
-
-    pBlockPlacementOutline = ObjectManagerSystem::CreateObject(new GameObject("BlockPlacementOutline"));
-    Transform* pBlockTrans = pBlockPlacementOutline->GetComponent<Transform>();
-    pBlockTrans->scale = CBY::Vector(1.05f, 1.05f, 1.05f);
-    RenderComponent *rComp = pBlockPlacementOutline->AddComponent<RenderComponent>(new RenderComponent("BasicCube.fbx", &mat, pBlockPlacementOutline));
-    rComp->renderComponent = showBlockPlaceOutline;
-    rComp->transparent = true;
 }
 
 PlayerController::~PlayerController()
-{
-    pBlockPlacementOutline->Delete();
-}
+{ }
 
 void PlayerController::Update(float dt)
 {
@@ -64,25 +52,13 @@ void PlayerController::Update(float dt)
     GraphicsSystem::SetCameraTrans(pTrans);
 
     //Block placement
-    if(InputSystem::GetKeyPressed('B'))
+    if(InputSystem::GetKeyPressed('0'))
     {
-        showBlockPlaceOutline = !showBlockPlaceOutline;
-        pBlockPlacementOutline->GetComponent<RenderComponent>()->renderComponent = showBlockPlaceOutline;
+        PlaceBlock(BlockType::Air);
     }
-    //Update block placement outline pos
-    auto pos = GetBlockPlacementCoord(false);
-    pBlockPlacementOutline->GetComponent<Transform>()->pos = CBY::Vector((float)std::get<0>(pos) + 0.5f, (float)std::get<1>(pos) + 0.5f, (float)std::get<2>(pos) + 0.5f);
-
-    if(showBlockPlaceOutline)
+    if(InputSystem::GetKeyPressed('1'))
     {
-        if(InputSystem::GetKeyPressed('0'))
-        {
-            PlaceBlock(BlockType::Air);
-        }
-        if(InputSystem::GetKeyPressed('1'))
-        {
-            PlaceBlock(BlockType::Dirt);
-        }
+        PlaceBlock(BlockType::Dirt);
     }
 }
 

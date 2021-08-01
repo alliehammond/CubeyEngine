@@ -21,8 +21,5 @@ private:
     float moveSpeed = 15.0f;
     float fastMoveSpeed = 45.0f;
     float turnSpeed = 0.0006f;
-
-    GameObject *pBlockPlacementOutline;
-    bool showBlockPlaceOutline;
 };
 
