@@ -44,13 +44,13 @@ void Chunk::CreateChunkMesh()
     }
 
     //Vector for the vertices and indices of each block type
-    std::vector<std::vector<VertexPosUV>> blockTypeVertices;
+    std::vector<std::vector<VertexPosUVNorm>> blockTypeVertices;
     std::vector<std::vector<unsigned int>> blockTypeIndices;
 
     //Initialize vectors
     for(unsigned char i = 0;i < unsigned char(BlockType::BLOCKCOUNT); ++i)
     {
-        blockTypeVertices.push_back(std::vector<VertexPosUV>());
+        blockTypeVertices.push_back(std::vector<VertexPosUVNorm>());
         blockTypeIndices.push_back(std::vector<unsigned int>());
     }
 
@@ -71,40 +71,40 @@ void Chunk::CreateChunkMesh()
                     //Create the 24 vertices of each block and assign UVs
 
                     //Top 2 faces (0-3)
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 1.0f, k + 0.0f), XMFLOAT2(0.0f, 1.0f) });
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 1.0f, k + 0.0f), XMFLOAT2(1.0f, 1.0f) });
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 1.0f, k + 1.0f), XMFLOAT2(0.0f, 0.0f) });
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 1.0f, k + 1.0f), XMFLOAT2(1.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 0.0f, j + 1.0f, k + 0.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 1.0f, j + 1.0f, k + 0.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 0.0f, j + 1.0f, k + 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 1.0f, j + 1.0f, k + 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) });
 
                     //Bottom 2 faces (4-7)
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 0.0f, k + 0.0f), XMFLOAT2(0.0f, 1.0f) });
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 0.0f, k + 0.0f), XMFLOAT2(1.0f, 1.0f) });
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 0.0f, k + 1.0f), XMFLOAT2(0.0f, 0.0f) });
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 0.0f, k + 1.0f), XMFLOAT2(1.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 0.0f, j + 0.0f, k + 0.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 1.0f, j + 0.0f, k + 0.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 0.0f, j + 0.0f, k + 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 1.0f, j + 0.0f, k + 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) });
 
                     //Front 2 faces (8-11)
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 1.0f, k + 0.0f), XMFLOAT2(0.0f, 0.0f) });
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 1.0f, k + 0.0f), XMFLOAT2(1.0f, 0.0f) });
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 0.0f, k + 0.0f), XMFLOAT2(0.0f, 1.0f) });
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 0.0f, k + 0.0f), XMFLOAT2(1.0f, 1.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 0.0f, j + 1.0f, k + 0.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 1.0f, j + 1.0f, k + 0.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 0.0f, j + 0.0f, k + 0.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 1.0f, j + 0.0f, k + 0.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) });
 
                     //Back 2 faces (12-15)
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 1.0f, k + 1.0f), XMFLOAT2(1.0f, 0.0f) });
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 1.0f, k + 1.0f), XMFLOAT2(0.0f, 0.0f) });
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 0.0f, k + 1.0f), XMFLOAT2(1.0f, 1.0f) });
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 0.0f, k + 1.0f), XMFLOAT2(0.0f, 1.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 0.0f, j + 1.0f, k + 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 1.0f, j + 1.0f, k + 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 0.0f, j + 0.0f, k + 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 1.0f, j + 0.0f, k + 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) });
 
                     //Left 2 faces (16-19)
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 1.0f, k + 0.0f), XMFLOAT2(1.0f, 0.0f) });
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 1.0f, k + 1.0f), XMFLOAT2(0.0f, 0.0f) });
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 0.0f, k + 0.0f), XMFLOAT2(1.0f, 1.0f) });
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 0.0f, j + 0.0f, k + 1.0f), XMFLOAT2(0.0f, 1.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 0.0f, j + 1.0f, k + 0.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 0.0f, j + 1.0f, k + 1.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 0.0f, j + 0.0f, k + 0.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 0.0f, j + 0.0f, k + 1.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) });
 
                     //Right 2 faces (20-23)
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 1.0f, k + 0.0f), XMFLOAT2(0.0f, 0.0f) });
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 1.0f, k + 1.0f), XMFLOAT2(1.0f, 0.0f) });
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 0.0f, k + 0.0f), XMFLOAT2(0.0f, 1.0f) });
-                    blockTypeVertices[bTypeIndex].push_back(VertexPosUV{ XMFLOAT3(i + 1.0f, j + 0.0f, k + 1.0f), XMFLOAT2(1.0f, 1.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 1.0f, j + 1.0f, k + 0.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 1.0f, j + 1.0f, k + 1.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 1.0f, j + 0.0f, k + 0.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) });
+                    blockTypeVertices[bTypeIndex].push_back(VertexPosUVNorm{ XMFLOAT3(i + 1.0f, j + 0.0f, k + 1.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) });
 
                     //Set indices for each face
                     //Top and bottom
@@ -129,17 +129,6 @@ void Chunk::CreateChunkMesh()
         }
     }
 
-
-    /*
-    //Temp use hardcoded material
-    TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUV, "BaseTextureMaterial", "dirtTexture.tga");
-
-    Mesh* newMesh = new Mesh(&mat);
-    //3 indices per face, 6 sides per cube, 2 faces per side of cube
-    newMesh->indexCount = 3 * 6 * 2 * numBlocks;
-
-    int totalFaces = numBlocks * 6 * 2, totalVerts = numBlocks * 24;*/
-
     int totalChunkVerts = 0;
 
     //Loop through each vector and create meshes for each one that contains blocks (start at 1 to skip air blocks)
@@ -155,7 +144,7 @@ void Chunk::CreateChunkMesh()
         ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
 
         vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-        vertexBufferDesc.ByteWidth = sizeof(VertexPosUV) * unsigned(blockTypeVertices[i].size());
+        vertexBufferDesc.ByteWidth = sizeof(VertexPosUVNorm) * unsigned(blockTypeVertices[i].size());
         vertexBufferDesc.CPUAccessFlags = 0;
         vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 
@@ -169,13 +158,19 @@ void Chunk::CreateChunkMesh()
         {
             case BlockType::Dirt:
             {
-                TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUV, "BaseTextureMaterial", "dirtTexture.tga");
+                TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "dirtTexture.tga");
+                newMesh = new Mesh(&mat);
+                break;
+            }
+            case BlockType::Grass:
+            {
+                TextureMaterial mat("BasicTextureTopSideBottomVS.cso", "BasicTextureTopSideBottomPS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "grassTexture.tga");
                 newMesh = new Mesh(&mat);
                 break;
             }
             case BlockType::Stone:
             {
-                TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUV, "BaseTextureMaterial", "stoneTexture.tga");
+                TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "stoneTexture.tga");
                 newMesh = new Mesh(&mat);
                 break;
             }

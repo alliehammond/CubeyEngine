@@ -374,7 +374,7 @@ void GraphicsSystem::LoadInputLayouts()
         { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, offsetof(VertexPosUV, uv), D3D11_INPUT_PER_VERTEX_DATA, 0 }
     };
 
-    hr = D3DReadFileToBlob(L"BasicTextureVS.cso", &vertexShaderBlob);
+    hr = D3DReadFileToBlob(L"UITextureVS.cso", &vertexShaderBlob);
 
     hr = d3dDevice->CreateInputLayout(vertexLayoutDesc1, _countof(vertexLayoutDesc1), vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &inputLayouts[InputLayout::POSUV]);
     SafeRelease(vertexShaderBlob);
@@ -382,6 +382,22 @@ void GraphicsSystem::LoadInputLayouts()
         LOGWARNING("Failed to create input layout POSUV!");
     else
         LOGDEBUG("Created input layout POSUV");
+
+    D3D11_INPUT_ELEMENT_DESC vertexLayoutDesc2[] =
+    {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offsetof(VertexPosUVNorm, position), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, offsetof(VertexPosUVNorm, uv), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offsetof(VertexPosUVNorm, normal), D3D11_INPUT_PER_VERTEX_DATA, 0 }
+    };
+
+    hr = D3DReadFileToBlob(L"BasicTextureVS.cso", &vertexShaderBlob);
+
+    hr = d3dDevice->CreateInputLayout(vertexLayoutDesc2, _countof(vertexLayoutDesc2), vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &inputLayouts[InputLayout::POSUVNORM]);
+    SafeRelease(vertexShaderBlob);
+    if(FAILED(hr))
+        LOGWARNING("Failed to create input layout POSUVNORM!");
+    else
+        LOGDEBUG("Created input layout POSUVNORM");
 }
 
 void GraphicsSystem::CreateConstantBuffers()
@@ -625,7 +641,7 @@ void GraphicsSystem::InitDirectX(HINSTANCE hInstance)
     //Setup sampler state
     D3D11_SAMPLER_DESC samplerDesc;
 
-    samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+    samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
     samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
     samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
     samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;

@@ -24,14 +24,21 @@ struct VertexPosUV
     XMFLOAT3 position;
     XMFLOAT2 uv;
 };
+struct VertexPosUVNorm
+{
+    XMFLOAT3 position;
+    XMFLOAT2 uv;
+    XMFLOAT3 normal;
+};
 //*****************************************
 enum InputLayout
 {
     POSCOL = 0,
     POSUV,
+    POSUVNORM,
     INPUTLAYOUTCOUNT
 };
-const unsigned int InputLayoutVertexSizes[InputLayout::INPUTLAYOUTCOUNT] = { sizeof(VertexPosColor), sizeof(VertexPosUV) };
+const unsigned int InputLayoutVertexSizes[InputLayout::INPUTLAYOUTCOUNT] = { sizeof(VertexPosColor), sizeof(VertexPosUV), sizeof(VertexPosUVNorm) };
 
 class Texture;
 

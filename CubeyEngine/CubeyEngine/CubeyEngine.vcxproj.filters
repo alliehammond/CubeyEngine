@@ -202,5 +202,11 @@
     <FxCompile Include="shaders\VertexShaders\UITextureVS.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
     </FxCompile>
+    <FxCompile Include="shaders\VertexShaders\BasicTextureTopSideBottomVS.hlsl">
+      <Filter>Resource Files\VertexShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\PixelShaders\BasicTextureTopSideBottomPS.hlsl">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

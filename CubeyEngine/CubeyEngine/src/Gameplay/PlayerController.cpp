@@ -50,7 +50,7 @@ void PlayerController::Update(float dt)
     //LOGDEBUG("X: " + std::to_string(pTrans->pos.x) + ", Y: " + std::to_string(pTrans->pos.y) + ", Z: " + std::to_string(pTrans->pos.z));
 
     GraphicsSystem::SetCameraTrans(pTrans);
-
+    
     //Block placement
     if(InputSystem::GetKeyPressed('0'))
     {
@@ -61,6 +61,10 @@ void PlayerController::Update(float dt)
         PlaceBlock(BlockType::Dirt);
     }
     if(InputSystem::GetKeyPressed('2'))
+    {
+        PlaceBlock(BlockType::Grass);
+    }
+    if(InputSystem::GetKeyPressed('3'))
     {
         PlaceBlock(BlockType::Stone);
     }

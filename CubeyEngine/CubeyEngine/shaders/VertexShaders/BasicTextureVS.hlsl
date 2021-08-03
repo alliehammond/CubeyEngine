@@ -15,6 +15,7 @@ struct VertexData
 {
     float3 position : POSITION;
     float2 uv : TEXCOORD;
+    float3 normal : NORMAL;
 };
 
 struct VertexShaderOutput
