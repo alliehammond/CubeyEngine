@@ -70,4 +70,13 @@ namespace CBY
 
         return *this;
     }
+
+    void Vector::Normalize()
+    {
+        float length = x * x + y * y + z * z;
+        length = sqrt(length);
+        x /= length;
+        y /= length;
+        z /= length;
+    }
 };

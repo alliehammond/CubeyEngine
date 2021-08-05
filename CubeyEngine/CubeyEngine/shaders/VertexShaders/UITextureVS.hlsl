@@ -5,10 +5,19 @@ cbuffer Application : register(b0)
 cbuffer Frame : register(b1)
 {
     matrix viewMatrix;
+    float4 Ia;      // Only first 3 floats used
+    float4 Ld;      // Only first 3 floats used
+    float4 Ls;      // Only first 3 floats used
+    float4 l;       // Only first 3 floats used
+    float4 eyePos;  // Only first 3 floats used
 }
+//Uses texture material constant buffer
 cbuffer Object : register(b2)
 {
     matrix worldMatrix;
+    matrix rotationMatrix;
+    float4 ks;        // Only first 3 floats used
+    float4 shininess; // Only first float used
 }
 
 struct VertexData

@@ -5,6 +5,7 @@
 #include "Graphics\GraphicsSystem.h"
 #include "Graphics\RenderComponent.h"
 #include "Graphics\Texture.h"
+#include "Graphics\Materials\TextureMaterial.h"
 #include <codecvt>
 #include <locale>
 
@@ -90,7 +91,10 @@ GraphicsSystem::~GraphicsSystem()
 {
     SafeRelease(d3dConstantBuffers[CB_Application]);
     SafeRelease(d3dConstantBuffers[CB_Frame]);
-    SafeRelease(d3dConstantBuffers[CB_Object]);
+    
+    //Release per material constant buffers
+    SafeRelease(Material::constantBufferMaterial);
+    SafeRelease(TextureMaterial::constantBufferTextureMaterial);
 
     for(auto &it : vertexShaders)
     {
@@ -186,7 +190,7 @@ void GraphicsSystem::ResizeWindow(int width, int height)
             d3dSwapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, 0);
 
             // Get buffer and create a render-target-view.
-            ID3D11Texture2D* pBuffer;
+            ID3D11Texture2D* pBuffer = 0;
             d3dSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBuffer);
             if(pBuffer)
             {
@@ -402,7 +406,7 @@ void GraphicsSystem::LoadInputLayouts()
 
 void GraphicsSystem::CreateConstantBuffers()
 {
-    // Create the constant buffers for the variables defined in the vertex shader.
+    //Create per frame and per application constant buffers
     D3D11_BUFFER_DESC constantBufferDesc;
     ZeroMemory(&constantBufferDesc, sizeof(D3D11_BUFFER_DESC));
 
@@ -411,13 +415,18 @@ void GraphicsSystem::CreateConstantBuffers()
     constantBufferDesc.CPUAccessFlags = 0;
     constantBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 
+    D3D11_BUFFER_DESC constantBufferFrameDesc;
+    ZeroMemory(&constantBufferFrameDesc, sizeof(D3D11_BUFFER_DESC));
+
+    constantBufferFrameDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    constantBufferFrameDesc.ByteWidth = sizeof(FrameConstantBuffer);
+    constantBufferFrameDesc.CPUAccessFlags = 0;
+    constantBufferFrameDesc.Usage = D3D11_USAGE_DEFAULT;
+
     auto hr = d3dDevice->CreateBuffer(&constantBufferDesc, nullptr, &d3dConstantBuffers[CB_Application]);
     if(FAILED(hr))
         LOGERROR("Failed to create constant buffer!");
-    hr = d3dDevice->CreateBuffer(&constantBufferDesc, nullptr, &d3dConstantBuffers[CB_Frame]);
-    if(FAILED(hr))
-        LOGERROR("Failed to create constant buffer!");
-    hr = d3dDevice->CreateBuffer(&constantBufferDesc, nullptr, &d3dConstantBuffers[CB_Object]);
+    hr = d3dDevice->CreateBuffer(&constantBufferFrameDesc, nullptr, &d3dConstantBuffers[CB_Frame]);
     if(FAILED(hr))
         LOGERROR("Failed to create constant buffer!");
 }
@@ -529,7 +538,7 @@ void GraphicsSystem::InitDirectX(HINSTANCE hInstance)
 
     // Next initialize the back buffer of the swap chain and associate it to a 
     // render target view.
-    ID3D11Texture2D* backBuffer;
+    ID3D11Texture2D* backBuffer = 0;
     hr = d3dSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBuffer);
     if(FAILED(hr))
     {
@@ -674,8 +683,23 @@ void GraphicsSystem::Render(float dt)
     Clear(Colors::SkyBlue, 1.0f, 0);
 
     XMVECTOR upDirection = XMVectorSet(0, 1, 0, 0);
-    viewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
-    d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Frame], 0, nullptr, &viewMatrix, 0, 0);
+
+    FrameConstantBuffer frameBuf;
+    frameBuf.viewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
+
+    //Set Frame constant buffer
+    //Temp hard code light values
+    frameBuf.Ia = XMFLOAT4(0.2f, 0.2f, 0.2f, 0.0f);
+    frameBuf.Ld = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.0f);
+    frameBuf.Ls = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.0f);
+    CBY::Vector lightDir(0.2f, 0.8f, -0.4f);
+    lightDir.Normalize();
+    frameBuf.l = XMFLOAT4(lightDir.x, lightDir.y, lightDir.z, 0.0f);
+
+    Transform *pTrans = PlayerController::GetPlayerTrans();
+    frameBuf.eyePos = XMFLOAT4(pTrans->pos.x, pTrans->pos.y, pTrans->pos.z, 0.0f);
+
+    d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Frame], 0, nullptr, &frameBuf, 0, 0);
     
     //Use to render transparent objects last (object, distsq from camera)
     std::vector<std::pair<GameObject *, float>> transparentObjects;
@@ -724,7 +748,6 @@ void GraphicsSystem::RenderObject(GameObject* pObject, float dt)
     DirectX::XMMATRIX rotationMatrix = XMMatrixRotationRollPitchYaw(pTrans->rot.x, pTrans->rot.y, pTrans->rot.z);
 
     DirectX::XMMATRIX worldMatrix = rotationMatrix * scaleMatrix * translationMatrix;
-    d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Object], 0, nullptr, &worldMatrix, 0, 0);
 
     for(Mesh *pMesh : pObject->GetComponent<RenderComponent>()->pModel->meshes)
     {
@@ -732,12 +755,16 @@ void GraphicsSystem::RenderObject(GameObject* pObject, float dt)
         const UINT offset = 0;
 
         //Render object
+        pMesh->material->BindConstantBuffer(&worldMatrix, &rotationMatrix);
         pMesh->material->BindMaterial();
         d3dDeviceContext->IASetVertexBuffers(0, 1, &pMesh->vertexBuffer, &vertexStride, &offset);
         d3dDeviceContext->IASetIndexBuffer(pMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
         d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        d3dDeviceContext->VSSetConstantBuffers(0, 3, d3dConstantBuffers);
+        d3dDeviceContext->VSSetConstantBuffers(0, 2, d3dConstantBuffers);
+        d3dDeviceContext->VSSetConstantBuffers(2, 1, &pMesh->material->constantBuffer);
+        d3dDeviceContext->PSSetConstantBuffers(0, 2, d3dConstantBuffers);
+        d3dDeviceContext->PSSetConstantBuffers(2, 1, &pMesh->material->constantBuffer);
 
         d3dDeviceContext->RSSetState(d3dRasterizerState);
         d3dDeviceContext->RSSetViewports(1, &viewport);

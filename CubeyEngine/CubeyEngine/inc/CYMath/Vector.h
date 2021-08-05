@@ -16,6 +16,9 @@ namespace CBY
         Vector& operator*=(const float lhs);
         Vector operator/(const float lhs);
         Vector& operator/=(const float lhs);
+        
+        void Normalize();
+
         float x, y, z;
     };
 };

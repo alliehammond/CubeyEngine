@@ -208,5 +208,11 @@
     <FxCompile Include="shaders\PixelShaders\BasicTextureTopSideBottomPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
+    <FxCompile Include="shaders\PixelShaders\PhongShading.hlsli">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\PixelShaders\BasicTextureUIPS.hlsl">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

@@ -9,6 +9,7 @@
 using DirectX::XMMATRIX;
 using DirectX::XMFLOAT2;
 using DirectX::XMFLOAT3;
+using DirectX::XMFLOAT4;
 using DirectX::XMVECTOR;
 
 //*****************************************
@@ -39,6 +40,16 @@ enum InputLayout
     INPUTLAYOUTCOUNT
 };
 const unsigned int InputLayoutVertexSizes[InputLayout::INPUTLAYOUTCOUNT] = { sizeof(VertexPosColor), sizeof(VertexPosUV), sizeof(VertexPosUVNorm) };
+
+struct FrameConstantBuffer
+{
+    XMMATRIX viewMatrix;
+    XMFLOAT4 Ia;
+    XMFLOAT4 Ld;
+    XMFLOAT4 Ls;
+    XMFLOAT4 l;
+    XMFLOAT4 eyePos;
+};
 
 class Texture;
 
@@ -120,7 +131,6 @@ private:
     {
         CB_Application,
         CB_Frame,
-        CB_Object,
         NumConstantBuffers
     };
     static ID3D11Buffer* d3dConstantBuffers[NumConstantBuffers];
