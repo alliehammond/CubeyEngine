@@ -68,6 +68,18 @@ void PlayerController::Update(float dt)
     {
         PlaceBlock(BlockType::Stone);
     }
+    if(InputSystem::GetKeyPressed('4'))
+    {
+        PlaceBlock(BlockType::Log);
+    }
+    if(InputSystem::GetKeyPressed('5'))
+    {
+        PlaceBlock(BlockType::Leaf);
+    }
+    if(InputSystem::GetKeyPressed('6'))
+    {
+        PlaceBlock(BlockType::Plank);
+    }
 }
 
 Transform* PlayerController::GetPlayerTrans()

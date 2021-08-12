@@ -31,9 +31,10 @@ struct PixelShaderInput
 
 float4 main(PixelShaderInput IN) : SV_TARGET
 {
-    float3 diffuse = shaderTexture.Sample(sampleState, IN.uv).xyz;
+    float4 texSample = shaderTexture.Sample(sampleState, IN.uv);
+    float3 diffuse = texSample.xyz;
     
     float3 v = eyePos.xyz - IN.worldPosition;
 
-    return float4(CalcPhongShading(Ia.xyz * diffuse, Ld.xyz, Ls.xyz, diffuse, ks.xyz, shininess.x, IN.norm, l.xyz, v), 1.0f);
+    return float4(CalcPhongShading(Ia.xyz * diffuse, Ld.xyz, Ls.xyz, diffuse, ks.xyz, shininess.x, IN.norm, l.xyz, v), texSample.w);
 }

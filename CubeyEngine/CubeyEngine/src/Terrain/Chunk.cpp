@@ -130,7 +130,9 @@ void Chunk::CreateChunkMesh()
     }
 
     int totalChunkVerts = 0;
-
+    
+    //Mark true if it contains a transparent block
+    bool transparentChunk = false;
     //Loop through each vector and create meshes for each one that contains blocks (start at 1 to skip air blocks)
     for(unsigned char i = 1; i < unsigned char(BlockType::BLOCKCOUNT); ++i)
     {
@@ -171,6 +173,25 @@ void Chunk::CreateChunkMesh()
             case BlockType::Stone:
             {
                 TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "stoneTexture.tga");
+                newMesh = new Mesh(&mat);
+                break;
+            }
+            case BlockType::Log:
+            {
+                TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "logTexture.tga");
+                newMesh = new Mesh(&mat);
+                break;
+            }
+            case BlockType::Leaf:
+            {
+                TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "leafTexture.tga");
+                newMesh = new Mesh(&mat);
+                transparentChunk = true;
+                break;
+            }
+            case BlockType::Plank:
+            {
+                TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "plankTexture.tga");
                 newMesh = new Mesh(&mat);
                 break;
             }
@@ -222,6 +243,7 @@ void Chunk::CreateChunkMesh()
 
         totalChunkVerts += unsigned(blockTypeVertices[i].size());
     }
+    blockTerrain->GetComponent<RenderComponent>()->transparent = transparentChunk;
 
     std::string str = "Loaded chunk " + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "! V:" + std::to_string(totalChunkVerts);
     LOGDEBUG(str);

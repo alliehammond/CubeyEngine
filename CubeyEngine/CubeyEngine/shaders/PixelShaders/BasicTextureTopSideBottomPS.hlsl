@@ -37,9 +37,10 @@ float4 main(PixelShaderInput IN) : SV_TARGET
 
     float2 uvCoord = float2(uvXOffset + IN.uv.x * (1.0f / 3.0f), IN.uv.y);
 
-    float3 diffuse = shaderTexture.Sample(sampleState, uvCoord);
+    float4 texSample = shaderTexture.Sample(sampleState, uvCoord);
+    float3 diffuse = texSample.xyz;
 
     float3 v = eyePos.xyz - IN.worldPosition;
 
-    return float4(CalcPhongShading(Ia.xyz * diffuse, Ld.xyz, Ls.xyz, diffuse, ks.xyz, shininess.x, IN.norm, l.xyz, v), 1.0f);
+    return float4(CalcPhongShading(Ia.xyz * diffuse, Ld.xyz, Ls.xyz, diffuse, ks.xyz, shininess.x, IN.norm, l.xyz, v), texSample.w);
 }

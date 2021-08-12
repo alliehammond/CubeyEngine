@@ -6,5 +6,8 @@ enum class BlockType : unsigned char
     Dirt,
     Grass,
     Stone,
+    Log,
+    Leaf,
+    Plank,
     BLOCKCOUNT
 };
