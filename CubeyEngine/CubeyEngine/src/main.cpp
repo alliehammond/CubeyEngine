@@ -29,7 +29,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
     GameObject *player = ObjectManagerSystem::CreateObject(new GameObject("Player"));
     player->AddComponent<PlayerController>(new PlayerController(player));
     player->GetComponent<Transform>()->pos.x = 1.0f;
-    player->GetComponent<Transform>()->pos.y = 10.0f;
+    player->GetComponent<Transform>()->pos.y = 100.0f;
 
     GameObject *UI = ObjectManagerSystem::CreateObject(new GameObject("UI"));
     player->AddComponent<UIComponent>(new UIComponent(UI));

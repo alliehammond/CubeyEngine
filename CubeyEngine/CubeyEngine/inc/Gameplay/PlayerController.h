@@ -20,6 +20,6 @@ private:
     float slowMoveSpeed = 5.0f;
     float moveSpeed = 15.0f;
     float fastMoveSpeed = 45.0f;
-    float turnSpeed = 0.0006f;
+    float turnSpeed = 0.00045f;
 };
 

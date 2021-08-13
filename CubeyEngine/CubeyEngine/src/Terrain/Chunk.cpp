@@ -184,7 +184,7 @@ void Chunk::CreateChunkMesh()
             }
             case BlockType::Leaf:
             {
-                TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "leafTexture.tga");
+                TextureMaterial mat("BasicTextureVS.cso", "BasicTextureTransPS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "leafTexture.tga");
                 newMesh = new Mesh(&mat);
                 transparentChunk = true;
                 break;

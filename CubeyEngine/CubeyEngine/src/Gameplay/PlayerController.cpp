@@ -124,6 +124,6 @@ void PlayerController::PlaceBlock(BlockType type)
         pos = GetBlockPlacementCoord(false);
     if(std::get<1>(pos) < 256 && std::get<1>(pos) >= 0)
     {
-        TerrainManagerSystem::SetBlockInLoadedChunk(std::get<0>(pos), std::get<1>(pos), std::get<2>(pos), type);
+        TerrainManagerSystem::SetBlock(std::get<0>(pos), std::get<1>(pos), std::get<2>(pos), type);
     }
 }

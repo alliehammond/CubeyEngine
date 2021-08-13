@@ -2,6 +2,7 @@
 #include "Core\ObjectManagerSystem.h"
 
 std::vector<GameObject *> ObjectManagerSystem::gameObjects;
+std::vector<GameObject *> ObjectManagerSystem::newGameObjects;
 
 ObjectManagerSystem::ObjectManagerSystem()
 {
@@ -20,6 +21,13 @@ ObjectManagerSystem::~ObjectManagerSystem()
 
 void ObjectManagerSystem::Update(float dt)
 {
+    //Add newly created game objects to gameObjects vector
+    for(auto &it : newGameObjects)
+    {
+        gameObjects.push_back(it);
+    }
+    newGameObjects.clear();
+
     //Delete game objects with deletion flag set
     gameObjects.erase(std::remove_if(gameObjects.begin(), gameObjects.end(),
         [](GameObject *it)
@@ -41,6 +49,6 @@ void ObjectManagerSystem::Update(float dt)
 
 GameObject *ObjectManagerSystem::CreateObject(GameObject* obj)
 {
-    gameObjects.push_back(obj);
+    newGameObjects.push_back(obj);
     return obj;
 }

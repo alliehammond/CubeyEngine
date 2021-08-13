@@ -5,6 +5,7 @@
 #include <fstream>
 
 std::unordered_map<unsigned __int64, Chunk*> TerrainManagerSystem::loadedChunks;
+std::vector<std::pair<unsigned __int64, std::ifstream *>> TerrainManagerSystem::openRegionFiles;
 
 const std::string terrainDataPath = "../resources/terrainData/";
 
@@ -211,7 +212,7 @@ void TerrainManagerSystem::SaveLoadedChunks()
 }
 
 //Uses block coordinates
-void TerrainManagerSystem::SetBlockInLoadedChunk(int x, int y, int z, BlockType type)
+void TerrainManagerSystem::SetBlock(int x, int y, int z, BlockType type, bool regenMesh)
 {
     int cx = GetChunkCoordinate(x);
     int cy = GetChunkCoordinate(y);
@@ -220,10 +221,18 @@ void TerrainManagerSystem::SetBlockInLoadedChunk(int x, int y, int z, BlockType 
     Chunk* pChunk = GetChunk(cx, cy, cz);
     if(!pChunk)
     {
-        LOGWARNING("Attempting to set block in unloaded chunk! (" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")");
-        return;
+        //Chunk not loaded - load it
+        pChunk = LoadAndCreateChunk(cx, cy, cz);
     }
-    pChunk->SetBlock(x - cx * CBYDefines::ChunkSize, y - cy * CBYDefines::ChunkSize, z - cz * CBYDefines::ChunkSize, type, true);
+    pChunk->SetBlock(x - cx * CBYDefines::ChunkSize, y - cy * CBYDefines::ChunkSize, z - cz * CBYDefines::ChunkSize, type, regenMesh);
+}
+
+void TerrainManagerSystem::RegenAllChunkMeshes()
+{
+    for(auto &it : loadedChunks)
+    {
+        it.second->CreateChunkMesh();
+    }
 }
 
 //Uses block coordinates, returns air if chunk is not loaded
