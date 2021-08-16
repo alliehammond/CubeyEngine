@@ -97,6 +97,8 @@ private:
     //*****************************************
     //Config Values
     //*****************************************
+    static float fieldOfViewVertical;
+
     static int windowWidth;
     static int windowHeight;
     LPCWSTR windowClassNameW = L"CubeyEngineWindowClass";

@@ -176,7 +176,7 @@ void Chunk::CreateChunkMesh()
             }
             case BlockType::Log:
             {
-                TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "logTexture.tga");
+                TextureMaterial mat("BasicTextureTopSideBottomVS.cso", "BasicTextureTopSideBottomPS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "logTexture.tga");
                 newMesh = new Mesh(&mat);
                 break;
             }
