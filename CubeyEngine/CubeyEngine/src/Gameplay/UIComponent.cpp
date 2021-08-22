@@ -48,6 +48,10 @@ void UIComponent::Update(float dt)
     if(InputSystem::GetKeyPressed('U'))
     {
         owner->GetComponent<RenderComponent>()->renderComponent = !owner->GetComponent<RenderComponent>()->renderComponent;
+        for(auto &it : blockIconObjects)
+        {
+            it->GetComponent<RenderComponent>()->renderComponent = !it->GetComponent<RenderComponent>()->renderComponent;
+        }
     }
 }
 
