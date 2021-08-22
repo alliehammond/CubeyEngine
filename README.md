@@ -14,5 +14,5 @@ L - toggles mouse to be locked to the screen and allows camera movement
 M key saves loaded chunks  
 Holding CTRL slows you down  
 Holding SHIFT speeds you up  
-
+U - Toggle UI
 

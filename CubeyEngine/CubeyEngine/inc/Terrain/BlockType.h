@@ -1,4 +1,5 @@
 #pragma once
+#include "Graphics\Material.h"
 
 enum class BlockType : unsigned char
 {
@@ -10,4 +11,10 @@ enum class BlockType : unsigned char
     Leaf,
     Plank,
     BLOCKCOUNT
+};
+
+namespace CBY
+{
+    //Pointer that is returned must be manually deleted
+    Material *GetBlockMaterial(BlockType bType);
 };

@@ -6,6 +6,7 @@
 #include "Graphics\RenderComponent.h"
 #include "Graphics\Texture.h"
 #include "Graphics\Materials\TextureMaterial.h"
+#include "Graphics\Materials\BlockIconMaterial.h"
 #include <codecvt>
 #include <locale>
 
@@ -96,6 +97,7 @@ GraphicsSystem::~GraphicsSystem()
     //Release per material constant buffers
     SafeRelease(Material::constantBufferMaterial);
     SafeRelease(TextureMaterial::constantBufferTextureMaterial);
+    SafeRelease(BlockIconMaterial::constantBufferBlockIconMaterial);
 
     for(auto &it : vertexShaders)
     {
@@ -784,3 +786,4 @@ void GraphicsSystem::SetCameraTrans(Transform *trans)
     CBY::Vector rotVector(cos(trans->rot.y) * cos(trans->rot.x), sin(trans->rot.x), sin(trans->rot.y) * cos(trans->rot.x));
     focusPoint = XMVectorSet(rotVector.x + trans->pos.x, rotVector.y + trans->pos.y, rotVector.z + trans->pos.z, 1.0f);
 }
+

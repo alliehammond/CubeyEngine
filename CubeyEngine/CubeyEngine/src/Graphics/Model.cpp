@@ -164,3 +164,9 @@ void Model::ClearModel()
         delete it;
     meshes.clear();
 }
+
+Mesh *Model::GetMesh(unsigned index)
+{
+    if(index >= meshes.size())return 0;
+    return meshes[index];
+}

@@ -17,6 +17,8 @@ public:
     bool LoadModel(std::string fileName, Material *mat, InputLayout IL);
     void AddMesh(Mesh *pMesh);
     void ClearModel();
+    //Returns 0 if index out of range
+    Mesh *GetMesh(unsigned index);
 private:
     std::vector<Mesh *> meshes;
 

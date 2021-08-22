@@ -114,6 +114,12 @@
     <ClCompile Include="src\Gameplay\UIComponent.cpp">
       <Filter>Source Files\Gameplay</Filter>
     </ClCompile>
+    <ClCompile Include="src\Terrain\BlockType.cpp">
+      <Filter>Source Files\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Materials\BlockIconMaterial.cpp">
+      <Filter>Source Files\Graphics\Materials</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\EnginePCH.h">
@@ -182,6 +188,9 @@
     <ClInclude Include="inc\Gameplay\UIComponent.h">
       <Filter>Header Files\Gameplay</Filter>
     </ClInclude>
+    <ClInclude Include="inc\Graphics\Materials\BlockIconMaterial.h">
+      <Filter>Header Files\Graphics\Materials</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\VertexShaders\BasicVertexShader.hlsl">
@@ -218,6 +227,12 @@
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
     <FxCompile Include="shaders\PixelShaders\BasicTextureTopSideBottomTransPS.hlsl">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\VertexShaders\UIBlockIconVS.hlsl">
+      <Filter>Resource Files\VertexShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\PixelShaders\UIBlockIconPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
   </ItemGroup>

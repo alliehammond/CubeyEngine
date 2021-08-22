@@ -153,48 +153,9 @@ void Chunk::CreateChunkMesh()
         
         resourceData.pSysMem = blockTypeVertices[i].data();
 
-        Mesh *newMesh = 0;
-        switch(bType)
-        {
-            case BlockType::Dirt:
-            {
-                TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "dirtTexture.tga");
-                newMesh = new Mesh(&mat);
-                break;
-            }
-            case BlockType::Grass:
-            {
-                TextureMaterial mat("BasicTextureTopSideBottomVS.cso", "BasicTextureTopSideBottomPS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "grassTexture.tga");
-                newMesh = new Mesh(&mat);
-                break;
-            }
-            case BlockType::Stone:
-            {
-                TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "stoneTexture.tga");
-                newMesh = new Mesh(&mat);
-                break;
-            }
-            case BlockType::Log:
-            {
-                TextureMaterial mat("BasicTextureTopSideBottomVS.cso", "BasicTextureTopSideBottomPS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "logTexture.tga");
-                newMesh = new Mesh(&mat);
-                break;
-            }
-            case BlockType::Leaf:
-            {
-                TextureMaterial mat("BasicTextureVS.cso", "BasicTextureTransPS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "leafTexture.tga");
-                newMesh = new Mesh(&mat);
-                break;
-            }
-            case BlockType::Plank:
-            {
-                TextureMaterial mat("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "plankTexture.tga");
-                newMesh = new Mesh(&mat);
-                break;
-            }
-            default:
-                LOGERROR("Invalid block type attempting to be loaded!");
-        }
+        Material *mat = CBY::GetBlockMaterial(bType);
+        Mesh *newMesh = new Mesh(mat);
+        delete mat;
 
         HRESULT hr = GraphicsSystem::GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &resourceData, &newMesh->vertexBuffer);
         if(FAILED(hr))

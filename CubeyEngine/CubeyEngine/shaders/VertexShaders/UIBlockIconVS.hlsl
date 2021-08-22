@@ -11,13 +11,15 @@ cbuffer Frame : register(b1)
     float4 l;       // Only first 3 floats used
     float4 eyePos;  // Only first 3 floats used
 }
-//Uses texture material constant buffer
+//Uses block icon constant buffer
 cbuffer Object : register(b2)
 {
-    matrix worldMatrix;
-    matrix rotationMatrix;
-    float4 ks;        // Only first 3 floats used
-    float4 shininess; // Only first float used
+    //X position, Y position, width, height of block icon ui element
+    //Width, height as percentage of screen size
+    //Position between -1 and 1
+    float4 posSize;
+    //First float - block type, second float - num blocks
+    float4 blockTypeNumBlocks;
 }
 
 struct VertexData
@@ -32,12 +34,12 @@ struct VertexShaderOutput
     float2 uv : TEXCOORD;
 };
 
-//Render UI plane over whole screen
+//Render UI plane over whole screen (scaled to position of block icon element)
 VertexShaderOutput main(VertexData IN)
 {
     VertexShaderOutput OUT;
 
-    OUT.position = float4(IN.position.x, IN.position.y, 0.0f, 0.99999f);
+    OUT.position = float4(IN.position.x * posSize.z + posSize.x, IN.position.y * posSize.w + posSize.y, 0.0f, 1.0f);
     OUT.uv = IN.uv;
 
     return OUT;

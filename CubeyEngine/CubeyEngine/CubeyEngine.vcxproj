@@ -188,6 +188,7 @@
     <ClCompile Include="src\Gameplay\PlayerController.cpp" />
     <ClCompile Include="src\Graphics\GraphicsSystem.cpp" />
     <ClCompile Include="src\Graphics\Material.cpp" />
+    <ClCompile Include="src\Graphics\Materials\BlockIconMaterial.cpp" />
     <ClCompile Include="src\Graphics\Materials\TextureMaterial.cpp" />
     <ClCompile Include="src\Graphics\Mesh.cpp" />
     <ClCompile Include="src\Graphics\Model.cpp" />
@@ -195,6 +196,7 @@
     <ClCompile Include="src\Graphics\Texture.cpp" />
     <ClCompile Include="src\Graphics\Transform.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Terrain\BlockType.cpp" />
     <ClCompile Include="src\Terrain\Chunk.cpp" />
     <ClCompile Include="src\Terrain\TerrainManagerSystem.cpp" />
   </ItemGroup>
@@ -212,6 +214,7 @@
     <ClInclude Include="inc\Gameplay\UIComponent.h" />
     <ClInclude Include="inc\Graphics\GraphicsSystem.h" />
     <ClInclude Include="inc\Graphics\Material.h" />
+    <ClInclude Include="inc\Graphics\Materials\BlockIconMaterial.h" />
     <ClInclude Include="inc\Graphics\Materials\TextureMaterial.h" />
     <ClInclude Include="inc\Graphics\Mesh.h" />
     <ClInclude Include="inc\Graphics\Model.h" />
@@ -272,6 +275,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="shaders\PixelShaders\UIBlockIconPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="shaders\VertexShaders\BasicTextureTopSideBottomVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
@@ -291,6 +300,12 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="shaders\VertexShaders\BlockPlacementDisplayVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="shaders\VertexShaders\UIBlockIconVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
