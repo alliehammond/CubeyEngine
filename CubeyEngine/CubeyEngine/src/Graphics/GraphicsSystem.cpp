@@ -7,6 +7,7 @@
 #include "Graphics\Texture.h"
 #include "Graphics\Materials\TextureMaterial.h"
 #include "Graphics\Materials\BlockIconMaterial.h"
+#include "Graphics\Materials\UIElementMaterial.h"
 #include <codecvt>
 #include <locale>
 
@@ -98,6 +99,7 @@ GraphicsSystem::~GraphicsSystem()
     SafeRelease(Material::constantBufferMaterial);
     SafeRelease(TextureMaterial::constantBufferTextureMaterial);
     SafeRelease(BlockIconMaterial::constantBufferBlockIconMaterial);
+    SafeRelease(UIElementMaterial::constantBufferUIElementMaterial);
 
     for(auto &it : vertexShaders)
     {

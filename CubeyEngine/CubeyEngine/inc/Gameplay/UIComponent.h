@@ -11,11 +11,13 @@ public:
     void Update(float dt);
     void PostUpdate(float dt);
 
-    void SetBlockIconType(unsigned pos, BlockType newBlockType);
-    BlockType GetBlockIconType(unsigned index);
+    static void SetBlockIconType(unsigned pos, BlockType newBlockType);
+    static BlockType GetBlockIconType(unsigned index);
 
 private:
-    std::vector<BlockType> blockIconTypes;
-    std::vector<GameObject *> blockIconObjects;
-    std::vector<BlockIconMaterial *> blockIconMaterials;
+    static std::vector<BlockType> blockIconTypes;
+    static std::vector<GameObject *> blockIconObjects;
+    static std::vector<BlockIconMaterial *> blockIconMaterials;
+
+    static GameObject *blockIconSelectionObject;
 };

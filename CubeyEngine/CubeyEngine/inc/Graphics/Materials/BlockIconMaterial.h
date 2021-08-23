@@ -8,7 +8,7 @@ struct ConstantBufferBlockIconMaterial
     //Width, height as percentage of screen size
     //Position between -1 and 1
     XMFLOAT4 posSize;
-    //First float - block type, second float - num blocks
+    //First float - block type, second float - num blocks, third float - bool true if block icon selected
     XMFLOAT4 blockTypeNumBlocks;
 };
 
@@ -23,6 +23,7 @@ public:
 
     BlockType bType;
     float posX, posY, width, height;
+    bool blockIconSelected = false;
 private:
     BlockIconMaterial();
     Texture *texture;

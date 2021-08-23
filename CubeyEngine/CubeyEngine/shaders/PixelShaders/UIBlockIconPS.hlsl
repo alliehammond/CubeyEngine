@@ -14,7 +14,7 @@ cbuffer Object : register(b2)
     //Width, height as percentage of screen size
     //Position between -1 and 1
     float4 posSize;
-    //First float - block type, second float - num blocks
+    //First float - block type, second float - num blocks, third float - bool true if block icon selected
     float4 blockTypeNumBlocks;
 }
 

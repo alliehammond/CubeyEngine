@@ -35,7 +35,7 @@ BlockIconMaterial::BlockIconMaterial(std::string VS, std::string PS, InputLayout
 void BlockIconMaterial::BindConstantBuffer(DirectX::XMMATRIX *worldMatrix, DirectX::XMMATRIX *rotationMatrix)
 {
     cBufStruct.posSize = XMFLOAT4(posX, posY, width, height);
-    cBufStruct.blockTypeNumBlocks = XMFLOAT4(static_cast<float>(bType), static_cast<float>(BlockType::BLOCKCOUNT), 0.0f, 0.0f);
+    cBufStruct.blockTypeNumBlocks = XMFLOAT4(static_cast<float>(bType), static_cast<float>(BlockType::BLOCKCOUNT), static_cast<float>(blockIconSelected), 0.0f);
 
     GraphicsSystem::GetD3DDeviceContext()->UpdateSubresource(constantBufferBlockIconMaterial, 0, nullptr, &cBufStruct, 0, 0);
 }

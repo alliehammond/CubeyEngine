@@ -81,33 +81,58 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             hDC = BeginPaint(hwnd, &paintStruct);
             EndPaint(hwnd, &paintStruct);
+            break;
         }
-        break;
         case WM_DESTROY:
         {
             PostQuitMessage(0);
+            break;
         }
-        break;
         case WM_SIZE:
         {
             GraphicsSystem::ResizeWindow(LOWORD(lParam), HIWORD(lParam));
+            break;
         }
-        break;
         case WM_KEYDOWN:
         {
             InputSystem::HandleWindowsMessageKeyDown(unsigned int(wParam));
+            break;
         }
-        break;
         case WM_KEYUP:
         {
             InputSystem::HandleWindowsMessageKeyUp(unsigned int(wParam));
+            break;
         }
-        break;
         case WM_MOUSEMOVE:
         {
             InputSystem::HandleMousePositionMessage(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            break;
         }
-        break;
+        case WM_LBUTTONDOWN:
+        {
+            InputSystem::HandleWindowsMessageLMB(true);
+            break;
+        }
+        case WM_LBUTTONUP:
+        {
+            InputSystem::HandleWindowsMessageLMB(false);
+            break;
+        }
+        case WM_RBUTTONDOWN:
+        {
+            InputSystem::HandleWindowsMessageRMB(true);
+            break;
+        }
+        case WM_RBUTTONUP:
+        {
+            InputSystem::HandleWindowsMessageRMB(false);
+            break;
+        }
+        case WM_MOUSEWHEEL:
+        {
+            InputSystem::HandleMouseScrollMessage(GET_WHEEL_DELTA_WPARAM(wParam));
+            break;
+        }
         default:
         return DefWindowProc(hwnd, message, wParam, lParam);
         }

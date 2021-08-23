@@ -2,18 +2,19 @@
 #include "Core\InputSystem.h"
 #include <vector>
 
-std::vector<bool> InputSystem::KeysDown(39);
-std::vector<bool> InputSystem::KeysDownPrev(39);
-std::vector<bool> InputSystem::KeysPressed(39);
-std::vector<bool> InputSystem::KeysReleased(39);
+std::vector<bool> InputSystem::KeysDown((unsigned)KeyCode::NUMCODES);
+std::vector<bool> InputSystem::KeysDownPrev((unsigned)KeyCode::NUMCODES);
+std::vector<bool> InputSystem::KeysPressed((unsigned)KeyCode::NUMCODES);
+std::vector<bool> InputSystem::KeysReleased((unsigned)KeyCode::NUMCODES);
 
 unsigned InputSystem::mouseX = 0, InputSystem::mouseY = 0;
 int InputSystem::mouseDeltaX = 0, InputSystem::mouseDeltaY = 0;
+int InputSystem::mouseWheelDelta = 0, InputSystem::mouseWheelDeltaPrevFrame = 0;
 
 //Vector character layout:
 //0-25 = 'A'-'Z'
 //26-35 = '0'-'9'
-//36-38 = CTRL, SHIFT, ALT
+//36-40 = CTRL, SHIFT, ALT, LEFTMOUSE, RIGHTMOUSE
 
 InputSystem::InputSystem()
 {
@@ -52,6 +53,8 @@ void InputSystem::Update(float dt)
     //Update mouse delta x/y
     mouseDeltaX = 0;
     mouseDeltaY = 0;
+    mouseWheelDelta = mouseWheelDeltaPrevFrame;
+    mouseWheelDeltaPrevFrame = 0;
     //Only update mouse deltas if cursor is locked to center of screen
     static bool ignoreFirstLockFrame = true;//If true ignore first frame where mouse moves to center
     if(GraphicsSystem::GetMouseCursorLock())
@@ -155,13 +158,13 @@ void InputSystem::HandleWindowsMessageKeyDown(unsigned int code)
     switch(code)
     {
     case VK_CONTROL:
-        KeysDown[36] = true;
+        KeysDown[(unsigned)KeyCode::CTRL] = true;
         break;
     case VK_SHIFT:
-        KeysDown[37] = true;
+        KeysDown[(unsigned)KeyCode::SHIFT] = true;
         break;
     case VK_MENU:
-        KeysDown[38] = true;
+        KeysDown[(unsigned)KeyCode::ALT] = true;
         break;
     }
 }
@@ -179,13 +182,13 @@ void InputSystem::HandleWindowsMessageKeyUp(unsigned int code)
     switch(code)
     {
     case VK_CONTROL:
-        KeysDown[36] = false;
+        KeysDown[(unsigned)KeyCode::CTRL] = false;
         break;
     case VK_SHIFT:
-        KeysDown[37] = false;
+        KeysDown[(unsigned)KeyCode::SHIFT] = false;
         break;
     case VK_MENU:
-        KeysDown[38] = false;
+        KeysDown[(unsigned)KeyCode::ALT] = false;
         break;
     }
 }
@@ -194,4 +197,19 @@ void InputSystem::HandleMousePositionMessage(unsigned x, unsigned y)
 {
     mouseX = x;
     mouseY = y;
+}
+
+void InputSystem::HandleWindowsMessageLMB(bool mouseDown)
+{
+    KeysDown[(unsigned)KeyCode::LEFTMOUSE] = mouseDown;
+}
+
+void InputSystem::HandleWindowsMessageRMB(bool mouseDown)
+{
+    KeysDown[(unsigned)KeyCode::RIGHTMOUSE] = mouseDown;
+}
+
+void InputSystem::HandleMouseScrollMessage(int delta)
+{
+    mouseWheelDeltaPrevFrame = delta / WHEEL_DELTA;
 }

@@ -10,6 +10,9 @@ public:
     void Update(float dt);
     static Transform *GetPlayerTrans();
 
+    //Corresponds to order of inventory slots, not to the hotkey
+    static int curSelectedBlock;
+
 private:
     //Returns coordinate of block placement target (block coordinates) (deleteBlockCoord gets different block if you are deleting a block)
     std::tuple<int, int, int> GetBlockPlacementCoord(bool deleteBlockCoord);

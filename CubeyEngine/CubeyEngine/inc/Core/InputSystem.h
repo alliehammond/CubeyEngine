@@ -7,6 +7,8 @@ enum class KeyCode : unsigned char
     CTRL = 36,
     SHIFT,
     ALT,
+    LEFTMOUSE,
+    RIGHTMOUSE,
     NUMCODES
 };
 
@@ -30,10 +32,15 @@ public:
     static unsigned GetMouseY() { return mouseY; }
     static int GetMouseDeltaX() { return mouseDeltaX; }
     static int GetMouseDeltaY() { return mouseDeltaY; }
+    static int GetMouseWheelDelta() { return mouseWheelDelta; }
 
     static void HandleWindowsMessageKeyDown(unsigned int code);
     static void HandleWindowsMessageKeyUp(unsigned int code);
     static void HandleMousePositionMessage(unsigned x, unsigned y);
+    static void HandleMouseScrollMessage(int delta);
+    //mouseDown false indicated mouse up message
+    static void HandleWindowsMessageLMB(bool mouseDown);
+    static void HandleWindowsMessageRMB(bool mouseDown);
 
 private:
     static std::vector<bool> KeysDown;
@@ -46,4 +53,6 @@ private:
     static unsigned mouseX, mouseY;
     //Mouse delta x positive = right, delta y positive = up
     static int mouseDeltaX, mouseDeltaY;
+    //Scroll wheel delta, positive away from user, negative towards
+    static int mouseWheelDelta, mouseWheelDeltaPrevFrame;
 };

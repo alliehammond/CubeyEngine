@@ -1,6 +1,8 @@
 #include "EnginePCH.h"
 #include "Gameplay\PlayerController.h"
+#include "Gameplay\UIComponent.h"
 
+int PlayerController::curSelectedBlock = 0;
 Transform *PlayerController::pTrans = 0;
 
 PlayerController::PlayerController(GameObject* owner) : Component(owner, "PlayerController")
@@ -51,35 +53,40 @@ void PlayerController::Update(float dt)
 
     GraphicsSystem::SetCameraTrans(pTrans);
     
-    //Block placement
-    if(InputSystem::GetKeyPressed('0'))
-    {
-        PlaceBlock(BlockType::Air);
-    }
+    //Inventory slot selection
     if(InputSystem::GetKeyPressed('1'))
-    {
-        PlaceBlock(BlockType::Dirt);
-    }
+        curSelectedBlock = 0;
     if(InputSystem::GetKeyPressed('2'))
-    {
-        PlaceBlock(BlockType::Grass);
-    }
+        curSelectedBlock = 1;
     if(InputSystem::GetKeyPressed('3'))
-    {
-        PlaceBlock(BlockType::Stone);
-    }
+        curSelectedBlock = 2;
     if(InputSystem::GetKeyPressed('4'))
-    {
-        PlaceBlock(BlockType::Log);
-    }
+        curSelectedBlock = 3;
     if(InputSystem::GetKeyPressed('5'))
-    {
-        PlaceBlock(BlockType::Leaf);
-    }
+        curSelectedBlock = 4;
     if(InputSystem::GetKeyPressed('6'))
+        curSelectedBlock = 5;
+    if(InputSystem::GetKeyPressed('7'))
+        curSelectedBlock = 6;
+    if(InputSystem::GetKeyPressed('8'))
+        curSelectedBlock = 7;
+    if(InputSystem::GetKeyPressed('9'))
+        curSelectedBlock = 8;
+    if(InputSystem::GetKeyPressed('0'))
+        curSelectedBlock = 9;
+
+    if(InputSystem::GetMouseWheelDelta())
     {
-        PlaceBlock(BlockType::Plank);
+        curSelectedBlock -= InputSystem::GetMouseWheelDelta();
+        if(curSelectedBlock > 9)curSelectedBlock = curSelectedBlock % 10;
+        if(curSelectedBlock < 0)curSelectedBlock = (curSelectedBlock % 10) + 10;
     }
+
+    //Block placement
+    if(InputSystem::GetKeyPressed(KeyCode::RIGHTMOUSE) && UIComponent::GetBlockIconType(curSelectedBlock) != BlockType::Air)
+        PlaceBlock(UIComponent::GetBlockIconType(curSelectedBlock));
+    if(InputSystem::GetKeyPressed(KeyCode::LEFTMOUSE))
+        PlaceBlock(BlockType::Air);
 }
 
 Transform* PlayerController::GetPlayerTrans()

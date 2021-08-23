@@ -120,6 +120,9 @@
     <ClCompile Include="src\Graphics\Materials\BlockIconMaterial.cpp">
       <Filter>Source Files\Graphics\Materials</Filter>
     </ClCompile>
+    <ClCompile Include="src\Graphics\Materials\UIElementMaterial.cpp">
+      <Filter>Source Files\Graphics\Materials</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\EnginePCH.h">
@@ -191,6 +194,9 @@
     <ClInclude Include="inc\Graphics\Materials\BlockIconMaterial.h">
       <Filter>Header Files\Graphics\Materials</Filter>
     </ClInclude>
+    <ClInclude Include="inc\Graphics\Materials\UIElementMaterial.h">
+      <Filter>Header Files\Graphics\Materials</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\VertexShaders\BasicVertexShader.hlsl">
@@ -233,6 +239,12 @@
       <Filter>Resource Files\VertexShaders</Filter>
     </FxCompile>
     <FxCompile Include="shaders\PixelShaders\UIBlockIconPS.hlsl">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\VertexShaders\UIElementVS.hlsl">
+      <Filter>Resource Files\VertexShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\PixelShaders\UIElementTransPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
   </ItemGroup>

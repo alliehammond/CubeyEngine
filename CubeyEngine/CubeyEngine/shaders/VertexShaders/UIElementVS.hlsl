@@ -11,15 +11,13 @@ cbuffer Frame : register(b1)
     float4 l;       // Only first 3 floats used
     float4 eyePos;  // Only first 3 floats used
 }
-//Uses block icon constant buffer
+//Uses ui element material
 cbuffer Object : register(b2)
 {
     //X position, Y position, width, height of block icon ui element
     //Width, height as percentage of screen size
     //Position between -1 and 1
     float4 posSize;
-    //First float - block type, second float - num blocks, third float - bool true if block icon selected
-    float4 blockTypeNumBlocks;
 }
 
 struct VertexData
