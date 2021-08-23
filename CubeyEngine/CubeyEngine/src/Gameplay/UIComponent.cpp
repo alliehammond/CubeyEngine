@@ -40,9 +40,11 @@ UIComponent::UIComponent(GameObject *owner) : Component(owner, "UIComponent")
     SetBlockIconType(0, BlockType::Dirt);
     SetBlockIconType(1, BlockType::Grass);
     SetBlockIconType(2, BlockType::Stone);
-    SetBlockIconType(3, BlockType::Log);
-    SetBlockIconType(4, BlockType::Leaf);
-    SetBlockIconType(5, BlockType::Plank);
+    SetBlockIconType(3, BlockType::Plank);
+    SetBlockIconType(4, BlockType::Log);
+    SetBlockIconType(5, BlockType::Leaf);
+    SetBlockIconType(6, BlockType::FlowerLeaf);
+    SetBlockIconType(7, BlockType::Glass);
 }
 
 UIComponent::~UIComponent()

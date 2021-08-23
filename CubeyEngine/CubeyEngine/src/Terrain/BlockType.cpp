@@ -37,6 +37,14 @@ namespace CBY
             {
                 return new TextureMaterial("BasicTextureVS.cso", "BasicTexturePS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "plankTexture.tga");
             }
+            case BlockType::Glass:
+            {
+                return new TextureMaterial("BasicTextureVS.cso", "BasicTextureTransPS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "glassTexture.tga");
+            }
+            case BlockType::FlowerLeaf:
+            {
+                return new TextureMaterial("BasicTextureVS.cso", "BasicTextureTransPS.cso", InputLayout::POSUVNORM, "BaseTextureMaterial", "flowerLeafTexture.tga");
+            }
             default:
                 LOGERROR("Invalid block type attempting to be loaded!");
         }

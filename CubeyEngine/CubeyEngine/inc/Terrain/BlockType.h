@@ -10,6 +10,8 @@ enum class BlockType : unsigned char
     Log,
     Leaf,
     Plank,
+    Glass,
+    FlowerLeaf,
     BLOCKCOUNT
 };
 
