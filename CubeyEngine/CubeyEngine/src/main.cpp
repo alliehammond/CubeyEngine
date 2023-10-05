@@ -34,6 +34,12 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstance, _
     GameObject *UI = ObjectManagerSystem::CreateObject(new GameObject("UI"));
     player->AddComponent<UIComponent>(new UIComponent(UI));
 
+    //Test
+    GameObject *test = ObjectManagerSystem::CreateObject(new GameObject("test"));
+    test->AddComponent<RenderComponent>(new RenderComponent("BasicCube.fbx", new Material("BasicParticleVS.cso", "BasicPixelShader.cso", InputLayout::POSCOLALPHA, "testMat"), test, CBY::Vector4(1.0f, 0.0f, 0.0f, 0.4f)));
+    test->GetComponent<Transform>()->pos.x = 1.0f;
+    test->GetComponent<Transform>()->pos.y = 100.0f;
+
 
     while(msg.message != WM_QUIT)
     {

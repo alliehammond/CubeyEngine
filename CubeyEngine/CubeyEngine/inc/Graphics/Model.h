@@ -10,12 +10,12 @@ class Model
 {
 public:
     //Meshes create a duplicate of mat
-    Model(std::string fileName, Material *mat, InputLayout IL);
+    Model(std::string fileName, Material *mat, InputLayout IL, CBY::Vector4 colorAlpha = CBY::Vector4());
     //Creates a model with no meshes
     Model();
     ~Model();
     //Deletes loaded model if one exists; returns true if successfully loaded model - meshes create a duplicate of mat
-    bool LoadModel(std::string fileName, Material *mat, InputLayout IL, CBY::Vector4 color = CBY::Vector4());
+    bool LoadModel(std::string fileName, Material *mat, InputLayout IL, CBY::Vector4 colAlpha);
     void AddMesh(Mesh *pMesh);
     void ClearModel();
     //Returns 0 if index out of range

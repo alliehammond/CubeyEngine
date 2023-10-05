@@ -6,6 +6,7 @@
 #include "Core\LoggingSystem.h"
 #include "Core\InputSystem.h"
 #include "CYMath\Vector.h"
+#include "CYMath\Vector4.h"
 #include "Core\GameObject.h"
 #include "Core\ObjectManagerSystem.h"
 #include "Graphics\GraphicsSystem.h"

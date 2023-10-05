@@ -1,9 +1,12 @@
 #pragma once
 
+#include "CYMath/Vector4.h"
+
 class Material
 {
 public:
     Material(std::string VS, std::string PS, InputLayout IL, std::string name_);
+    Material(std::string VS, std::string PS, InputLayout IL, std::string name_, CBY::Vector4 colAlpha) : Material(VS, PS, IL, name_) { colorAlpha = colAlpha; }
     virtual ~Material() {}
     virtual void BindConstantBuffer(DirectX::XMMATRIX *worldMatrix, DirectX::XMMATRIX *rotationMatrix);
     virtual void BindMaterial();
@@ -18,6 +21,8 @@ private:
     std::string name = "Material";
     unsigned int vertexSize;
     InputLayout ILayout;
+
+    CBY::Vector4 colorAlpha;
     
     static ID3D11Buffer *constantBufferMaterial;
 protected:

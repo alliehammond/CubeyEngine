@@ -7,9 +7,9 @@
 
 const std::string modelPath = "../resources/models/";
 
-Model::Model(std::string fileName, Material *mat, InputLayout IL)
+Model::Model(std::string fileName, Material *mat, InputLayout IL, CBY::Vector4 colorAlpha)
 {
-    LoadModel(fileName, mat, IL);
+    LoadModel(fileName, mat, IL, colorAlpha);
 }
 
 Model::~Model()
@@ -17,7 +17,7 @@ Model::~Model()
     ClearModel();
 }
 
-bool Model::LoadModel(std::string fileName, Material *mat, InputLayout IL, CBY::Vector4 color)
+bool Model::LoadModel(std::string fileName, Material *mat, InputLayout IL, CBY::Vector4 colAlpha)
 {
     if(!meshes.empty())
     {
@@ -71,9 +71,9 @@ bool Model::LoadModel(std::string fileName, Material *mat, InputLayout IL, CBY::
             //Load vertices from assimp aiMesh struct
             for(unsigned int j = 0; j < curMesh->mNumVertices; ++j)
             {
-                verticesPosCol[j].color.x = color.x;
-                verticesPosCol[j].color.y = color.y;
-                verticesPosCol[j].color.z = color.z;
+                verticesPosCol[j].color.x = colAlpha.x;
+                verticesPosCol[j].color.y = colAlpha.y;
+                verticesPosCol[j].color.z = colAlpha.z;
                 verticesPosCol[j].position.x = curMesh->mVertices[j].x;
                 verticesPosCol[j].position.y = curMesh->mVertices[j].y;
                 verticesPosCol[j].position.z = curMesh->mVertices[j].z;
@@ -87,10 +87,10 @@ bool Model::LoadModel(std::string fileName, Material *mat, InputLayout IL, CBY::
             //Load vertices from assimp aiMesh struct
             for(unsigned int j = 0; j < curMesh->mNumVertices; ++j)
             {
-                verticesPosColAlpha[j].colorAlpha.x = color.x;
-                verticesPosColAlpha[j].colorAlpha.y = color.y;
-                verticesPosColAlpha[j].colorAlpha.z = color.z;
-                verticesPosColAlpha[j].colorAlpha.w = color.w;
+                verticesPosColAlpha[j].colorAlpha.x = colAlpha.x;
+                verticesPosColAlpha[j].colorAlpha.y = colAlpha.y;
+                verticesPosColAlpha[j].colorAlpha.z = colAlpha.z;
+                verticesPosColAlpha[j].colorAlpha.w = colAlpha.w;
                 verticesPosColAlpha[j].position.x = curMesh->mVertices[j].x;
                 verticesPosColAlpha[j].position.y = curMesh->mVertices[j].y;
                 verticesPosColAlpha[j].position.z = curMesh->mVertices[j].z;

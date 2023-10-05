@@ -9,9 +9,10 @@ RenderComponent::RenderComponent(std::string modelFileName, GameObject *owner) :
     pModel = new Model(modelFileName, &mat, mat.GetInputLayout());
 }
 
-RenderComponent::RenderComponent(std::string modelFileName, Material* mat, GameObject* owner) : Component(owner, "RenderComponent")
+RenderComponent::RenderComponent(std::string modelFileName, Material* mat, GameObject *owner, CBY::Vector4 colorAlpha) : Component(owner, "RenderComponent")
 {
-    pModel = new Model(modelFileName, mat, mat->GetInputLayout());
+    pModel = new Model(modelFileName, mat, mat->GetInputLayout(), colorAlpha);
+    if(colorAlpha.w < 1.0f)transparent = true;
 }
 
 RenderComponent::RenderComponent(Model *Model, GameObject* owner)
