@@ -247,5 +247,8 @@
     <FxCompile Include="shaders\PixelShaders\UIElementTransPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
+    <FxCompile Include="shaders\VertexShaders\BasicParticleVS.hlsl">
+      <Filter>Resource Files\VertexShaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
