@@ -20,7 +20,7 @@ cbuffer Object : register(b2)
 struct VertexData
 {
     float3 position : POSITION;
-    float3 color : COLOR;
+    float4 colorAlpha : COLOR;
 };
 
 struct VertexShaderOutput
@@ -35,7 +35,7 @@ VertexShaderOutput main(VertexData IN)
 
     matrix mvp = mul(projectionMatrix, mul(viewMatrix, worldMatrix));
     OUT.position = mul(mvp, float4(IN.position, 1.0f));
-    OUT.color = float4(IN.color, 1.0f);
+    OUT.color = IN.colorAlpha;
 
     return OUT;
 }
