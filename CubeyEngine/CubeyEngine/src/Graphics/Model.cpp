@@ -17,7 +17,7 @@ Model::~Model()
     ClearModel();
 }
 
-bool Model::LoadModel(std::string fileName, Material *mat, InputLayout IL)
+bool Model::LoadModel(std::string fileName, Material *mat, InputLayout IL, CBY::Vector4 color)
 {
     if(!meshes.empty())
     {
@@ -62,6 +62,7 @@ bool Model::LoadModel(std::string fileName, Material *mat, InputLayout IL)
         ZeroMemory(&resourceData, sizeof(D3D11_SUBRESOURCE_DATA));
 
         VertexPosCol *verticesPosCol = 0;
+        VertexPosColAlpha *verticesPosColAlpha = 0;
         VertexPosUV *verticesPosUV = 0;
 
         if(IL == InputLayout::POSCOL)
@@ -70,15 +71,32 @@ bool Model::LoadModel(std::string fileName, Material *mat, InputLayout IL)
             //Load vertices from assimp aiMesh struct
             for(unsigned int j = 0; j < curMesh->mNumVertices; ++j)
             {
-                verticesPosCol[j].color.x = (rand() % 100) / 100.0f;
-                verticesPosCol[j].color.y = (rand() % 100) / 100.0f;
-                verticesPosCol[j].color.z = (rand() % 100) / 100.0f;
+                verticesPosCol[j].color.x = color.x;
+                verticesPosCol[j].color.y = color.y;
+                verticesPosCol[j].color.z = color.z;
                 verticesPosCol[j].position.x = curMesh->mVertices[j].x;
                 verticesPosCol[j].position.y = curMesh->mVertices[j].y;
                 verticesPosCol[j].position.z = curMesh->mVertices[j].z;
             }
             vertexBufferDesc.ByteWidth = sizeof(VertexPosCol) * curMesh->mNumVertices;
             resourceData.pSysMem = verticesPosCol;
+        }
+        else if(IL == InputLayout::POSCOLALPHA)
+        {
+            verticesPosColAlpha = new VertexPosColAlpha[curMesh->mNumVertices];
+            //Load vertices from assimp aiMesh struct
+            for(unsigned int j = 0; j < curMesh->mNumVertices; ++j)
+            {
+                verticesPosColAlpha[j].colorAlpha.x = color.x;
+                verticesPosColAlpha[j].colorAlpha.y = color.y;
+                verticesPosColAlpha[j].colorAlpha.z = color.z;
+                verticesPosColAlpha[j].colorAlpha.w = color.w;
+                verticesPosColAlpha[j].position.x = curMesh->mVertices[j].x;
+                verticesPosColAlpha[j].position.y = curMesh->mVertices[j].y;
+                verticesPosColAlpha[j].position.z = curMesh->mVertices[j].z;
+            }
+            vertexBufferDesc.ByteWidth = sizeof(VertexPosColAlpha) * curMesh->mNumVertices;
+            resourceData.pSysMem = verticesPosColAlpha;
         }
         else if(IL == InputLayout::POSUV)
         {

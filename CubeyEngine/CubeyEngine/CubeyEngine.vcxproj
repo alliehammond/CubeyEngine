@@ -209,6 +209,7 @@
     <ClInclude Include="inc\Core\LoggingSystem.h" />
     <ClInclude Include="inc\Core\ObjectManagerSystem.h" />
     <ClInclude Include="inc\CYMath\Vector.h" />
+    <ClInclude Include="inc\CYMath\Vector4.h" />
     <ClInclude Include="inc\EnginePCH.h" />
     <ClInclude Include="inc\GameDefines.h" />
     <ClInclude Include="inc\Gameplay\PlayerController.h" />

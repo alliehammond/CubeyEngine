@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Graphics\Mesh.h"
+#include "Graphics/Mesh.h"
+#include "CYMath/Vector4.h"
 #include "d3d11.h"
 #include <vector>
 #include <string>
@@ -14,7 +15,7 @@ public:
     Model();
     ~Model();
     //Deletes loaded model if one exists; returns true if successfully loaded model - meshes create a duplicate of mat
-    bool LoadModel(std::string fileName, Material *mat, InputLayout IL);
+    bool LoadModel(std::string fileName, Material *mat, InputLayout IL, CBY::Vector4 color = CBY::Vector4());
     void AddMesh(Mesh *pMesh);
     void ClearModel();
     //Returns 0 if index out of range
