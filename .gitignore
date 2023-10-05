@@ -12,7 +12,6 @@
 
 # Compiled stuff
 *.cso
-*.pdb
 *.exe
 
 # User-specific files (MonoDevelop/Xamarin Studio)
