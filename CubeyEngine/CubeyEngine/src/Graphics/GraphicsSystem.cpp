@@ -363,8 +363,8 @@ void GraphicsSystem::LoadInputLayouts()
 {
     D3D11_INPUT_ELEMENT_DESC vertexLayoutDesc[] =
     {
-        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offsetof(VertexPosColor, position), D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offsetof(VertexPosColor, color), D3D11_INPUT_PER_VERTEX_DATA, 0 }
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offsetof(VertexPosCol, position), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offsetof(VertexPosCol, color), D3D11_INPUT_PER_VERTEX_DATA, 0 }
     };
 
     ID3DBlob* vertexShaderBlob;
@@ -376,6 +376,22 @@ void GraphicsSystem::LoadInputLayouts()
         LOGWARNING("Failed to create input layout POSCOL!");
     else
         LOGDEBUG("Created input layout POSCOL");
+
+    D3D11_INPUT_ELEMENT_DESC vertexLayoutDescPosColAlpha[] =
+    {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offsetof(VertexPosColAlpha, position), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, offsetof(VertexPosColAlpha, colorAlpha), D3D11_INPUT_PER_VERTEX_DATA, 0 }
+    };
+
+    hr = D3DReadFileToBlob(L"BasicParticleVS.cso", &vertexShaderBlob);
+
+    hr = d3dDevice->CreateInputLayout(vertexLayoutDescPosColAlpha, _countof(vertexLayoutDescPosColAlpha), vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &inputLayouts[InputLayout::POSCOLALPHA]);
+
+    SafeRelease(vertexShaderBlob);
+    if(FAILED(hr))
+        LOGWARNING("Failed to create input layout POSCOLALPHA!");
+    else
+        LOGDEBUG("Created input layout POSCOLALPHA");
 
     D3D11_INPUT_ELEMENT_DESC vertexLayoutDesc1[] =
     {

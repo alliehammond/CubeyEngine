@@ -247,7 +247,6 @@ BlockType TerrainManagerSystem::GetBlockInLoadedChunk(int x, int y, int z)
     return pChunk->GetBlockChunkRelative(x - cx * CBYDefines::ChunkSize, y - cy * CBYDefines::ChunkSize, z - cz * CBYDefines::ChunkSize);
 }
 
-
 //Don't modify this function - will invalidate all region files
 unsigned __int64 TerrainManagerSystem::HashChunkCoord(short cX, short cY, short cZ)
 {

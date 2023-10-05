@@ -61,12 +61,12 @@ bool Model::LoadModel(std::string fileName, Material *mat, InputLayout IL)
         D3D11_SUBRESOURCE_DATA resourceData;
         ZeroMemory(&resourceData, sizeof(D3D11_SUBRESOURCE_DATA));
 
-        VertexPosColor *verticesPosCol = 0;
+        VertexPosCol *verticesPosCol = 0;
         VertexPosUV *verticesPosUV = 0;
 
         if(IL == InputLayout::POSCOL)
         {
-            verticesPosCol = new VertexPosColor[curMesh->mNumVertices];
+            verticesPosCol = new VertexPosCol[curMesh->mNumVertices];
             //Load vertices from assimp aiMesh struct
             for(unsigned int j = 0; j < curMesh->mNumVertices; ++j)
             {
@@ -77,7 +77,7 @@ bool Model::LoadModel(std::string fileName, Material *mat, InputLayout IL)
                 verticesPosCol[j].position.y = curMesh->mVertices[j].y;
                 verticesPosCol[j].position.z = curMesh->mVertices[j].z;
             }
-            vertexBufferDesc.ByteWidth = sizeof(VertexPosColor) * curMesh->mNumVertices;
+            vertexBufferDesc.ByteWidth = sizeof(VertexPosCol) * curMesh->mNumVertices;
             resourceData.pSysMem = verticesPosCol;
         }
         else if(IL == InputLayout::POSUV)

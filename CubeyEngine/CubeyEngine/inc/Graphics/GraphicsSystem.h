@@ -15,10 +15,16 @@ using DirectX::XMVECTOR;
 //*****************************************
 //Input Layouts
 //*****************************************
-struct VertexPosColor
+struct VertexPosCol
 {
     XMFLOAT3 position;
     XMFLOAT3 color;
+};
+struct VertexPosColAlpha
+{
+    XMFLOAT3 position;
+    //RGBA (Alpha between 0 and 1)
+    XMFLOAT4 colorAlpha;
 };
 struct VertexPosUV
 {
@@ -35,11 +41,12 @@ struct VertexPosUVNorm
 enum InputLayout
 {
     POSCOL = 0,
+    POSCOLALPHA,
     POSUV,
     POSUVNORM,
     INPUTLAYOUTCOUNT
 };
-const unsigned int InputLayoutVertexSizes[InputLayout::INPUTLAYOUTCOUNT] = { sizeof(VertexPosColor), sizeof(VertexPosUV), sizeof(VertexPosUVNorm) };
+const unsigned int InputLayoutVertexSizes[InputLayout::INPUTLAYOUTCOUNT] = { sizeof(VertexPosCol), sizeof(VertexPosColAlpha), sizeof(VertexPosUV), sizeof(VertexPosUVNorm) };
 
 struct FrameConstantBuffer
 {
