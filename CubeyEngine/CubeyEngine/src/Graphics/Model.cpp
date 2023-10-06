@@ -35,7 +35,6 @@ bool Model::LoadModel(std::string fileName, Material *mat, InputLayout IL, CBY::
         aiProcess_MakeLeftHanded |
         aiProcess_FlipUVs);
 
-    //If the import failed, report it
     if(!scene) {
         LOGWARNING("Failed to load model from " + path);
         return false;
@@ -50,7 +49,7 @@ bool Model::LoadModel(std::string fileName, Material *mat, InputLayout IL, CBY::
         totalFaces += curMesh->mNumFaces;
         totalVerts += curMesh->mNumVertices;
 
-        //Create an initialize the vertex buffer.
+        //Create and initialize the vertex buffer.
         D3D11_BUFFER_DESC vertexBufferDesc;
         ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
 
@@ -148,7 +147,7 @@ bool Model::LoadModel(std::string fileName, Material *mat, InputLayout IL, CBY::
         indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
         resourceData.pSysMem = indices;
 
-        std::string str = "Loaded model from " + path + "! V:" + std::to_string(totalVerts) + " F:" + std::to_string(totalFaces);
+        std::string str = "Loaded mesh from " + path + "! V:" + std::to_string(totalVerts) + " F:" + std::to_string(totalFaces);
         LOGDEBUG(str);
 
         hr = GraphicsSystem::GetD3DDevice()->CreateBuffer(&indexBufferDesc, &resourceData, &newMesh->indexBuffer);

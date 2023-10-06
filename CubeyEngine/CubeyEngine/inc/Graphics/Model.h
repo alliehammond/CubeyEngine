@@ -10,7 +10,7 @@ class Model
 {
 public:
     //Meshes create a duplicate of mat
-    Model(std::string fileName, Material *mat, InputLayout IL, CBY::Vector4 colorAlpha = CBY::Vector4());
+    Model(std::string fileName, Material *mat, InputLayout IL, CBY::Vector4 colorAlpha = CBY::Vector4(0.0f, 0.0f, 0.0f, 1.0f));
     //Creates a model with no meshes
     Model();
     ~Model();
