@@ -200,6 +200,9 @@
     <ClInclude Include="inc\CYMath\Vector4.h">
       <Filter>Header Files\CYMath</Filter>
     </ClInclude>
+    <ClInclude Include="inc\CYMath\RGBColor_16.h">
+      <Filter>Header Files\CYMath</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\VertexShaders\BasicVertexShader.hlsl">

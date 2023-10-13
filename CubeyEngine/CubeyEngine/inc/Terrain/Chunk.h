@@ -29,6 +29,8 @@ private:
     void SetBlockChunkRelative(short x, short y, short z, BlockType type);
     std::vector<BlockType> blocks;
     GameObject *blockTerrain;
+    //Maybe this could later be moved and have it stored in constant buffer/only store on cpu for actively changing chunks
+    //std::vector
 
     friend class TerrainManagerSystem;
 };

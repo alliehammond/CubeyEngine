@@ -212,6 +212,7 @@
     <ClInclude Include="inc\Core\InputSystem.h" />
     <ClInclude Include="inc\Core\LoggingSystem.h" />
     <ClInclude Include="inc\Core\ObjectManagerSystem.h" />
+    <ClInclude Include="inc\CYMath\RGBColor_16.h" />
     <ClInclude Include="inc\CYMath\Vector.h" />
     <ClInclude Include="inc\CYMath\Vector4.h" />
     <ClInclude Include="inc\EnginePCH.h" />
