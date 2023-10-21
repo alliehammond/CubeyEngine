@@ -1,5 +1,6 @@
 #pragma once
 #include "Core\CubeySystem.h"
+#include "GameDefines.h"
 #include "d3d11.h"
 #include <DirectXMath.h>
 #include <string>
@@ -58,6 +59,7 @@ struct FrameConstantBuffer
     XMFLOAT4 eyePos;
 };
 
+struct ChunkConstantBuffer;
 class Texture;
 
 //Manages creation and deletion of objects
@@ -135,7 +137,8 @@ private:
     static bool lockMouseCenter;
     static bool windowMinimized;
 
-    //3 Different constant buffers - updated rarely, per frame, and per object - reduces how much data needs to be rewritten
+    //Constant buffer slots: 0 - Application, 1 - Frame, 2 - Object, 3 - Chunk
+    //3 Different constant buffers - updated rarely, per frame and per object - reduces how much data needs to be rewritten
     enum ConstantBuffer
     {
         CB_Application,

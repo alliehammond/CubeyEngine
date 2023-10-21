@@ -25,7 +25,7 @@ void LoggingSystem::Update(float dt)
         fpsTimer = 0.0f;
         std::string framerate = "FPS:";
         framerate += std::to_string(int(1.0f/dt));
-        //LOGDEBUG(framerate);
+        LOGDEBUG(framerate);
     }
     //Print all messages in the queue to the console window
     while(!messageQueue.empty())

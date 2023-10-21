@@ -31,6 +31,21 @@ void Chunk::LoadChunk()
     }
 }
 
+void Chunk::UpdateConstantBuffer()
+{
+    D3D11_BUFFER_DESC constantBufferChunkDesc;
+    ZeroMemory(&constantBufferChunkDesc, sizeof(D3D11_BUFFER_DESC));
+
+    constantBufferChunkDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    constantBufferChunkDesc.ByteWidth = sizeof(ChunkConstantBuffer);
+    constantBufferChunkDesc.CPUAccessFlags = 0;
+    constantBufferChunkDesc.Usage = D3D11_USAGE_DEFAULT;
+
+    auto hr = GraphicsSystem::GetD3DDevice()->CreateBuffer(&constantBufferChunkDesc, nullptr, &constantBuffer);
+    if(FAILED(hr))
+        LOGERROR("Failed to create constant buffer!");
+}
+
 //Creates the chunk mesh once blocks vector has been filled and numBlocks has been set to number of non-air blocks
 void Chunk::CreateChunkMesh()
 {
@@ -53,6 +68,13 @@ void Chunk::CreateChunkMesh()
         blockTypeVertices.push_back(std::vector<VertexPosUVNorm>());
         blockTypeIndices.push_back(std::vector<unsigned int>());
     }
+
+    //TEMP SET LIGHT VECTOR
+    for(unsigned int i = 0; i < CBYDefines::ChunkSize * CBYDefines::ChunkSize * CBYDefines::ChunkSize; ++i)
+    {
+        constantBufferStruct.lightValues[i].setBlue(unsigned char(i % 16));
+    }
+    UpdateConstantBuffer();
 
     for(unsigned int i = 0; i < CBYDefines::ChunkSize; ++i)
     {
@@ -230,6 +252,22 @@ void Chunk::SetBlock(short x, short y, short z, BlockType type, bool regenMesh)
     SetBlockChunkRelative(x, y, z, type);
 
     if(regenMesh)CreateChunkMesh();
+}
+
+void Chunk::SetBlockLight(short x, short y, short z, unsigned char red, unsigned char green, unsigned char blue, bool regenCBuf)
+{
+    assert(x >= 0 && x <= 15 &&
+           y >= 0 && y <= 15 &&
+           z >= 0 && z <= 15);
+
+    constantBufferStruct.lightValues[x + y * 16 + z * 16].setColorQuick(red, green, blue);
+    UpdateConstantBuffer();
+
+    //Regenerate constant buffer
+    if(regenCBuf)
+    {
+        //this is the todo before passing cbuf to shader and rendering it
+    }
 }
 
 //Don't use this function to set blocks in empty chunk

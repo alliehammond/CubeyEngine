@@ -764,6 +764,21 @@ void GraphicsSystem::RenderObject(GameObject* pObject, float dt)
 {
     Transform *pTrans = pObject->GetComponent<Transform>();
 
+    static Chunk *curChunk = 0;
+    Chunk *newChunk = TerrainManagerSystem::GetChunkFromWorldCoordinates((int)pTrans->pos.x, (int)pTrans->pos.y, (int)pTrans->pos.z);
+
+    // Update chunk constant buffer if necessary (new chunk)
+    if(newChunk != curChunk)
+    {
+        curChunk = newChunk;
+
+        if(curChunk)
+        {
+            d3dDeviceContext->VSSetConstantBuffers(3, 1, &curChunk->constantBuffer);
+            d3dDeviceContext->PSSetConstantBuffers(3, 1, &curChunk->constantBuffer);
+        }
+    }
+
     DirectX::XMMATRIX translationMatrix = XMMatrixTranslation(pTrans->pos.x, pTrans->pos.y, pTrans->pos.z);
     DirectX::XMMATRIX scaleMatrix = XMMatrixScaling(pTrans->scale.x, pTrans->scale.y, pTrans->scale.z);
     DirectX::XMMATRIX rotationMatrix = XMMatrixRotationRollPitchYaw(pTrans->rot.x, pTrans->rot.y, pTrans->rot.z);
@@ -782,9 +797,9 @@ void GraphicsSystem::RenderObject(GameObject* pObject, float dt)
         d3dDeviceContext->IASetIndexBuffer(pMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
         d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        d3dDeviceContext->VSSetConstantBuffers(0, 2, d3dConstantBuffers);
+        d3dDeviceContext->VSSetConstantBuffers(0, ConstantBuffer::NumConstantBuffers, d3dConstantBuffers);
         d3dDeviceContext->VSSetConstantBuffers(2, 1, &pMesh->material->constantBuffer);
-        d3dDeviceContext->PSSetConstantBuffers(0, 2, d3dConstantBuffers);
+        d3dDeviceContext->PSSetConstantBuffers(0, ConstantBuffer::NumConstantBuffers, d3dConstantBuffers);
         d3dDeviceContext->PSSetConstantBuffers(2, 1, &pMesh->material->constantBuffer);
 
         d3dDeviceContext->RSSetState(d3dRasterizerState);

@@ -1,14 +1,12 @@
 #pragma once
-
-#include <climits>
-
+#include "Terrain/Chunk.h"
 namespace CBY
 {
     //Uses 4 bits to store each red, green, blue
     //Each color component goes from 0-15
     struct RGBColor_16
     {
-        RGBColor_16() : color(SHRT_MAX) {}
+        RGBColor_16() : color(0) {}
         RGBColor_16(unsigned char r, unsigned char g, unsigned char b) { setColor(r, g, b); }
 
         unsigned char getRed() { return color % 16; }
@@ -22,7 +20,7 @@ namespace CBY
             g = (g < 16) ? g : 15;
             b = (b < 16) ? b : 15;
 
-            color = r + 16 * g + 16 * 16 * b;
+            setColorQuick(r, g, b);
         }
         void setRed(unsigned char r) { setColor(r, getGreen(), getBlue()); }
         void setGreen(unsigned char g) { setColor(getRed(), g, getBlue()); }
@@ -31,6 +29,13 @@ namespace CBY
     private:
         //Blue stored as higher bits, red lowest
         unsigned short color;
+
+        inline void setColorQuick(unsigned char r, unsigned char g, unsigned char b)
+        {
+            color = r + 16 * g + 16 * 16 * b;
+        }
+
+        friend class Chunk;
     };
 
 };

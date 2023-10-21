@@ -99,6 +99,11 @@ Chunk* TerrainManagerSystem::GetChunk(short cX, short cY, short cZ)
     return it->second;
 }
 
+Chunk *TerrainManagerSystem::GetChunkFromWorldCoordinates(int x, int y, int z)
+{
+    return GetChunk(GetChunkCoordinate(x), GetChunkCoordinate(y), GetChunkCoordinate(z));
+}
+
 //Gets the corresponding chunk coordinate to inputted block coordinate  
 short TerrainManagerSystem::GetChunkCoordinate(int n)
 {
