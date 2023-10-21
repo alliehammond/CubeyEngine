@@ -15,6 +15,7 @@ Chunk::Chunk(short xLoc, short yLoc, short zLoc, bool empty_) : x(xLoc), y(yLoc)
 Chunk::~Chunk()
 {
     if(blockTerrain)blockTerrain->Delete();
+    SafeRelease(constantBuffer);
 }
 
 //Generate a chunk without loading chunk data
