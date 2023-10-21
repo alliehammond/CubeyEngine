@@ -34,6 +34,7 @@ private:
     void CreateChunkMesh();
     //Don't use this function to set blocks in empty chunk
     void SetBlockChunkRelative(short x, short y, short z, BlockType type);
+    void CreateConstantBuffer();
     void UpdateConstantBuffer();
 
 
