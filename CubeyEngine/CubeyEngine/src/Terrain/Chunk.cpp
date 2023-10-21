@@ -3,7 +3,7 @@
 #include "Graphics\RenderComponent.h"
 #include "Graphics\Materials\TextureMaterial.h"
 
-Chunk::Chunk(short xLoc, short yLoc, short zLoc, bool empty_) : x(xLoc), y(yLoc), z(zLoc), empty(empty_), blockTerrain(0)
+Chunk::Chunk(short xLoc, short yLoc, short zLoc, bool empty_) : x(xLoc), y(yLoc), z(zLoc), empty(empty_), blockTerrain(0), constantBuffer(0)
 {
     if(!empty)
     {
@@ -31,7 +31,7 @@ void Chunk::LoadChunk()
     }
 }
 
-void Chunk::UpdateConstantBuffer()
+void Chunk::CreateConstantBuffer()
 {
     D3D11_BUFFER_DESC constantBufferChunkDesc;
     ZeroMemory(&constantBufferChunkDesc, sizeof(D3D11_BUFFER_DESC));
@@ -44,6 +44,13 @@ void Chunk::UpdateConstantBuffer()
     auto hr = GraphicsSystem::GetD3DDevice()->CreateBuffer(&constantBufferChunkDesc, nullptr, &constantBuffer);
     if(FAILED(hr))
         LOGERROR("Failed to create constant buffer!");
+
+    UpdateConstantBuffer();
+}
+
+void Chunk::UpdateConstantBuffer()
+{
+    GraphicsSystem::GetD3DDeviceContext()->UpdateSubresource(constantBuffer, 0, nullptr, &constantBufferStruct, 0, 0);
 }
 
 //Creates the chunk mesh once blocks vector has been filled and numBlocks has been set to number of non-air blocks
@@ -74,7 +81,7 @@ void Chunk::CreateChunkMesh()
     {
         constantBufferStruct.lightValues[i].setBlue(unsigned char(i % 16));
     }
-    UpdateConstantBuffer();
+    CreateConstantBuffer();
 
     for(unsigned int i = 0; i < CBYDefines::ChunkSize; ++i)
     {
@@ -266,7 +273,7 @@ void Chunk::SetBlockLight(short x, short y, short z, unsigned char red, unsigned
     //Regenerate constant buffer
     if(regenCBuf)
     {
-        //this is the todo before passing cbuf to shader and rendering it
+        UpdateConstantBuffer();
     }
 }
 
